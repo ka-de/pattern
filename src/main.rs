@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use rand::Rng; // Add this
+use rand::Rng;
 
 #[derive(Component)]
 struct Person;
@@ -11,19 +11,16 @@ struct Name(String);
 struct Age(u32);
 
 #[derive(Component)]
-struct MaxAge(u32); // New component
+struct MaxAge(u32);
 
 fn add_people(mut commands: Commands) {
     let mut rng = rand::thread_rng();
-    for _ in 0..3 {
+    let names = vec!["Elaina Proctor", "Renzo Hume", "Zayna Nieves"];
+
+    for name in names {
         let age: u32 = rng.gen_range(25..=35);
         let max_age: u32 = rng.gen_range((age + 1)..=100);
-        commands.spawn((
-            Person,
-            Name("Random Person".to_string()),
-            Age(age),
-            MaxAge(max_age),
-        ));
+        commands.spawn((Person, Name(name.to_string()), Age(age), MaxAge(max_age)));
     }
 }
 
