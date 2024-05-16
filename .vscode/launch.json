@@ -1,0 +1,45 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'pattern'",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=pattern",
+          "--package=pattern"
+        ],
+        "filter": {
+          "name": "pattern",
+          "kind": "bin"
+        }
+      },
+      "env": {
+        "PATH": "C:\\Users\\kade\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin;C:\\Users\\kade\\Desktop\\rust\\pattern\\target\\debug\\deps;%PATH%"
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'pattern'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--bin=pattern",
+          "--package=pattern"
+        ],
+        "filter": {
+          "name": "pattern",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
