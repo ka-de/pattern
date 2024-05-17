@@ -3,7 +3,7 @@ use bevy::prelude::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_startup_system(setup_cam)
+        .add_systems(Startup, setup_cam)
         .run()
 }
 

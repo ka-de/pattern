@@ -19,7 +19,7 @@
       },
       "env": {
         "CARGO_MANIFEST_DIR": "${workspaceFolder}",
-        "RUSTFLAGS": "-Clinker=rust-lld.exe -Zshare-generics=y -Zthreads=0",
+        "RUSTFLAGS": "-Clinker=rust-lld.exe -Zshare-generics=n -Zthreads=0",
         "PATH": "${env:HOME}/.rustup/toolchains/nightly-x86_64-pc-windows-msvc/bin;${workspaceFolder}/target/debug/deps;${env:PATH}"
       },
       "args": [],

@@ -18,7 +18,7 @@ rustflags = [
 
 [target.x86_64-pc-windows-msvc]
 linker = "rust-lld.exe"                           # Use LLD Linker
-rustflags = ["-Zshare-generics=y", "-Zthreads=0"]
+rustflags = ["-Zshare-generics=n", "-Zthreads=0"]
 
 #[profile.dev]
 #debug = 1
