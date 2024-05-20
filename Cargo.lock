@@ -669,15 +669,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_life"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6e1c89e978125052aa522342a18033ec65fd3ed00c0837e21d2097bcf98fa46"
-dependencies = [
- "bevy",
-]
-
-[[package]]
 name = "bevy_log"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2675,7 +2666,6 @@ name = "pattern"
 version = "1.0.0"
 dependencies = [
  "bevy",
- "bevy_life",
  "iyes_perf_ui",
  "rand",
 ]

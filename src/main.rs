@@ -1,3 +1,6 @@
+use rand::{thread_rng, Rng};
+use rand::seq::SliceRandom;
+
 use bevy::prelude::*;
 use bevy::utils::Duration;
 use bevy::input::mouse::MouseButtonInput;
@@ -9,14 +12,6 @@ use bevy::ecs::system::SystemParam;
 use bevy::window::PrimaryWindow;
 
 use iyes_perf_ui::prelude::*;
-
-use rand::seq::SliceRandom;
-use rand::thread_rng;
-
-fn get_random_element(elements: Vec<&str>) -> Option<&str> {
-    let mut rng = thread_rng();
-    elements.choose(&mut rng).cloned()
-}
 
 /**
  * Stores the world position of the mouse cursor.
@@ -38,6 +33,15 @@ pub struct TimeSinceLastClick {
 #[derive(Resource, Default)]
 pub struct TimeSinceLastKeypress {
     last_keypress: Duration,
+}
+
+
+/**
+ * The Cat Component 🐈‍⬛
+ */
+#[derive(Component)]
+struct Cat {
+    name: String,
 }
 
 /**
@@ -149,7 +153,7 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
 
     fn label(&self) -> &str {
         if self.label.is_empty() {
-            "Time since last click"
+            "T since last click"
         } else {
             &self.label
         }
@@ -201,7 +205,7 @@ impl PerfUiEntry for PerfUiTimeSinceLastKeypress {
 
     fn label(&self) -> &str {
         if self.label.is_empty() {
-            "Time since last key press"
+            "T since last key press"
         } else {
             &self.label
         }
@@ -302,18 +306,30 @@ fn cursor_system(
         .map(|ray| ray.origin.truncate())
     {
         coords.0 = world_position;
-        eprintln!("World coords: {}/{}", world_position.x, world_position.y);
+        eprintln!("CursorWorldCoordinate: {}/{}", world_position.x, world_position.y);
     }
 }
 
-fn setup(mut commands: Commands, ass: Res<AssetServer>) {
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((Camera2dBundle::default(), MainCamera));
+
+    let cat_names = vec![
+        "picard", "beverly", "data", "troi", "laforge", "crusher", "yar", "kirk",
+    ];
+
+    let mut rng = thread_rng();
+
+    for _ in 0..5 { // Spawn 5 cats
+        let name = cat_names.choose(&mut rng).unwrap().to_string();
+        commands.spawn((Cat { name: name.clone() },));
+        println!("Spawned cat with name: {}", name);
+    }
 
     commands.spawn((
         PerfUiRoot {
-            font_label: ass.load("bahnschrift.ttf"),
-            font_value: ass.load("bahnschrift.ttf"),
-            font_highlight: ass.load("bahnschrift.ttf"),
+            font_label: asset_server.load("bahnschrift.ttf"),
+            font_value: asset_server.load("bahnschrift.ttf"),
+            font_highlight: asset_server.load("bahnschrift.ttf"),
             values_col_width: Some(80.0),
             ..default()
         },
@@ -325,31 +341,6 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
 }
 
 fn main() {
-    let st_names = vec![
-        "picard", "beverly", "data", "troi", "laforge", "crusher", "yar", "kirk",
-        "spock", "mccoy", "scotty", "uhura", "sulu", "chekov", "chakotay", "tuvok",
-        "sisko", "kira", "dax", "bashir", "odo", "quark", "archer", "tucker",
-        "tpol", "reed", "mayweather", "phlox", "sato", "sevenofnine", "thedoctor",
-        "tomparis", "harrykim", "belanna", "torres", "jeanluc", "lorca", "burnham",
-        "saru", "stamets", "tilly", "georgiou", "culber", "cornwell", "leland",
-        "vance", "reno", "booker", "grudge", "shaxs", "detmer", "owosekun", "rhys",
-        "pike", "number-one", "laan", "chapel", "kyle", "vina", "mudd", "garak",
-        "leyton", "ross", "nog", "jake", "seven", "janeway", "tuvix", "neelix",
-        "kes", "carey", "vorik", "wildman", "zahir", "seska", "jonas", "rio",
-        "maxwell", "tryla", "lorian", "icheb", "q", "guinan", "pulaski", "ro",
-        "hwomyn", "riker", "shelby", "obrien", "keiko", "molly", "kirayoshi",
-        "naomi", "ezri", "kassidy", "leeta", "nog", "rom", "brunt", "ishka", "worf",
-        "martok", "grilka", "sharan", "alexander", "kehleyr", "lwaxana", "kamala",
-        "vash", "tasha", "ogawa", "barclay", "maddox", "soong", "juliana", "sela",
-        "toral", "ziyal", "dukat", "damar", "weyoun", "eddington", "michael",
-        "sarina", "hugh", "lore", "el-aurian"
-    ];
-
-    match get_random_element(st_names) {
-        Some(name) => println!("Cat's random name is: {}", name),
-        None => println!("The vector is empty!"),
-    }
-
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
