@@ -1,4 +1,4 @@
-use rand::{thread_rng, Rng};
+use rand::thread_rng;
 use rand::seq::SliceRandom;
 
 use bevy::prelude::*;
@@ -153,7 +153,7 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
 
     fn label(&self) -> &str {
         if self.label.is_empty() {
-            "T since last click"
+            "Time since last click"
         } else {
             &self.label
         }
@@ -205,7 +205,7 @@ impl PerfUiEntry for PerfUiTimeSinceLastKeypress {
 
     fn label(&self) -> &str {
         if self.label.is_empty() {
-            "T since last key press"
+            "Time since last key press"
         } else {
             &self.label
         }
@@ -319,11 +319,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     let mut rng = thread_rng();
 
-    for _ in 0..5 { // Spawn 5 cats
-        let name = cat_names.choose(&mut rng).unwrap().to_string();
-        commands.spawn((Cat { name: name.clone() },));
-        println!("Spawned cat with name: {}", name);
-    }
+    let name = cat_names.choose(&mut rng).unwrap().to_string();
+    commands.spawn((Cat { name: name.clone() },));
+    println!("Cat name: {}", name);
 
     commands.spawn((
         PerfUiRoot {
