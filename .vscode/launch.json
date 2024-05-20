@@ -7,11 +7,7 @@
       "sourceLanguages": ["rust"],
       "name": "Debug Pattern",
       "cargo": {
-        "args": [
-          "build",
-          "--bin=pattern",
-          "--package=pattern"
-        ],
+        "args": ["build", "--bin=pattern", "--package=pattern"],
         "filter": {
           "name": "pattern",
           "kind": "bin"

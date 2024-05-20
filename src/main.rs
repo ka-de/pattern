@@ -6,7 +6,24 @@ use bevy::input::keyboard::KeyCode;
 use bevy::input::ButtonState;
 use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
+use bevy::window::PrimaryWindow;
+
 use iyes_perf_ui::prelude::*;
+
+use rand::seq::SliceRandom;
+use rand::thread_rng;
+
+fn get_random_element(elements: Vec<&str>) -> Option<&str> {
+    let mut rng = thread_rng();
+    elements.choose(&mut rng).cloned()
+}
+
+/**
+ * Stores the world position of the mouse cursor.
+ */
+#[derive(Resource, Default)]
+struct CursorWorldCoordinates(Vec2);
+
 
 #[derive(Resource, Default)]
 pub struct SpaceKeyPressCount {
@@ -22,6 +39,12 @@ pub struct TimeSinceLastClick {
 pub struct TimeSinceLastKeypress {
     last_keypress: Duration,
 }
+
+/**
+ * Identifies the main camera.
+ */
+#[derive(Component)]
+struct MainCamera;
 
 #[derive(Component)]
 pub struct PerfUiTimeSinceLastClick {
@@ -259,8 +282,32 @@ fn handle_keypress(
     }
 }
 
+fn cursor_system(
+    mut coords: ResMut<CursorWorldCoordinates>,
+    // Get the window
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    // Get the camera transform
+    camera_query: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+) {
+    // Get the camera info and transform
+    let (camera, camera_transform) = camera_query.single();
+
+    // There is only one primary window, so we can get it from the query:
+    let window = window_query.single();
+
+    // check if the cursor is inside the window and get its position
+    // then, ask bevy to convert into world coordinates, and truncate to discard Z
+    if let Some(world_position) = window.cursor_position()
+        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+        .map(|ray| ray.origin.truncate())
+    {
+        coords.0 = world_position;
+        eprintln!("World coords: {}/{}", world_position.x, world_position.y);
+    }
+}
+
 fn setup(mut commands: Commands, ass: Res<AssetServer>) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn((Camera2dBundle::default(), MainCamera));
 
     commands.spawn((
         PerfUiRoot {
@@ -278,6 +325,31 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
 }
 
 fn main() {
+    let st_names = vec![
+        "picard", "beverly", "data", "troi", "laforge", "crusher", "yar", "kirk",
+        "spock", "mccoy", "scotty", "uhura", "sulu", "chekov", "chakotay", "tuvok",
+        "sisko", "kira", "dax", "bashir", "odo", "quark", "archer", "tucker",
+        "tpol", "reed", "mayweather", "phlox", "sato", "sevenofnine", "thedoctor",
+        "tomparis", "harrykim", "belanna", "torres", "jeanluc", "lorca", "burnham",
+        "saru", "stamets", "tilly", "georgiou", "culber", "cornwell", "leland",
+        "vance", "reno", "booker", "grudge", "shaxs", "detmer", "owosekun", "rhys",
+        "pike", "number-one", "laan", "chapel", "kyle", "vina", "mudd", "garak",
+        "leyton", "ross", "nog", "jake", "seven", "janeway", "tuvix", "neelix",
+        "kes", "carey", "vorik", "wildman", "zahir", "seska", "jonas", "rio",
+        "maxwell", "tryla", "lorian", "icheb", "q", "guinan", "pulaski", "ro",
+        "hwomyn", "riker", "shelby", "obrien", "keiko", "molly", "kirayoshi",
+        "naomi", "ezri", "kassidy", "leeta", "nog", "rom", "brunt", "ishka", "worf",
+        "martok", "grilka", "sharan", "alexander", "kehleyr", "lwaxana", "kamala",
+        "vash", "tasha", "ogawa", "barclay", "maddox", "soong", "juliana", "sela",
+        "toral", "ziyal", "dukat", "damar", "weyoun", "eddington", "michael",
+        "sarina", "hugh", "lore", "el-aurian"
+    ];
+
+    match get_random_element(st_names) {
+        Some(name) => println!("Cat's random name is: {}", name),
+        None => println!("The vector is empty!"),
+    }
+
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
@@ -285,10 +357,12 @@ fn main() {
         .add_perf_ui_entry_type::<PerfUiTimeSinceLastClick>()
         .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
         .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
+        .init_resource::<CursorWorldCoordinates>()
         .init_resource::<TimeSinceLastClick>()
         .init_resource::<TimeSinceLastKeypress>()
         .init_resource::<SpaceKeyPressCount>()
         .add_systems(Startup, setup)
+        .add_systems(Update, cursor_system)
         .add_systems(Update, handle_click)
         .add_systems(Update, handle_keypress)
         .add_systems(Update, handle_space_keypress)
