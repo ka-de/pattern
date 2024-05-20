@@ -1,6 +1,4 @@
-use rand::thread_rng;
-use rand::seq::SliceRandom;
-
+use rand::prelude::*;
 use bevy::prelude::*;
 use bevy::utils::Duration;
 use bevy::input::mouse::MouseButtonInput;
@@ -10,8 +8,8 @@ use bevy::input::ButtonState;
 use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
 use bevy::window::PrimaryWindow;
-
 use iyes_perf_ui::prelude::*;
+use iyes_cli::prelude::*;
 
 /**
  * Stores the world position of the mouse cursor.
@@ -310,8 +308,13 @@ fn cursor_system(
     }
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+#[derive(Component)]
+struct DespawnTimeout(Timer);
+
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>, world: &mut World) {
     commands.spawn((Camera2dBundle::default(), MainCamera));
+    let camera = MainCamera;
+    world.spawn(camera);
 
     let cat_names = vec![
         "picard", "beverly", "data", "troi", "laforge", "crusher", "yar", "kirk",
@@ -350,10 +353,173 @@ fn main() {
         .init_resource::<TimeSinceLastClick>()
         .init_resource::<TimeSinceLastKeypress>()
         .init_resource::<SpaceKeyPressCount>()
-        .add_systems(Startup, setup)
+        .register_clicommand_noargs("version", show_version)
+        .register_clicommand_noargs("help", show_help)
+        .register_clicommand_noargs("spawn", spawn_sprite_random)
+        .register_clicommand_args("spawn", spawn_sprite_at)
+        .register_clicommand_noargs("despawn", despawn_sprites)
+        .add_systems(Startup, (setup, setup_console))
+        .add_systems(Update, (mouseclicks, console_text_input, despawn_timeout))
         .add_systems(Update, cursor_system)
         .add_systems(Update, handle_click)
         .add_systems(Update, handle_keypress)
         .add_systems(Update, handle_space_keypress)
         .run();
+}
+
+fn setup_console(world: &mut World) {
+    let font = world.resource::<AssetServer>().load("Ubuntu-R.ttf");
+    let console = world
+        .spawn(NodeBundle {
+            style: Style {
+                position_type: PositionType::Absolute,
+                bottom: Val::Percent(5.0),
+                left: Val::Percent(5.0),
+                top: Val::Auto,
+                right: Val::Auto,
+                padding: UiRect::all(Val::Px(8.0)),
+                align_items: AlignItems::Center,
+                ..Default::default()
+            },
+            background_color: BackgroundColor(Color::BEIGE),
+            ..Default::default()
+        })
+        .id();
+    let prompt_style = TextStyle {
+        font: font.clone(),
+        font_size: 24.0,
+        color: Color::RED,
+    };
+    let input_style = TextStyle {
+        font: font.clone(),
+        font_size: 16.0,
+        color: Color::BLACK,
+    };
+    let prompt = world
+        .spawn((
+            CliPrompt,
+            TextBundle {
+                text: Text::from_sections([
+                    TextSection::new("~ ", prompt_style),
+                    TextSection::new("", input_style),
+                ]),
+                ..Default::default()
+            },
+        ))
+        .id();
+    world.entity_mut(console).push_children(&[prompt]);
+}
+
+#[derive(Component)]
+struct CliPrompt;
+
+fn show_version() {
+    println!("TODO");
+}
+
+fn spawn_sprite_random(q_window: Query<&Window, With<PrimaryWindow>>, mut commands: Commands) {
+    let window = q_window.single();
+    let mut rng = thread_rng();
+    commands.spawn((
+        DespawnTimeout(Timer::new(Duration::from_secs(5), TimerMode::Once)),
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::PINK,
+                custom_size: Some(Vec2::splat(64.0)),
+                ..default()
+            },
+            transform: Transform::from_xyz(
+                rng.gen_range(0.0..window.width()),
+                rng.gen_range(0.0..window.height()),
+                1.0,
+            ),
+            ..default()
+        },
+    ));
+}
+
+fn spawn_sprite_at(In(args): In<Vec<String>>, mut commands: Commands) {
+    if args.len() != 2 {
+        error!("spawn command must take exactly 2 args!");
+        return;
+    }
+    let Ok(x) = args[0].parse::<f32>() else {
+        error!("spawn command args must be numbers!");
+        return;
+    };
+    let Ok(y) = args[1].parse::<f32>() else {
+        error!("spawn command args must be numbers!");
+        return;
+    };
+
+    commands.spawn((
+        DespawnTimeout(Timer::new(Duration::from_secs(5), TimerMode::Once)),
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::PINK,
+                custom_size: Some(Vec2::splat(64.0)),
+                ..default()
+            },
+            transform: Transform::from_xyz(x, y, 1.0),
+            ..default()
+        },
+    ));
+}
+
+fn despawn_sprites(mut commands: Commands, q: Query<Entity, With<Sprite>>) {
+    for e in &q {
+        commands.entity(e).despawn();
+    }
+}
+
+fn show_help(world: &mut World) {
+    let font = world.resource::<AssetServer>().load("bahnschrift.ttf");
+    let help_box = world
+        .spawn((
+            DespawnTimeout(Timer::new(Duration::from_secs(5), TimerMode::Once)),
+            NodeBundle {
+                style: Style {
+                    position_type: PositionType::Absolute,
+                    top: Val::Percent(5.0),
+                    left: Val::Percent(5.0),
+                    bottom: Val::Auto,
+                    right: Val::Auto,
+                    padding: UiRect::all(Val::Px(8.0)),
+                    align_items: AlignItems::Center,
+                    ..Default::default()
+                },
+                background_color: BackgroundColor(Color::BEIGE),
+                ..Default::default()
+            },
+        ))
+        .id();
+    let text_style = TextStyle {
+        font: font.clone(),
+        font_size: 12.0,
+        color: Color::BLACK,
+    };
+    let prompt = world
+        .spawn((TextBundle {
+            text: Text::from_section(
+                "Available console commands: \"help\", \"hello\", \"spawn\", \"spawn <x> <y>\", \"despawn\".\n
+                Left/Right mouse click will run \"spawn\"/\"despawn\".",
+                text_style,
+            ),
+            ..Default::default()
+        },))
+        .id();
+    world.entity_mut(help_box).push_children(&[prompt]);
+}
+
+fn despawn_timeout(
+    mut commands: Commands,
+    t: Res<Time>,
+    mut q: Query<(Entity, &mut DespawnTimeout)>,
+) {
+    for (e, mut timeout) in &mut q {
+        timeout.0.tick(t.delta());
+        if timeout.0.finished() {
+            commands.entity(e).despawn_recursive();
+        }
+    }
 }
