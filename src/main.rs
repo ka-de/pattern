@@ -40,7 +40,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         // A 2D sprite
         SpriteBundle {
-            texture: asset_server.load("cat.png"),
+            texture: asset_server.load("cat-idle-1.png"),
             transform: Transform::from_xyz(25.0, 50.0, 0.0),
             // use the default values for all other components in the bundle
             ..Default::default()
