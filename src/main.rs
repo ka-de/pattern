@@ -157,7 +157,7 @@ impl PerfUiEntry for PerfUiTimeSinceLastKeypress {
 
     fn label(&self) -> &str {
         if self.label.is_empty() {
-            "Time since last keypress"
+            "Time since last key press"
         } else {
             &self.label
         }
