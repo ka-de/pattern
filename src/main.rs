@@ -2,41 +2,15 @@ use bevy::prelude::*;
 use bevy::utils::Duration;
 use bevy::input::mouse::MouseButtonInput;
 use bevy::input::keyboard::KeyboardInput;
+use bevy::input::keyboard::KeyCode;
 use bevy::input::ButtonState;
 use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
 use iyes_perf_ui::prelude::*;
 
-fn main() {
-    App::new()
-        .add_plugins(DefaultPlugins)
-        .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
-        .add_plugins(PerfUiPlugin)
-        .add_perf_ui_entry_type::<PerfUiTimeSinceLastClick>()
-        .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
-        .init_resource::<TimeSinceLastClick>()
-        .init_resource::<TimeSinceLastKeypress>()
-        .add_systems(Startup, setup)
-        .add_systems(Update, handle_click)
-        .add_systems(Update, handle_keypress)
-        .run();
-}
-
-fn setup(mut commands: Commands, ass: Res<AssetServer>) {
-    commands.spawn(Camera2dBundle::default());
-
-    commands.spawn((
-        PerfUiRoot {
-            font_label: ass.load("bahnschrift.ttf"),
-            font_value: ass.load("bahnschrift.ttf"),
-            font_highlight: ass.load("bahnschrift.ttf"),
-            values_col_width: Some(80.0),
-            ..default()
-        },
-        PerfUiEntryFPS::default(),
-        PerfUiTimeSinceLastClick::default(),
-        PerfUiTimeSinceLastKeypress::default(),
-    ));
+#[derive(Resource, Default)]
+pub struct SpaceKeyPressCount {
+    count: u32,
 }
 
 #[derive(Resource, Default)]
@@ -96,6 +70,53 @@ impl Default for PerfUiTimeSinceLastKeypress {
             precision: 3,
             sort_key: iyes_perf_ui::utils::next_sort_key(),
         }
+    }
+}
+
+#[derive(Component)]
+pub struct PerfUiSpaceKeyPressCount {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiSpaceKeyPressCount {
+    fn default() -> Self {
+        PerfUiSpaceKeyPressCount {
+            label: String::new(),
+            sort_key: iyes_perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiSpaceKeyPressCount {
+    type Value = u32;
+    type SystemParam = SRes<SpaceKeyPressCount>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Space key press count"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(
+        &self,
+        space_key_press_count: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
+    ) -> Option<Self::Value> {
+        Some(space_key_press_count.count)
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        format!("{}", value)
+    }
+
+    fn width_hint(&self) -> usize {
+        10
     }
 }
 
@@ -215,6 +236,17 @@ fn handle_click(
     }
 }
 
+fn handle_space_keypress(
+    mut evr_keyboard: EventReader<KeyboardInput>,
+    mut space_key_press_count: ResMut<SpaceKeyPressCount>,
+) {
+    for ev in evr_keyboard.read() {
+        if ev.state == ButtonState::Pressed && ev.key_code == KeyCode::Space {
+            space_key_press_count.count += 1;
+        }
+    }
+}
+
 fn handle_keypress(
     time: Res<Time>,
     mut lastkeypress: ResMut<TimeSinceLastKeypress>,
@@ -225,4 +257,40 @@ fn handle_keypress(
             lastkeypress.last_keypress = time.elapsed();
         }
     }
+}
+
+fn setup(mut commands: Commands, ass: Res<AssetServer>) {
+    commands.spawn(Camera2dBundle::default());
+
+    commands.spawn((
+        PerfUiRoot {
+            font_label: ass.load("bahnschrift.ttf"),
+            font_value: ass.load("bahnschrift.ttf"),
+            font_highlight: ass.load("bahnschrift.ttf"),
+            values_col_width: Some(80.0),
+            ..default()
+        },
+        PerfUiEntryFPS::default(),
+        PerfUiTimeSinceLastClick::default(),
+        PerfUiTimeSinceLastKeypress::default(),
+        PerfUiSpaceKeyPressCount::default(),
+    ));
+}
+
+fn main() {
+    App::new()
+        .add_plugins(DefaultPlugins)
+        .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
+        .add_plugins(PerfUiPlugin)
+        .add_perf_ui_entry_type::<PerfUiTimeSinceLastClick>()
+        .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
+        .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
+        .init_resource::<TimeSinceLastClick>()
+        .init_resource::<TimeSinceLastKeypress>()
+        .init_resource::<SpaceKeyPressCount>()
+        .add_systems(Startup, setup)
+        .add_systems(Update, handle_click)
+        .add_systems(Update, handle_keypress)
+        .add_systems(Update, handle_space_keypress)
+        .run();
 }
