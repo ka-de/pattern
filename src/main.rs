@@ -31,6 +31,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         PerfUiSpaceKeyPressCount::default(),
         PerfUiCatName::default(),
         PerfUiCatGender::default(),
+        PerfUiCatHealth::default(),
+        PerfUiCatHunger::default(),
     ));
 
     // 🐈‍⬛
@@ -42,6 +44,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         Health {
             current: 100,
             max: 100,
+            hunger: 100,
         },
         SpriteBundle {
             texture: asset_server.load("cat-idle-1.png"),
@@ -51,12 +54,12 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 
     // Print the cat's name
-    println!("The cat's name is: {}", cat_name);
+    //println!("The cat's name is: {}", cat_name);
 
-    match get_cat_gender(&cat_name) {
-        Some(gender) => println!("The gender of {} is {}.", cat_name, gender),
-        None => println!("Could not find a cat named {}.", cat_name),
-    }
+    //match get_cat_gender(&cat_name) {
+    //    Some(gender) => println!("The gender of {} is {}.", cat_name, gender),
+    //    None => println!("Could not find a cat named {}.", cat_name),
+    //}
 }
 
 fn main() {
@@ -69,12 +72,16 @@ fn main() {
         .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
         .add_perf_ui_entry_type::<PerfUiCatName>() // I hate this 🐈‍⬛ already omg
         .add_perf_ui_entry_type::<PerfUiCatGender>()
-        .init_resource::<CursorWorldCoordinates>()
+        .add_perf_ui_entry_type::<PerfUiCatHealth>()
+        .add_perf_ui_entry_type::<PerfUiCatHunger>()
+        .init_resource::<CursorWorldCoordinates>() // Finally the 🐈‍⬛ stuff is over!
         .init_resource::<TimeSinceLastClick>()
         .init_resource::<TimeSinceLastKeypress>()
         .init_resource::<SpaceKeyPressCount>()
         .init_resource::<SpaceKeyPressState>()
+        .init_resource::<HungerTimer>()
         .add_systems(Startup, setup)
+        .add_systems(Update, decrease_hunger) // Nyeheh
         .add_systems(Update, cursor_system)
         .add_systems(Update, handle_click)
         .add_systems(Update, handle_keypress)
@@ -85,6 +92,96 @@ fn main() {
 /**
  * More fucking 🐈‍⬛ stuff.
  */
+ #[derive(Component)]
+pub struct PerfUiCatHunger {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiCatHunger {
+    fn default() -> Self {
+        PerfUiCatHunger {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiCatHunger {
+    type Value = u32;
+    type SystemParam = Query<'static, 'static, &'static Health>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Cat Hunger"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let health = health_query.single();
+        Some(health.hunger)
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        format!("{}", value)
+    }
+
+    fn width_hint(&self) -> usize {
+        3
+    }
+}
+
+#[derive(Component)]
+pub struct PerfUiCatHealth {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiCatHealth {
+    fn default() -> Self {
+        PerfUiCatHealth {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiCatHealth {
+    type Value = String;
+    type SystemParam = Query<'static, 'static, &'static Health>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Cat Health"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let health = health_query.single();
+        Some(format!("{}/{}", health.current, health.max))
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        value.clone()
+    }
+
+    fn width_hint(&self) -> usize {
+        10
+    }
+}
+
 #[derive(Component)]
 pub struct PerfUiCatName {
     pub label: String,
@@ -179,6 +276,24 @@ impl PerfUiEntry for PerfUiCatGender {
     }
 }
 
+// Let's be evil to the 🐈‍⬛!
+#[derive(Resource, Default)]
+struct HungerTimer(Timer);
+
+fn decrease_hunger(
+    time: Res<Time>,
+    mut hunger_timer: ResMut<HungerTimer>,
+    mut cat_query: Query<&mut Health>,
+) {
+    hunger_timer.0.tick(time.delta());
+    if hunger_timer.0.just_finished() {
+        if let Ok(mut health) = cat_query.get_single_mut() {
+            health.hunger = health.hunger.saturating_sub(5);
+        }
+        hunger_timer.0.set_duration(Duration::from_secs(30.0 as u64));
+    }
+}
+
 /**
  * Stores the world position of the mouse cursor.
  */
@@ -244,6 +359,7 @@ pub const CAT_NAMES: &[(&str, &str)] = &[
 pub struct Health {
     current: u32,
     max: u32,
+    hunger: u32,
 }
 
 /**
