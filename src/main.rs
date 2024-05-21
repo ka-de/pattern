@@ -45,7 +45,7 @@ fn setup(
     let cat_texture = asset_server.load("textures/cat-texture.png");
     let cat_layout = TextureAtlasLayout::from_grid(Vec2::new(26.0, 26.0), 4, 4, None, None);
     let cat_texture_atlas_layout = texture_atlas_layouts.add(cat_layout);
-    let cat_animation_indices = AnimationIndices { first: 0, last: 3 }; // idle animation
+    let cat_animation_indices = AnimationIndices { first: 0, last: 3, current_index: 0 }; // idle animation
     let _cat_entity = commands.spawn((
         Cat {
             name: generate_cat_name(),
@@ -62,18 +62,18 @@ fn setup(
                 index: cat_animation_indices.first,
             },
             transform: Transform::from_xyz(25.0, 50.0, 0.0),
-           ..Default::default()
+          ..Default::default()
         },
         AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
         cat_animation_indices.clone(),
-        Velocity { x: 2.0, y: 0.0 }
+        Velocity { x: 5.0, y: 0.0 }
     ));
 
     // 🐕
     let dog_texture = asset_server.load("textures/dog-texture.png");
     let dog_layout = TextureAtlasLayout::from_grid(Vec2::new(26.0, 26.0), 4, 4, None, None);
     let dog_texture_atlas_layout = texture_atlas_layouts.add(dog_layout);
-    let dog_animation_indices = AnimationIndices { first: 0, last: 3 }; // idle animation
+    let dog_animation_indices = AnimationIndices { first: 0, last: 3, current_index: 0 }; // idle animation
     let _dog_entity = commands.spawn((
         Dog {
             name: generate_dog_name(),
@@ -90,7 +90,7 @@ fn setup(
                 index: dog_animation_indices.first,
             },
             transform: Transform::from_xyz(-25.0, 50.0, 0.0),
-           ..Default::default()
+          ..Default::default()
         },
         AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
         dog_animation_indices.clone(),
@@ -133,6 +133,7 @@ fn main() {
        .add_systems(Update, update_facing_direction)
        .add_systems(Update, animate_cat_sprite)
        .add_systems(Update, animate_dog_sprite)
+       .add_systems(Update, update_animation)
        .run();
 }
 
@@ -140,39 +141,72 @@ fn main() {
 struct AnimationIndices {
     first: usize,
     last: usize,
+    current_index: usize,
 }
 
 #[derive(Component, Deref, DerefMut)]
 struct AnimationTimer(Timer);
 
+fn update_animation(
+    mut query: Query<(&mut AnimationIndices, &Velocity)>,
+) {
+    for (mut animation_indices, velocity) in query.iter_mut() {
+        let abs_velocity = velocity.x.abs();
+        if abs_velocity < 0.01 {
+            // idle animation
+            if animation_indices.first != 0 {
+                animation_indices.first = 0;
+                animation_indices.last = 3;
+                animation_indices.current_index = 0;
+            }
+        } else if abs_velocity < 2.1 {
+            // walking animation
+            if animation_indices.first != 8 {
+                animation_indices.first = 8;
+                animation_indices.last = 11;
+                animation_indices.current_index = 8;
+            }
+        } else {
+            // running animation
+            if animation_indices.first != 12 {
+                animation_indices.first = 12;
+                animation_indices.last = 15;
+                animation_indices.current_index = 12;
+            }
+        }
+    }
+}
+
 fn animate_cat_sprite(
     time: Res<Time>,
-    mut query: Query<(&AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
+    mut query: Query<(&mut AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
 ) {
-    for (indices, mut timer, mut atlas) in &mut query {
+    for (mut indices, mut timer, mut atlas) in query.iter_mut() {
         timer.tick(time.delta());
         if timer.just_finished() {
-            atlas.index = if atlas.index == indices.last {
+            indices.current_index = if indices.current_index == indices.last {
                 indices.first
             } else {
-                atlas.index + 1
+                indices.current_index + 1
             };
+            atlas.index = indices.current_index;
         }
     }
 }
 
 fn animate_dog_sprite(
     time: Res<Time>,
-    mut query: Query<(&AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
+    mut query: Query<(&mut AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
 ) {
-    for (indices, mut timer, mut atlas) in &mut query {
+    for (mut indices, mut timer, mut atlas) in query.iter_mut() {
         timer.tick(time.delta());
         if timer.just_finished() {
-            atlas.index = if atlas.index == indices.last {
+            indices.current_index = if indices.current_index == indices.last {
                 indices.first
             } else {
-                atlas.index + 1
+                indices.current_index + 1
             };
+            atlas.index = indices.current_index;
         }
     }
 }
@@ -199,7 +233,7 @@ struct LastPosition {
 /**
  * ↗️
  */
-#[derive(Component)]
+#[derive(Component, Debug)]
 struct Velocity {
     x: f32,
     y: f32,
@@ -207,13 +241,28 @@ struct Velocity {
 
 fn move_entities(
     time: Res<Time>,
-    mut query: Query<(&mut Transform, &Velocity, &mut LastPosition), Or<(With<Dog>, With<Cat>)>>,
+    mut query: Query<(&mut Transform, &Velocity)>,
+    //mut query: Query<(Entity, &mut Transform, &Velocity, Option<&Dog>, Option<&Cat>)>,
 ) {
-    for (mut transform, velocity, mut last_position) in query.iter_mut() {
-        last_position.x = transform.translation.x;
-        last_position.y = transform.translation.y;
-        transform.translation.x += velocity.x * time.delta_seconds();
-        transform.translation.y += velocity.y * time.delta_seconds();
+    //for (entity, mut transform, velocity, dog, cat) in query.iter_mut() {
+    for (mut transform, velocity) in query.iter_mut() {
+        /*
+        let entity_type = if dog.is_some() {
+            "Dog"
+        } else if cat.is_some() {
+            "Cat"
+        } else {
+            "Unknown"
+        };
+        */
+
+        let delta_seconds = time.delta_seconds();
+        //println!("Current velocity for {} {:?}: {:?}", entity_type, entity, velocity);
+
+        transform.translation.x += velocity.x * delta_seconds;
+        transform.translation.y += velocity.y * delta_seconds;
+
+        //println!("New position for {} {:?}: {:?}", entity_type, entity, transform.translation);
     }
 }
 
