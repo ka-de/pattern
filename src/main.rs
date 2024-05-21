@@ -10,7 +10,7 @@ use bevy::input::ButtonState;
 use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
 use bevy::window::PrimaryWindow;
-
+use bevy::sprite::TextureAtlasSprite;
 use perf_ui::prelude::*;
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -19,9 +19,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Performance UI
     commands.spawn((
         PerfUiRoot {
-            font_label: asset_server.load("bahnschrift.ttf"),
-            font_value: asset_server.load("bahnschrift.ttf"),
-            font_highlight: asset_server.load("bahnschrift.ttf"),
+            font_label: asset_server.load("fonts/bahnschrift.ttf"),
+            font_value: asset_server.load("fonts/bahnschrift.ttf"),
+            font_highlight: asset_server.load("fonts/bahnschrift.ttf"),
             values_col_width: Some(80.0),
             ..default()
         },
@@ -80,7 +80,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        // The ImagePlugin::default_nearest() prevents blurry sprites
+        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
         .add_plugins(PerfUiPlugin)
         .add_perf_ui_entry_type::<PerfUiTimeSinceLastClick>()
@@ -150,6 +151,70 @@ fn move_entities(
         last_position.y = transform.translation.y;
         transform.translation.x += velocity.x * time.delta_seconds();
         transform.translation.y += velocity.y * time.delta_seconds();
+    }
+}
+
+fn check_dog_health(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    dog_query: Query<(Entity, &Health, &LastPosition), With<Dog>>,
+) {
+    for (entity, health, last_position) in dog_query.iter() {
+        if health.current == 0 {
+            let dead_dog_texture = asset_server.load("dog-dead.png");
+            commands.spawn(SpriteBundle {
+                texture: dead_dog_texture,
+                transform: Transform::from_xyz(last_position.x, last_position.y, 0.0),
+                ..Default::default()
+            });
+            commands.entity(entity).despawn();
+        }
+    }
+}
+
+fn check_cat_health(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    cat_query: Query<(Entity, &Health, &LastPosition), With<Cat>>,
+) {
+    for (entity, health, last_position) in cat_query.iter() {
+        if health.current == 0 {
+            let dead_cat_texture = asset_server.load("cat-dead.png");
+            commands.spawn(SpriteBundle {
+                texture: dead_cat_texture,
+                transform: Transform::from_xyz(last_position.x, last_position.y, 0.0),
+                ..Default::default()
+            });
+            commands.entity(entity).despawn();
+        }
+    }
+}
+
+/**
+ * Hunger 🍗
+ */
+#[derive(Resource, Default)]
+struct HungerTimer(Timer);
+
+fn decrease_hunger(
+    time: Res<Time>,
+    mut hunger_timer: ResMut<HungerTimer>,
+    mut health_query: Query<&mut Health>,
+) {
+    hunger_timer.0.tick(time.delta());
+    if hunger_timer.0.just_finished() {
+        for mut health in health_query.iter_mut() {
+            health.hunger = health.hunger.saturating_sub(5);
+
+            // If hunger reaches 0, decrease health by 5 every second
+            if health.hunger == 0 {
+                health.current = health.current.saturating_sub(5);
+            }
+        }
+        // Set the timer's duration to 60 seconds for periodic decrease
+        hunger_timer.0.set_duration(Duration::from_secs(1));
+        // Reset the timer to count down again.
+        hunger_timer.0.reset();
     }
 }
 
@@ -524,65 +589,6 @@ impl PerfUiEntry for PerfUiCatGender {
 
     fn width_hint(&self) -> usize {
         10
-    }
-}
-
-fn check_dog_health(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    dog_query: Query<(Entity, &Health, &LastPosition), With<Dog>>,
-) {
-    for (entity, health, last_position) in dog_query.iter() {
-        if health.current == 0 {
-            let dead_dog_texture = asset_server.load("dog-dead.png");
-            commands.entity(entity).insert(SpriteBundle {
-                texture: dead_dog_texture,
-                transform: Transform::from_xyz(last_position.x, last_position.y, 0.0),
-                ..Default::default()
-            });
-        }
-    }
-}
-
-fn check_cat_health(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    cat_query: Query<(Entity, &Health, &LastPosition), With<Cat>>,
-) {
-    for (entity, health, last_position) in cat_query.iter() {
-        if health.current == 0 {
-            let dead_cat_texture = asset_server.load("cat-dead.png");
-            commands.entity(entity).insert(SpriteBundle {
-                texture: dead_cat_texture,
-                transform: Transform::from_xyz(last_position.x, last_position.y, 0.0),
-                ..Default::default()
-            });
-        }
-    }
-}
-
-#[derive(Resource, Default)]
-struct HungerTimer(Timer);
-
-fn decrease_hunger(
-    time: Res<Time>,
-    mut hunger_timer: ResMut<HungerTimer>,
-    mut health_query: Query<&mut Health>,
-) {
-    hunger_timer.0.tick(time.delta());
-    if hunger_timer.0.just_finished() {
-        for mut health in health_query.iter_mut() {
-            health.hunger = health.hunger.saturating_sub(5);
-
-            // If hunger reaches 0, decrease health by 5 every second
-            if health.hunger == 0 {
-                health.current = health.current.saturating_sub(5);
-            }
-        }
-        // Set the timer's duration to 60 seconds for periodic decrease
-        hunger_timer.0.set_duration(Duration::from_secs(1));
-        // Reset the timer to count down again.
-        hunger_timer.0.reset();
     }
 }
 
