@@ -66,7 +66,8 @@ fn setup(
         },
         AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
         cat_animation_indices.clone(),
-        Velocity { x: 5.0, y: 0.0 }
+        Velocity { x: 5.0, y: 0.0 },
+        DeathAnimationPlayed(false)
     ));
 
     // 🐕
@@ -94,7 +95,8 @@ fn setup(
         },
         AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
         dog_animation_indices.clone(),
-        Velocity { x: -2.0, y: 0.0 }
+        Velocity { x: -2.0, y: 0.0 },
+        DeathAnimationPlayed(false)
     ));
 }
 
@@ -123,8 +125,6 @@ fn main() {
        .init_resource::<HungerTimer>()
        .add_systems(Startup, setup)
        .add_systems(Update, decrease_hunger) // Nyeheh
-       .add_systems(Update, check_cat_health) // 🐈‍⬛
-       .add_systems(Update, check_dog_health) // 🐕
        .add_systems(Update, cursor_system)
        .add_systems(Update, handle_click)
        .add_systems(Update, handle_keypress)
@@ -134,6 +134,7 @@ fn main() {
        .add_systems(Update, animate_cat_sprite)
        .add_systems(Update, animate_dog_sprite)
        .add_systems(Update, update_animation)
+       .add_systems(Update, play_death_animation)
        .run();
 }
 
@@ -148,30 +149,39 @@ struct AnimationIndices {
 struct AnimationTimer(Timer);
 
 fn update_animation(
-    mut query: Query<(&mut AnimationIndices, &Velocity)>,
+    mut query: Query<(&mut AnimationIndices, &Velocity, &Health)>,
 ) {
-    for (mut animation_indices, velocity) in query.iter_mut() {
-        let abs_velocity = velocity.x.abs();
-        if abs_velocity < 0.01 {
-            // idle animation
-            if animation_indices.first != 0 {
-                animation_indices.first = 0;
-                animation_indices.last = 3;
-                animation_indices.current_index = 0;
-            }
-        } else if abs_velocity < 2.1 {
-            // walking animation
-            if animation_indices.first != 8 {
-                animation_indices.first = 8;
-                animation_indices.last = 11;
-                animation_indices.current_index = 8;
+    for (mut animation_indices, velocity, health) in query.iter_mut() {
+        if health.current > 0 {
+            let abs_velocity = velocity.x.abs();
+            if abs_velocity < 0.01 {
+                // idle animation
+                if animation_indices.first != 0 {
+                    animation_indices.first = 0;
+                    animation_indices.last = 3;
+                    animation_indices.current_index = 0;
+                }
+            } else if abs_velocity < 2.1 {
+                // walking animation
+                if animation_indices.first != 8 {
+                    animation_indices.first = 8;
+                    animation_indices.last = 11;
+                    animation_indices.current_index = 8;
+                }
+            } else {
+                // running animation
+                if animation_indices.first != 12 {
+                    animation_indices.first = 12;
+                    animation_indices.last = 15;
+                    animation_indices.current_index = 12;
+                }
             }
         } else {
-            // running animation
-            if animation_indices.first != 12 {
-                animation_indices.first = 12;
-                animation_indices.last = 15;
-                animation_indices.current_index = 12;
+            // Death animation
+            if animation_indices.first != 4 {
+                animation_indices.first = 4;
+                animation_indices.last = 4;
+                animation_indices.current_index = 4;
             }
         }
     }
@@ -185,7 +195,11 @@ fn animate_cat_sprite(
         timer.tick(time.delta());
         if timer.just_finished() {
             indices.current_index = if indices.current_index == indices.last {
-                indices.first
+                if indices.first == 4 { // Death animation
+                    4 // Loop back to the first frame of the death animation
+                } else {
+                    indices.first
+                }
             } else {
                 indices.current_index + 1
             };
@@ -202,7 +216,11 @@ fn animate_dog_sprite(
         timer.tick(time.delta());
         if timer.just_finished() {
             indices.current_index = if indices.current_index == indices.last {
-                indices.first
+                if indices.first == 4 { // Death animation
+                    4 // Loop back to the first frame of the death animation
+                } else {
+                    indices.first
+                }
             } else {
                 indices.current_index + 1
             };
@@ -224,12 +242,6 @@ fn update_facing_direction(
     }
 }
 
-#[derive(Component)]
-struct LastPosition {
-    x: f32,
-    y: f32,
-}
-
 /**
  * ↗️
  */
@@ -239,49 +251,40 @@ struct Velocity {
     y: f32,
 }
 
-fn move_entities(
-    time: Res<Time>,
-    mut query: Query<(&mut Transform, &Velocity)>,
-) {
-    for (mut transform, velocity) in query.iter_mut() {
-        let delta_seconds = time.delta_seconds();
-        transform.translation.x += velocity.x * delta_seconds;
-        transform.translation.y += velocity.y * delta_seconds;
-    }
-}
+#[derive(Component)]
+struct DeathAnimationPlayed(bool);
 
-fn check_dog_health(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    dog_query: Query<(Entity, &Health, &LastPosition), With<Dog>>,
+fn play_death_animation(
+    mut query: Query<(
+        &mut AnimationIndices,
+        &Health,
+        &mut DeathAnimationPlayed,
+        &mut TextureAtlas,
+    )>,
 ) {
-    for (entity, health, last_position) in dog_query.iter() {
-        if health.current == 0 {
-            let dead_dog_texture = asset_server.load("dog-dead.png");
-            commands.spawn(SpriteBundle {
-                texture: dead_dog_texture,
-                transform: Transform::from_xyz(last_position.x, last_position.y, 0.0),
-                ..Default::default()
-            });
-            commands.entity(entity).despawn();
+    for (mut animation_indices, health, mut death_animation_played, mut atlas) in query.iter_mut() {
+        if health.current == 0 &&!death_animation_played.0 {
+            animation_indices.first = 4;
+            animation_indices.last = 4;
+            animation_indices.current_index = 4;
+            atlas.index = animation_indices.current_index; // Update the TextureAtlas index
+            death_animation_played.0 = true;
         }
     }
 }
 
-fn check_cat_health(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    cat_query: Query<(Entity, &Health, &LastPosition), With<Cat>>,
+fn move_entities(
+    time: Res<Time>,
+    mut query: Query<(&mut Transform, &mut Velocity, &Health)>,
 ) {
-    for (entity, health, last_position) in cat_query.iter() {
-        if health.current == 0 {
-            let dead_cat_texture = asset_server.load("cat-dead.png");
-            commands.spawn(SpriteBundle {
-                texture: dead_cat_texture,
-                transform: Transform::from_xyz(last_position.x, last_position.y, 0.0),
-                ..Default::default()
-            });
-            commands.entity(entity).despawn();
+    for (mut transform, mut velocity, health) in query.iter_mut() {
+        if health.current > 0 {
+            let delta_seconds = time.delta_seconds();
+            transform.translation.x += velocity.x * delta_seconds;
+            transform.translation.y += velocity.y * delta_seconds;
+        } else {
+            velocity.x = 0.0;
+            velocity.y = 0.0;
         }
     }
 }
@@ -300,11 +303,12 @@ fn decrease_hunger(
     hunger_timer.0.tick(time.delta());
     if hunger_timer.0.just_finished() {
         for mut health in health_query.iter_mut() {
-            health.hunger = health.hunger.saturating_sub(5);
+            // Decrease hunger by 20 every second.
+            health.hunger = health.hunger.saturating_sub(20);
 
-            // If hunger reaches 0, decrease health by 5 every second
+            // If hunger reaches 0, decrease health by 20 every second.
             if health.hunger == 0 {
-                health.current = health.current.saturating_sub(5);
+                health.current = health.current.saturating_sub(20);
             }
         }
         // Set the timer's duration to 60 seconds for periodic decrease
@@ -1075,15 +1079,15 @@ fn handle_keypress(
 
 fn cursor_system(
     mut coords: ResMut<CursorWorldCoordinates>,
-    // Get the window
+    // Get the window.
     window_query: Query<&Window, With<PrimaryWindow>>,
-    // Get the camera transform
+    // Get the camera transform.
     camera_query: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
 ) {
-    // Get the camera info and transform
+    // Get the camera info and transform.
     let (camera, camera_transform) = camera_query.single();
 
-    // There is only one primary window, so we can get it from the query:
+    // There is only one primary window, so we can get it from the query.
     let window = window_query.single();
 
     // Check if the cursor is inside the window and get its position
