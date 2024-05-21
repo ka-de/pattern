@@ -49,7 +49,7 @@ fn setup(
     let cat_animation_indices = AnimationIndices { first: 0, last: 3, current_index: 0 }; // idle animation
     let _cat_entity = commands.spawn((
         Cat {
-            name: generate_cat_name(),
+            name: generate_animal_name(AnimalType::Cat),
         },
         Health {
             current: 100,
@@ -78,7 +78,7 @@ fn setup(
     let dog_animation_indices = AnimationIndices { first: 0, last: 3, current_index: 0 }; // idle animation
     let _dog_entity = commands.spawn((
         Dog {
-            name: generate_dog_name(),
+            name: generate_animal_name(AnimalType::Dog),
         },
         Health {
             current: 100,
@@ -189,9 +189,8 @@ fn update_animation(
     }
 }
 
-
 fn update_facing_direction(
-    mut query: Query<(&mut Transform, &Velocity), Or<(With<Dog>, With<Cat>)>>,
+    mut query: Query<(&mut Transform, &Velocity)>,
 ) {
     for (mut transform, velocity) in query.iter_mut() {
         // Flip the sprite based on the direction of movement
@@ -690,17 +689,93 @@ impl PerfUiEntry for PerfUiSpaceKeyPressCount {
 }
 
 /**
- * A lot of names for the 🐕.
+ * A lot of names for the 🐕 and 🐈‍⬛.
  */
-pub const DOG_NAMES: &[(&str, &str)] = &[
-    ("Malcolm", "male"), ("Zoe", "female"), ("Wash", "male"), ("Inara", "female"),
-    ("Jayne", "male"), ("Kaylee", "female"), ("Simon", "male"), ("River", "female"),
-    ("Book", "male"), ("Saffron", "female"), ("Badger", "male"), ("Nandi", "female"),
-    ("Bester", "male"), ("Dobson", "male"), ("Atherton", "male"), ("Gabriel", "male"),
-    ("Regan", "female"), ("Tracey", "male"), ("Amnon", "male"), ("Fess", "male"),
-    ("Rance", "male"), ("Magistrate", "male"), ("Lucy", "female"), ("Ruth", "female"),
-    ("Bree", "female")
+const ANIMAL_NAMES: &[(&str, &str, AnimalType)] = &[
+    ("Malcolm", "male", AnimalType::Dog), ("Zoe", "female", AnimalType::Dog), ("Wash", "male", AnimalType::Dog),
+    ("Inara", "female", AnimalType::Dog), ("Jayne", "male", AnimalType::Dog), ("Kaylee", "female", AnimalType::Dog),
+    ("Simon", "male", AnimalType::Dog), ("River", "female", AnimalType::Dog), ("Book", "male", AnimalType::Dog),
+    ("Saffron", "female", AnimalType::Dog), ("Badger", "male", AnimalType::Dog), ("Nandi", "female", AnimalType::Dog),
+    ("Bester", "male", AnimalType::Dog), ("Dobson", "male", AnimalType::Dog), ("Atherton", "male", AnimalType::Dog),
+    ("Gabriel", "male", AnimalType::Dog), ("Regan", "female", AnimalType::Dog), ("Tracey", "male", AnimalType::Dog),
+    ("Amnon", "male", AnimalType::Dog), ("Fess", "male", AnimalType::Dog), ("Rance", "male", AnimalType::Dog),
+    ("Magistrate", "male", AnimalType::Dog), ("Lucy", "female", AnimalType::Dog), ("Ruth", "female", AnimalType::Dog),
+    ("Bree", "female", AnimalType::Dog), // End of 🐕
+    ("Picard", "male", AnimalType::Cat), ("Beverly", "female", AnimalType::Cat), ("Data", "male", AnimalType::Cat),
+    ("Troi", "female", AnimalType::Cat), ("Laforge", "male", AnimalType::Cat), ("Crusher", "male", AnimalType::Cat),
+    ("Yar", "female", AnimalType::Cat), ("Kirk", "male", AnimalType::Cat), ("Spock", "male", AnimalType::Cat),
+    ("Mccoy", "male", AnimalType::Cat), ("Scotty", "male", AnimalType::Cat), ("Uhura", "female", AnimalType::Cat),
+    ("Sulu", "male", AnimalType::Cat), ("Chekov", "male", AnimalType::Cat), ("Chakotay", "male", AnimalType::Cat),
+    ("Tuvok", "male", AnimalType::Cat), ("Sisko", "male", AnimalType::Cat), ("Kira", "female", AnimalType::Cat),
+    ("Dax", "female", AnimalType::Cat), ("Bashir", "male", AnimalType::Cat), ("Odo", "male", AnimalType::Cat),
+    ("Quark", "male", AnimalType::Cat), ("Archer", "male", AnimalType::Cat), ("Tucker", "male", AnimalType::Cat),
+    ("Tpol", "female", AnimalType::Cat), ("Reed", "male", AnimalType::Cat), ("Mayweather", "male", AnimalType::Cat),
+    ("Phlox", "male", AnimalType::Cat), ("Sato", "female", AnimalType::Cat), ("Sevenofnine", "female", AnimalType::Cat),
+    ("Thedoctor", "male", AnimalType::Cat), ("Tomparis", "male", AnimalType::Cat), ("Harrykim", "male", AnimalType::Cat),
+    ("Belanna", "female", AnimalType::Cat), ("Torres", "female", AnimalType::Cat), ("Jeanluc", "male", AnimalType::Cat),
+    ("Lorca", "male", AnimalType::Cat), ("Burnham", "female", AnimalType::Cat), ("Saru", "male", AnimalType::Cat),
+    ("Stamets", "male", AnimalType::Cat), ("Tilly", "female", AnimalType::Cat), ("Georgiou", "female", AnimalType::Cat), 
+    ("Culber", "male", AnimalType::Cat), ("Cornwell", "female", AnimalType::Cat), ("Leland", "male", AnimalType::Cat),
+    ("Vance", "male", AnimalType::Cat), ("Reno", "female", AnimalType::Cat), ("Booker", "male", AnimalType::Cat),
+    ("Grudge", "female", AnimalType::Cat), ("Shaxs", "male", AnimalType::Cat), ("Detmer", "female", AnimalType::Cat),
+    ("Owosekun", "female", AnimalType::Cat), ("Rhys", "male", AnimalType::Cat), ("Pike", "male", AnimalType::Cat),
+    ("Number One", "male", AnimalType::Cat), ("Laan", "male", AnimalType::Cat), ("Chapel", "female", AnimalType::Cat), 
+    ("Kyle", "male", AnimalType::Cat), ("Vina", "female", AnimalType::Cat), ("Mudd", "male", AnimalType::Cat),
+    ("Garak", "male", AnimalType::Cat), ("Leyton", "male", AnimalType::Cat), ("Ross", "male", AnimalType::Cat),
+    ("Nog", "male", AnimalType::Cat), ("Jake", "male", AnimalType::Cat), ("Seven", "female", AnimalType::Cat),
+    ("Janeway", "female", AnimalType::Cat), ("Tuvix", "male", AnimalType::Cat), ("Neelix", "male", AnimalType::Cat),
+    ("Kes", "female", AnimalType::Cat), ("Carey", "male", AnimalType::Cat), ("Vorik", "male", AnimalType::Cat),
+    ("Wildman", "female", AnimalType::Cat), ("Zahir", "male", AnimalType::Cat), ("Seska", "female", AnimalType::Cat),
+    ("Jonas", "male", AnimalType::Cat), ("Rio", "male", AnimalType::Cat), ("Maxwell", "male", AnimalType::Cat),
+    ("Tryla", "female", AnimalType::Cat), ("Lorian", "male", AnimalType::Cat), ("Icheb", "male", AnimalType::Cat), 
+    ("Q", "male", AnimalType::Cat), ("Guinan", "female", AnimalType::Cat), ("Pulaski", "female", AnimalType::Cat),
+    ("Ro", "female", AnimalType::Cat), ("Hwomyn", "female", AnimalType::Cat), ("Riker", "male", AnimalType::Cat),
+    ("Shelby", "female", AnimalType::Cat), ("Obrien", "male", AnimalType::Cat), ("Keiko", "female", AnimalType::Cat),
+    ("Molly", "female", AnimalType::Cat), ("Kirayoshi", "male", AnimalType::Cat), ("Naomi", "female", AnimalType::Cat),
+    ("Ezri", "female", AnimalType::Cat), ("Kassidy", "female", AnimalType::Cat), ("Leeta", "female", AnimalType::Cat), 
+    ("Nog", "male", AnimalType::Cat), ("Rom", "male", AnimalType::Cat), ("Brunt", "male", AnimalType::Cat),
+    ("Ishka", "female", AnimalType::Cat), ("Worf", "male", AnimalType::Cat), ("Martok", "male", AnimalType::Cat),
+    ("Grilka", "female", AnimalType::Cat), ("Sharan", "male", AnimalType::Cat), ("Alexander", "male", AnimalType::Cat), 
+    ("Kehleyr", "female", AnimalType::Cat), ("Lwaxana", "female", AnimalType::Cat), ("Kamala", "female", AnimalType::Cat),
+    ("Vash", "female", AnimalType::Cat), ("Tasha", "female", AnimalType::Cat), ("Ogawa", "female", AnimalType::Cat),
+    ("Barclay", "male", AnimalType::Cat), ("Maddox", "male", AnimalType::Cat), ("Soong", "male", AnimalType::Cat),
+    ("Juliana", "female", AnimalType::Cat), ("Sela", "female", AnimalType::Cat), ("Toral", "male", AnimalType::Cat),
+    ("Ziyal", "female", AnimalType::Cat), ("Dukat", "male", AnimalType::Cat), ("Damar", "male", AnimalType::Cat), 
+    ("Weyoun", "male", AnimalType::Cat), ("Eddington", "male", AnimalType::Cat), ("Michael", "male", AnimalType::Cat),
+    ("Sarina", "female", AnimalType::Cat), ("Hugh", "male", AnimalType::Cat), ("Lore", "male", AnimalType::Cat),
+    ("Elaurian", "male", AnimalType::Cat) // End of 🐈‍⬛
 ];
+
+#[derive(Component, PartialEq, Eq)]
+enum AnimalType {
+    Dog,
+    Cat,
+}
+
+fn generate_animal_name(animal_type: AnimalType) -> String {
+    let mut rng = thread_rng();
+    let (name, _gender, name_type) = ANIMAL_NAMES.choose(&mut rng).unwrap();
+    if *name_type == animal_type {
+        name.to_string()
+    } else {
+        generate_animal_name(animal_type)
+    }
+}
+
+fn get_animal_gender(name: &str) -> Option<&'static str> {
+    for &(animal_name, gender, _) in ANIMAL_NAMES {
+        if animal_name == name {
+            return Some(gender);
+        }
+    }
+    None
+}
+
+#[derive(Component)]
+struct Animal {
+    name: String,
+    animal_type: AnimalType,
+}
 
 /**
  * The 🐕 Component
@@ -708,22 +783,6 @@ pub const DOG_NAMES: &[(&str, &str)] = &[
 #[derive(Component)]
 pub struct Dog {
     name: String,
-}
-
-// Function to generate dog names
-fn generate_dog_name() -> String {
-    let mut rng = thread_rng();
-    let (name, _gender) = DOG_NAMES.choose(&mut rng).unwrap();
-    name.to_string()
-}
-
-fn get_dog_gender(name: &str) -> Option<&'static str> {
-    for &(dog_name, gender) in DOG_NAMES {
-        if dog_name == name {
-            return Some(gender);
-        }
-    }
-    None
 }
 
 fn animate_dog_sprite(
@@ -921,7 +980,7 @@ impl PerfUiEntry for PerfUiDogGender {
 
     fn update_value(&self, dog_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
         let dog = dog_query.single();
-        let gender = get_dog_gender(&dog.name);
+        let gender = get_animal_gender(&dog.name);
         Some(gender.unwrap_or("Unknown").to_string())
     }
 
@@ -935,65 +994,11 @@ impl PerfUiEntry for PerfUiDogGender {
 }
 
 /**
- * A lot of names for the 🐈‍⬛.
- */
-pub const CAT_NAMES: &[(&str, &str)] = &[
-    ("Picard", "male"), ("Beverly", "female"), ("Data", "male"), ("Troi", "female"), 
-    ("Laforge", "male"), ("Crusher", "male"), ("Yar", "female"), ("Kirk", "male"),
-    ("Spock", "male"), ("Mccoy", "male"), ("Scotty", "male"), ("Uhura", "female"), 
-    ("Sulu", "male"), ("Chekov", "male"), ("Chakotay", "male"), ("Tuvok", "male"),
-    ("Sisko", "male"), ("Kira", "female"), ("Dax", "female"), ("Bashir", "male"), 
-    ("Odo", "male"), ("Quark", "male"), ("Archer", "male"), ("Tucker", "male"),
-    ("Tpol", "female"), ("Reed", "male"), ("Mayweather", "male"), ("Phlox", "male"), 
-    ("Sato", "female"), ("Sevenofnine", "female"), ("Thedoctor", "male"),
-    ("Tomparis", "male"), ("Harrykim", "male"), ("Belanna", "female"), 
-    ("Torres", "female"), ("Jeanluc", "male"), ("Lorca", "male"), ("Burnham", "female"),
-    ("Saru", "male"), ("Stamets", "male"), ("Tilly", "female"), ("Georgiou", "female"), 
-    ("Culber", "male"), ("Cornwell", "female"), ("Leland", "male"),
-    ("Vance", "male"), ("Reno", "female"), ("Booker", "male"), ("Grudge", "female"), 
-    ("Shaxs", "male"), ("Detmer", "female"), ("Owosekun", "female"), ("Rhys", "male"),
-    ("Pike", "male"), ("Number One", "male"), ("Laan", "male"), ("Chapel", "female"), 
-    ("Kyle", "male"), ("Vina", "female"), ("Mudd", "male"), ("Garak", "male"),
-    ("Leyton", "male"), ("Ross", "male"), ("Nog", "male"), ("Jake", "male"), 
-    ("Seven", "female"), ("Janeway", "female"), ("Tuvix", "male"), ("Neelix", "male"),
-    ("Kes", "female"), ("Carey", "male"), ("Vorik", "male"), ("Wildman", "female"), 
-    ("Zahir", "male"), ("Seska", "female"), ("Jonas", "male"), ("Rio", "male"),
-    ("Maxwell", "male"), ("Tryla", "female"), ("Lorian", "male"), ("Icheb", "male"), 
-    ("Q", "male"), ("Guinan", "female"), ("Pulaski", "female"), ("Ro", "female"),
-    ("Hwomyn", "female"), ("Riker", "male"), ("Shelby", "female"), ("Obrien", "male"), 
-    ("Keiko", "female"), ("Molly", "female"), ("Kirayoshi", "male"),
-    ("Naomi", "female"), ("Ezri", "female"), ("Kassidy", "female"), ("Leeta", "female"), 
-    ("Nog", "male"), ("Rom", "male"), ("Brunt", "male"), ("Ishka", "female"), ("Worf", "male"),
-    ("Martok", "male"), ("Grilka", "female"), ("Sharan", "male"), ("Alexander", "male"), 
-    ("Kehleyr", "female"), ("Lwaxana", "female"), ("Kamala", "female"),
-    ("Vash", "female"), ("Tasha", "female"), ("Ogawa", "female"), ("Barclay", "male"), 
-    ("Maddox", "male"), ("Soong", "male"), ("Juliana", "female"), ("Sela", "female"),
-    ("Toral", "male"), ("Ziyal", "female"), ("Dukat", "male"), ("Damar", "male"), 
-    ("Weyoun", "male"), ("Eddington", "male"), ("Michael", "male"),
-    ("Sarina", "female"), ("Hugh", "male"), ("Lore", "male"), ("Elaurian", "male")
-];
-
-/**
  * The 🐈‍⬛ Component
  */
 #[derive(Component)]
 pub struct Cat {
     name: String,
-}
-
-fn generate_cat_name() -> String {
-    let mut rng = thread_rng();
-    let (name, _gender) = CAT_NAMES.choose(&mut rng).unwrap();
-    name.to_string()
-}
-
-fn get_cat_gender(name: &str) -> Option<&'static str> {
-    for &(cat_name, gender) in CAT_NAMES {
-        if cat_name == name {
-            return Some(gender);
-        }
-    }
-    None
 }
 
 fn animate_cat_sprite(
@@ -1191,7 +1196,7 @@ impl PerfUiEntry for PerfUiCatGender {
 
     fn update_value(&self, cat_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
         let cat = cat_query.single();
-        let gender = get_cat_gender(&cat.name);
+        let gender = get_animal_gender(&cat.name);
         Some(gender.unwrap_or("Unknown").to_string())
     }
 
