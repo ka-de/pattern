@@ -242,27 +242,11 @@ struct Velocity {
 fn move_entities(
     time: Res<Time>,
     mut query: Query<(&mut Transform, &Velocity)>,
-    //mut query: Query<(Entity, &mut Transform, &Velocity, Option<&Dog>, Option<&Cat>)>,
 ) {
-    //for (entity, mut transform, velocity, dog, cat) in query.iter_mut() {
     for (mut transform, velocity) in query.iter_mut() {
-        /*
-        let entity_type = if dog.is_some() {
-            "Dog"
-        } else if cat.is_some() {
-            "Cat"
-        } else {
-            "Unknown"
-        };
-        */
-
         let delta_seconds = time.delta_seconds();
-        //println!("Current velocity for {} {:?}: {:?}", entity_type, entity, velocity);
-
         transform.translation.x += velocity.x * delta_seconds;
         transform.translation.y += velocity.y * delta_seconds;
-
-        //println!("New position for {} {:?}: {:?}", entity_type, entity, transform.translation);
     }
 }
 
