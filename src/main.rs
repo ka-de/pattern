@@ -29,20 +29,24 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         PerfUiTimeSinceLastClick::default(),
         PerfUiTimeSinceLastKeypress::default(),
         PerfUiSpaceKeyPressCount::default(),
+        PerfUiCatInfo::default(),
+        PerfUiCatName::default(), // Add this line
+        PerfUiCatGender::default(),
     ));
 
     // 🐈‍⬛
     let cat_name = generate_cat_name();
     let _cat_entity = commands.spawn((
-        // Marker
         Cat {
             name: cat_name.clone(),
         },
-        // A 2D sprite
+        Health {
+            current: 100,
+            max: 100,
+        },
         SpriteBundle {
             texture: asset_server.load("cat-idle-1.png"),
             transform: Transform::from_xyz(25.0, 50.0, 0.0),
-            // use the default values for all other components in the bundle
             ..Default::default()
         }
     ));
@@ -64,16 +68,116 @@ fn main() {
         .add_perf_ui_entry_type::<PerfUiTimeSinceLastClick>()
         .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
         .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
+        .add_perf_ui_entry_type::<PerfUiCatName>() // I hate this 🐈‍⬛ already omg
+        .add_perf_ui_entry_type::<PerfUiCatGender>()
         .init_resource::<CursorWorldCoordinates>()
         .init_resource::<TimeSinceLastClick>()
         .init_resource::<TimeSinceLastKeypress>()
         .init_resource::<SpaceKeyPressCount>()
+        .init_resource::<SpaceKeyPressState>()
         .add_systems(Startup, setup)
         .add_systems(Update, cursor_system)
         .add_systems(Update, handle_click)
         .add_systems(Update, handle_keypress)
         .add_systems(Update, handle_space_keypress)
         .run();
+}
+
+/**
+ * More fucking 🐈‍⬛ stuff.
+ */
+#[derive(Component)]
+pub struct PerfUiCatName {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiCatName {
+    fn default() -> Self {
+        PerfUiCatName {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiCatName {
+    type Value = String;
+    type SystemParam = Query<'static, 'static, &'static Cat>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Cat Name"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, cat_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let cat = cat_query.single();
+        Some(cat.name.clone())
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        value.clone()
+    }
+
+    fn width_hint(&self) -> usize {
+        20
+    }
+}
+
+/**
+ * This is just for the fucking gender of the 🐈‍⬛ in the PerfUI lmao
+ */
+#[derive(Component)]
+pub struct PerfUiCatGender {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiCatGender {
+    fn default() -> Self {
+        PerfUiCatGender {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiCatGender {
+    type Value = String;
+    type SystemParam = Query<'static, 'static, &'static Cat>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Cat Gender"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, cat_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let cat = cat_query.single();
+        let gender = get_cat_gender(&cat.name);
+        Some(gender.unwrap_or("Unknown").to_string())
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        value.clone()
+    }
+
+    fn width_hint(&self) -> usize {
+        10
+    }
 }
 
 /**
@@ -138,7 +242,7 @@ pub const CAT_NAMES: &[(&str, &str)] = &[
  * The Health Component 🩸 
  */
 #[derive(Component)]
-struct Health {
+pub struct Health {
     current: u32,
     max: u32,
 }
@@ -147,7 +251,7 @@ struct Health {
  * The Cat Component 🐈‍⬛
  */
 #[derive(Component)]
-struct Cat {
+pub struct Cat {
     name: String,
 }
 
@@ -171,6 +275,62 @@ fn get_cat_gender(name: &str) -> Option<&'static str> {
  */
 #[derive(Component)]
 struct MainCamera;
+
+
+/**
+ * 🐈‍⬛ Info
+ */
+#[derive(Component)]
+pub struct PerfUiCatInfo {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiCatInfo {
+    fn default() -> Self {
+        PerfUiCatInfo {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiCatInfo {
+    type Value = String;
+    type SystemParam = (Query<'static, 'static, &'static Cat>, Query<'static, 'static, &'static Health>);
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Cat Info"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, (cat_query, health_query): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let cat = cat_query.single();
+        let health = health_query.single();
+        let gender = get_cat_gender(&cat.name);
+        let gender_symbol = match gender {
+            Some("male") => "♂",
+            Some("female") => "♀",
+            _ => "",
+        };
+        Some(format!("{} {} ({}/{})", cat.name, gender_symbol, health.current, health.max))
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        value.clone()
+    }
+
+    fn width_hint(&self) -> usize {
+        30
+    }
+}
 
 #[derive(Component)]
 pub struct PerfUiTimeSinceLastClick {
@@ -385,13 +545,24 @@ fn handle_click(
     }
 }
 
+#[derive(Resource, Default)]
+struct SpaceKeyPressState {
+    last_pressed: bool,
+}
+
 fn handle_space_keypress(
     mut evr_keyboard: EventReader<KeyboardInput>,
     mut space_key_press_count: ResMut<SpaceKeyPressCount>,
+    mut space_key_press_state: ResMut<SpaceKeyPressState>,
 ) {
     for ev in evr_keyboard.read() {
-        if ev.state == ButtonState::Pressed && ev.key_code == KeyCode::Space {
-            space_key_press_count.count += 1;
+        if ev.key_code == KeyCode::Space {
+            if ev.state == ButtonState::Pressed && !space_key_press_state.last_pressed {
+                space_key_press_count.count += 1;
+                *space_key_press_state = SpaceKeyPressState { last_pressed: true };
+            } else if ev.state == ButtonState::Released {
+                *space_key_press_state = SpaceKeyPressState { last_pressed: false };
+            }
         }
     }
 }

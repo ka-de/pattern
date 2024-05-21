@@ -1461,9 +1461,9 @@ dependencies = [
 
 [[package]]
 name = "crc32fast"
-version = "1.4.1"
+version = "1.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58ebf8d6963185c7625d2c3c3962d99eb8936637b1427536d21dc36ae402ebad"
+checksum = "a97769d94ddab943e4510d138150169a2758b5ef3eb191a9ee688de3e23ef7b3"
 dependencies = [
  "cfg-if",
 ]
@@ -2671,7 +2671,7 @@ checksum = "e3148f5046208a5d56bcfc03053e3ca6334e51da8dfb19b6cdc8b306fae3283e"
 [[package]]
 name = "perf_ui"
 version = "0.2.3"
-source = "git+https://github.com/ka-de/perf_ui#3bd61fe19c65445f72c6c388e9fb49e48b1c5a3d"
+source = "git+https://github.com/ka-de/perf_ui#38198a6838337349f744efb2f7b9a1d614a607f7"
 dependencies = [
  "bevy",
 ]
