@@ -289,9 +289,14 @@ fn decrease_hunger(
     if hunger_timer.0.just_finished() {
         if let Ok(mut health) = cat_query.get_single_mut() {
             health.hunger = health.hunger.saturating_sub(5);
+
+            // If hunger reaches 0, decrease health by 5 every second
+            if health.hunger == 0 {
+                health.current = health.current.saturating_sub(5);
+            }
         }
         // Set the timer's duration to 60 seconds for periodic decrease
-        hunger_timer.0.set_duration(Duration::from_secs(1)); // We don't have time for this. TESTING //
+        hunger_timer.0.set_duration(Duration::from_secs(1));
         // Reset the timer to count down again.
         hunger_timer.0.reset();
     }
