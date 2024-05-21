@@ -49,6 +49,11 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     // Print the cat's name
     println!("The cat's name is: {}", cat_name);
+
+    match get_cat_gender(&cat_name) {
+        Some(gender) => println!("The gender of {} is {}.", cat_name, gender),
+        None => println!("Could not find a cat named {}.", cat_name),
+    }
 }
 
 fn main() {
@@ -93,6 +98,41 @@ pub struct TimeSinceLastKeypress {
     last_keypress: Duration,
 }
 
+pub const CAT_NAMES: &[(&str, &str)] = &[
+    ("Picard", "male"), ("Beverly", "female"), ("Data", "male"), ("Troi", "female"), 
+    ("Laforge", "male"), ("Crusher", "male"), ("Yar", "female"), ("Kirk", "male"),
+    ("Spock", "male"), ("Mccoy", "male"), ("Scotty", "male"), ("Uhura", "female"), 
+    ("Sulu", "male"), ("Chekov", "male"), ("Chakotay", "male"), ("Tuvok", "male"),
+    ("Sisko", "male"), ("Kira", "female"), ("Dax", "female"), ("Bashir", "male"), 
+    ("Odo", "male"), ("Quark", "male"), ("Archer", "male"), ("Tucker", "male"),
+    ("Tpol", "female"), ("Reed", "male"), ("Mayweather", "male"), ("Phlox", "male"), 
+    ("Sato", "female"), ("Sevenofnine", "female"), ("Thedoctor", "male"),
+    ("Tomparis", "male"), ("Harrykim", "male"), ("Belanna", "female"), 
+    ("Torres", "female"), ("Jeanluc", "male"), ("Lorca", "male"), ("Burnham", "female"),
+    ("Saru", "male"), ("Stamets", "male"), ("Tilly", "female"), ("Georgiou", "female"), 
+    ("Culber", "male"), ("Cornwell", "female"), ("Leland", "male"),
+    ("Vance", "male"), ("Reno", "female"), ("Booker", "male"), ("Grudge", "female"), 
+    ("Shaxs", "male"), ("Detmer", "female"), ("Owosekun", "female"), ("Rhys", "male"),
+    ("Pike", "male"), ("Number-One", "female"), ("Laan", "male"), ("Chapel", "female"), 
+    ("Kyle", "male"), ("Vina", "female"), ("Mudd", "male"), ("Garak", "male"),
+    ("Leyton", "male"), ("Ross", "male"), ("Nog", "male"), ("Jake", "male"), 
+    ("Seven", "female"), ("Janeway", "female"), ("Tuvix", "male"), ("Neelix", "male"),
+    ("Kes", "female"), ("Carey", "male"), ("Vorik", "male"), ("Wildman", "female"), 
+    ("Zahir", "male"), ("Seska", "female"), ("Jonas", "male"), ("Rio", "male"),
+    ("Maxwell", "male"), ("Tryla", "female"), ("Lorian", "male"), ("Icheb", "male"), 
+    ("Q", "male"), ("Guinan", "female"), ("Pulaski", "female"), ("Ro", "female"),
+    ("Hwomyn", "female"), ("Riker", "male"), ("Shelby", "female"), ("Obrien", "male"), 
+    ("Keiko", "female"), ("Molly", "female"), ("Kirayoshi", "male"),
+    ("Naomi", "female"), ("Ezri", "female"), ("Kassidy", "female"), ("Leeta", "female"), 
+    ("Nog", "male"), ("Rom", "male"), ("Brunt", "male"), ("Ishka", "female"), ("Worf", "male"),
+    ("Martok", "male"), ("Grilka", "female"), ("Sharan", "male"), ("Alexander", "male"), 
+    ("Kehleyr", "female"), ("Lwaxana", "female"), ("Kamala", "female"),
+    ("Vash", "female"), ("Tasha", "female"), ("Ogawa", "female"), ("Barclay", "male"), 
+    ("Maddox", "male"), ("Soong", "male"), ("Juliana", "female"), ("Sela", "female"),
+    ("Toral", "male"), ("Ziyal", "female"), ("Dukat", "male"), ("Damar", "male"), 
+    ("Weyoun", "male"), ("Eddington", "male"), ("Michael", "male"),
+    ("Sarina", "female"), ("Hugh", "male"), ("Lore", "male"), ("El-Aurian", "male")
+];
 
 /**
  * The Health Component 🩸 
@@ -113,29 +153,17 @@ struct Cat {
 
 fn generate_cat_name() -> String {
     let mut rng = thread_rng();
-    let cat_names = vec![
-        "picard", "beverly", "data", "troi", "laforge", "crusher", "yar", "kirk",
-        "spock", "mccoy", "scotty", "uhura", "sulu", "chekov", "chakotay", "tuvok",
-        "sisko", "kira", "dax", "bashir", "odo", "quark", "archer", "tucker",
-        "tpol", "reed", "mayweather", "phlox", "sato", "sevenofnine", "thedoctor",
-        "tomparis", "harrykim", "belanna", "torres", "jeanluc", "lorca", "burnham",
-        "saru", "stamets", "tilly", "georgiou", "culber", "cornwell", "leland",
-        "vance", "reno", "booker", "grudge", "shaxs", "detmer", "owosekun", "rhys",
-        "pike", "number-one", "laan", "chapel", "kyle", "vina", "mudd", "garak",
-        "leyton", "ross", "nog", "jake", "seven", "janeway", "tuvix", "neelix",
-        "kes", "carey", "vorik", "wildman", "zahir", "seska", "jonas", "rio",
-        "maxwell", "tryla", "lorian", "icheb", "q", "guinan", "pulaski", "ro",
-        "hwomyn", "riker", "shelby", "obrien", "keiko", "molly", "kirayoshi",
-        "naomi", "ezri", "kassidy", "leeta", "nog", "rom", "brunt", "ishka", "worf",
-        "martok", "grilka", "sharan", "alexander", "kehleyr", "lwaxana", "kamala",
-        "vash", "tasha", "ogawa", "barclay", "maddox", "soong", "juliana", "sela",
-        "toral", "ziyal", "dukat", "damar", "weyoun", "eddington", "michael",
-        "sarina", "hugh", "lore", "el-aurian"
-    ];
+    let (name, _gender) = CAT_NAMES.choose(&mut rng).unwrap();
+    name.to_string()
+}
 
-
-    let name = cat_names.choose(&mut rng).unwrap().to_string();
-    return name;
+fn get_cat_gender(name: &str) -> Option<&'static str> {
+    for &(cat_name, gender) in CAT_NAMES {
+        if cat_name == name {
+            return Some(gender);
+        }
+    }
+    None
 }
 
 /**
