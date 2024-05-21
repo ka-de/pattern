@@ -29,10 +29,14 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         PerfUiTimeSinceLastClick::default(),
         PerfUiTimeSinceLastKeypress::default(),
         PerfUiSpaceKeyPressCount::default(),
-        PerfUiCatName::default(),
+        PerfUiCatName::default(), // 🐈‍⬛
         PerfUiCatGender::default(),
         PerfUiCatHealth::default(),
         PerfUiCatHunger::default(),
+        PerfUiDogName::default(), // 🐕
+        PerfUiDogGender::default(),
+        PerfUiDogHealth::default(),
+        PerfUiDogHunger::default(),
     ));
 
     // 🐈‍⬛
@@ -50,7 +54,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             texture: asset_server.load("cat-idle-1.png"),
             transform: Transform::from_xyz(25.0, 50.0, 0.0),
             ..Default::default()
-        }
+        },
+        Velocity { x: 2.0, y: 0.0 }
     ));
 
     // 🐕
@@ -66,18 +71,11 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         SpriteBundle {
             texture: asset_server.load("dog-idle-1.png"),
-            transform: Transform::from_xyz(25.0, 50.0, 0.0),
+            transform: Transform::from_xyz(-25.0, 50.0, 0.0),
             ..Default::default()
-        }
+        },
+        Velocity { x: -2.0, y: 0.0 }
     ));
-
-    // Print the cat's name
-    //println!("The cat's name is: {}", cat_name);
-
-    //match get_cat_gender(&cat_name) {
-    //    Some(gender) => println!("The gender of {} is {}.", cat_name, gender),
-    //    None => println!("Could not find a cat named {}.", cat_name),
-    //}
 }
 
 fn main() {
@@ -92,21 +90,254 @@ fn main() {
         .add_perf_ui_entry_type::<PerfUiCatGender>()
         .add_perf_ui_entry_type::<PerfUiCatHealth>()
         .add_perf_ui_entry_type::<PerfUiCatHunger>()
-        .init_resource::<CursorWorldCoordinates>() // Finally the 🐈‍⬛ stuff is over!
+        .add_perf_ui_entry_type::<PerfUiDogName>() // Finally the 🐈‍⬛ stuff is over!
+        .add_perf_ui_entry_type::<PerfUiDogGender>()
+        .add_perf_ui_entry_type::<PerfUiDogHealth>()
+        .add_perf_ui_entry_type::<PerfUiDogHunger>()
+        .init_resource::<CursorWorldCoordinates>() // End of 🐕
         .init_resource::<TimeSinceLastClick>()
         .init_resource::<TimeSinceLastKeypress>()
         .init_resource::<SpaceKeyPressCount>()
         .init_resource::<SpaceKeyPressState>()
         .init_resource::<HungerTimer>()
         .add_systems(Startup, setup)
-        .add_systems(Update, decrease_hunger) // 🐈‍⬛ - Nyeheh
+        .add_systems(Update, decrease_hunger) // Nyeheh
         .add_systems(Update, check_cat_health) // 🐈‍⬛
         .add_systems(Update, check_dog_health) // 🐕
         .add_systems(Update, cursor_system)
         .add_systems(Update, handle_click)
         .add_systems(Update, handle_keypress)
         .add_systems(Update, handle_space_keypress)
+        .add_systems(Update, move_entities)
+        .add_systems(Update, update_facing_direction)
         .run();
+}
+
+fn update_facing_direction(
+    mut query: Query<(&mut Transform, &Velocity), Or<(With<Dog>, With<Cat>)>>,
+) {
+    for (mut transform, velocity) in query.iter_mut() {
+        // Flip the sprite based on the direction of movement
+        if velocity.x < 0.0 {
+            transform.scale.x = transform.scale.x.abs() * -1.0;
+        } else {
+            transform.scale.x = transform.scale.x.abs();
+        }
+    }
+}
+
+#[derive(Component)]
+struct LastPosition {
+    x: f32,
+    y: f32,
+}
+
+/**
+ * ↗️
+ */
+#[derive(Component)]
+struct Velocity {
+    x: f32,
+    y: f32,
+}
+
+fn move_entities(
+    time: Res<Time>,
+    mut query: Query<(&mut Transform, &Velocity, &mut LastPosition), Or<(With<Dog>, With<Cat>)>>,
+) {
+    for (mut transform, velocity, mut last_position) in query.iter_mut() {
+        last_position.x = transform.translation.x;
+        last_position.y = transform.translation.y;
+        transform.translation.x += velocity.x * time.delta_seconds();
+        transform.translation.y += velocity.y * time.delta_seconds();
+    }
+}
+
+/**
+ * More fucking 🐕 stuff.
+ */
+ #[derive(Component)]
+pub struct PerfUiDogHunger {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiDogHunger {
+    fn default() -> Self {
+        PerfUiDogHunger {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiDogHunger {
+    type Value = u32;
+    type SystemParam = Query<'static, 'static, &'static Health, With<Cat>>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Dog Hunger"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let health = health_query.single();
+        Some(health.hunger)
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        format!("{}", value)
+    }
+
+    fn width_hint(&self) -> usize {
+        3
+    }
+}
+
+#[derive(Component)]
+pub struct PerfUiDogHealth {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiDogHealth {
+    fn default() -> Self {
+        PerfUiDogHealth {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiDogHealth {
+    type Value = String;
+    type SystemParam = Query<'static, 'static, &'static Health, With<Cat>>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Dog Health"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let health = health_query.single();
+        Some(format!("{}/{}", health.current, health.max))
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        value.clone()
+    }
+
+    fn width_hint(&self) -> usize {
+        10
+    }
+}
+
+#[derive(Component)]
+pub struct PerfUiDogName {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiDogName {
+    fn default() -> Self {
+        PerfUiDogName {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiDogName {
+    type Value = String;
+    type SystemParam = Query<'static, 'static, &'static Dog>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Dog Name"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, cat_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let cat = cat_query.single();
+        Some(cat.name.clone())
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        value.clone()
+    }
+
+    fn width_hint(&self) -> usize {
+        20
+    }
+}
+
+/**
+ * This is just for the fucking gender of the 🐕 in the PerfUI lmao
+ */
+#[derive(Component)]
+pub struct PerfUiDogGender {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiDogGender {
+    fn default() -> Self {
+        PerfUiDogGender {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiDogGender {
+    type Value = String;
+    type SystemParam = Query<'static, 'static, &'static Dog>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Dog Gender"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, cat_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let cat = cat_query.single();
+        let gender = get_dog_gender(&cat.name);
+        Some(gender.unwrap_or("Unknown").to_string())
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        value.clone()
+    }
+
+    fn width_hint(&self) -> usize {
+        10
+    }
 }
 
 /**
@@ -299,36 +530,31 @@ impl PerfUiEntry for PerfUiCatGender {
 fn check_dog_health(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    dog_query: Query<(Entity, &Health), With<Dog>>,
+    dog_query: Query<(Entity, &Health, &LastPosition), With<Dog>>,
 ) {
-    for (entity, health) in dog_query.iter() {
+    for (entity, health, last_position) in dog_query.iter() {
         if health.current == 0 {
-            // Load the dead dog texture
-            let dead_dog_texture = asset_server.load("dog-dead.png"); // Use the appropriate dead dog sprite here
-            // Insert a new SpriteBundle with the dead dog texture
+            let dead_dog_texture = asset_server.load("dog-dead.png");
             commands.entity(entity).insert(SpriteBundle {
                 texture: dead_dog_texture,
-                transform: Transform::from_xyz(25.0, 50.0, 0.0),
+                transform: Transform::from_xyz(last_position.x, last_position.y, 0.0),
                 ..Default::default()
             });
         }
     }
 }
 
-// Let's be evil to the 🐈‍⬛!
 fn check_cat_health(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    cat_query: Query<(Entity, &Health), With<Cat>>,
+    cat_query: Query<(Entity, &Health, &LastPosition), With<Cat>>,
 ) {
-    for (entity, health) in cat_query.iter() {
+    for (entity, health, last_position) in cat_query.iter() {
         if health.current == 0 {
-            // Load the dead cat texture
             let dead_cat_texture = asset_server.load("cat-dead.png");
-            // Insert a new SpriteBundle with the dead cat texture
             commands.entity(entity).insert(SpriteBundle {
                 texture: dead_cat_texture,
-                transform: Transform::from_xyz(25.0, 50.0, 0.0),
+                transform: Transform::from_xyz(last_position.x, last_position.y, 0.0),
                 ..Default::default()
             });
         }
@@ -439,7 +665,7 @@ pub struct Health {
 }
 
 /**
- * The 🐶 Component
+ * The 🐕 Component
  */
 #[derive(Component)]
 pub struct Dog {
@@ -451,6 +677,15 @@ fn generate_dog_name() -> String {
     let mut rng = thread_rng();
     let (name, _gender) = DOG_NAMES.choose(&mut rng).unwrap();
     name.to_string()
+}
+
+fn get_dog_gender(name: &str) -> Option<&'static str> {
+    for &(cat_name, gender) in DOG_NAMES {
+        if cat_name == name {
+            return Some(gender);
+        }
+    }
+    None
 }
 
 /**
