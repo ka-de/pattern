@@ -189,47 +189,6 @@ fn update_animation(
     }
 }
 
-fn animate_cat_sprite(
-    time: Res<Time>,
-    mut query: Query<(&mut AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
-) {
-    for (mut indices, mut timer, mut atlas) in query.iter_mut() {
-        timer.tick(time.delta());
-        if timer.just_finished() {
-            indices.current_index = if indices.current_index == indices.last {
-                if indices.first == 4 { // Death animation
-                    4 // Loop back to the first frame of the death animation
-                } else {
-                    indices.first
-                }
-            } else {
-                indices.current_index + 1
-            };
-            atlas.index = indices.current_index;
-        }
-    }
-}
-
-fn animate_dog_sprite(
-    time: Res<Time>,
-    mut query: Query<(&mut AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
-) {
-    for (mut indices, mut timer, mut atlas) in query.iter_mut() {
-        timer.tick(time.delta());
-        if timer.just_finished() {
-            indices.current_index = if indices.current_index == indices.last {
-                if indices.first == 4 { // Death animation
-                    4 // Loop back to the first frame of the death animation
-                } else {
-                    indices.first
-                }
-            } else {
-                indices.current_index + 1
-            };
-            atlas.index = indices.current_index;
-        }
-    }
-}
 
 fn update_facing_direction(
     mut query: Query<(&mut Transform, &Velocity), Or<(With<Dog>, With<Cat>)>>,
@@ -320,380 +279,6 @@ fn decrease_hunger(
     }
 }
 
-/**
- * More fucking 🐕 stuff.
- */
- #[derive(Component)]
-pub struct PerfUiDogHunger {
-    pub label: String,
-    pub sort_key: i32,
-}
-
-impl Default for PerfUiDogHunger {
-    fn default() -> Self {
-        PerfUiDogHunger {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-        }
-    }
-}
-
-impl PerfUiEntry for PerfUiDogHunger {
-    type Value = u32;
-    type SystemParam = Query<'static, 'static, &'static Health, With<Cat>>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Dog Hunger"
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
-        let health = health_query.single();
-        Some(health.hunger)
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        format!("{}", value)
-    }
-
-    fn width_hint(&self) -> usize {
-        3
-    }
-}
-
-#[derive(Component)]
-pub struct PerfUiDogHealth {
-    pub label: String,
-    pub sort_key: i32,
-}
-
-impl Default for PerfUiDogHealth {
-    fn default() -> Self {
-        PerfUiDogHealth {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-        }
-    }
-}
-
-impl PerfUiEntry for PerfUiDogHealth {
-    type Value = String;
-    type SystemParam = Query<'static, 'static, &'static Health, With<Cat>>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Dog Health"
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
-        let health = health_query.single();
-        Some(format!("{}/{}", health.current, health.max))
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        value.clone()
-    }
-
-    fn width_hint(&self) -> usize {
-        10
-    }
-}
-
-#[derive(Component)]
-pub struct PerfUiDogName {
-    pub label: String,
-    pub sort_key: i32,
-}
-
-impl Default for PerfUiDogName {
-    fn default() -> Self {
-        PerfUiDogName {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-        }
-    }
-}
-
-impl PerfUiEntry for PerfUiDogName {
-    type Value = String;
-    type SystemParam = Query<'static, 'static, &'static Dog>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Dog Name"
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(&self, cat_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
-        let cat = cat_query.single();
-        Some(cat.name.clone())
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        value.clone()
-    }
-
-    fn width_hint(&self) -> usize {
-        20
-    }
-}
-
-/**
- * This is just for the fucking gender of the 🐕 in the PerfUI lmao
- */
-#[derive(Component)]
-pub struct PerfUiDogGender {
-    pub label: String,
-    pub sort_key: i32,
-}
-
-impl Default for PerfUiDogGender {
-    fn default() -> Self {
-        PerfUiDogGender {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-        }
-    }
-}
-
-impl PerfUiEntry for PerfUiDogGender {
-    type Value = String;
-    type SystemParam = Query<'static, 'static, &'static Dog>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Dog Gender"
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(&self, cat_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
-        let cat = cat_query.single();
-        let gender = get_dog_gender(&cat.name);
-        Some(gender.unwrap_or("Unknown").to_string())
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        value.clone()
-    }
-
-    fn width_hint(&self) -> usize {
-        10
-    }
-}
-
-/**
- * More fucking 🐈‍⬛ stuff.
- */
- #[derive(Component)]
-pub struct PerfUiCatHunger {
-    pub label: String,
-    pub sort_key: i32,
-}
-
-impl Default for PerfUiCatHunger {
-    fn default() -> Self {
-        PerfUiCatHunger {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-        }
-    }
-}
-
-impl PerfUiEntry for PerfUiCatHunger {
-    type Value = u32;
-    type SystemParam = Query<'static, 'static, &'static Health, With<Cat>>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Cat Hunger"
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
-        let health = health_query.single();
-        Some(health.hunger)
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        format!("{}", value)
-    }
-
-    fn width_hint(&self) -> usize {
-        3
-    }
-}
-
-#[derive(Component)]
-pub struct PerfUiCatHealth {
-    pub label: String,
-    pub sort_key: i32,
-}
-
-impl Default for PerfUiCatHealth {
-    fn default() -> Self {
-        PerfUiCatHealth {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-        }
-    }
-}
-
-impl PerfUiEntry for PerfUiCatHealth {
-    type Value = String;
-    type SystemParam = Query<'static, 'static, &'static Health, With<Cat>>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Cat Health"
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
-        let health = health_query.single();
-        Some(format!("{}/{}", health.current, health.max))
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        value.clone()
-    }
-
-    fn width_hint(&self) -> usize {
-        10
-    }
-}
-
-#[derive(Component)]
-pub struct PerfUiCatName {
-    pub label: String,
-    pub sort_key: i32,
-}
-
-impl Default for PerfUiCatName {
-    fn default() -> Self {
-        PerfUiCatName {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-        }
-    }
-}
-
-impl PerfUiEntry for PerfUiCatName {
-    type Value = String;
-    type SystemParam = Query<'static, 'static, &'static Cat>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Cat Name"
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(&self, cat_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
-        let cat = cat_query.single();
-        Some(cat.name.clone())
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        value.clone()
-    }
-
-    fn width_hint(&self) -> usize {
-        20
-    }
-}
-
-/**
- * This is just for the fucking gender of the 🐈‍⬛ in the PerfUI lmao
- */
-#[derive(Component)]
-pub struct PerfUiCatGender {
-    pub label: String,
-    pub sort_key: i32,
-}
-
-impl Default for PerfUiCatGender {
-    fn default() -> Self {
-        PerfUiCatGender {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-        }
-    }
-}
-
-impl PerfUiEntry for PerfUiCatGender {
-    type Value = String;
-    type SystemParam = Query<'static, 'static, &'static Cat>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Cat Gender"
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(&self, cat_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
-        let cat = cat_query.single();
-        let gender = get_cat_gender(&cat.name);
-        Some(gender.unwrap_or("Unknown").to_string())
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        value.clone()
-    }
-
-    fn width_hint(&self) -> usize {
-        10
-    }
-}
-
 #[derive(Resource, Default)]
 pub struct SpaceKeyPressCount {
     count: u32,
@@ -709,52 +294,6 @@ pub struct TimeSinceLastKeypress {
     last_keypress: Duration,
 }
 
-pub const CAT_NAMES: &[(&str, &str)] = &[
-    ("Picard", "male"), ("Beverly", "female"), ("Data", "male"), ("Troi", "female"), 
-    ("Laforge", "male"), ("Crusher", "male"), ("Yar", "female"), ("Kirk", "male"),
-    ("Spock", "male"), ("Mccoy", "male"), ("Scotty", "male"), ("Uhura", "female"), 
-    ("Sulu", "male"), ("Chekov", "male"), ("Chakotay", "male"), ("Tuvok", "male"),
-    ("Sisko", "male"), ("Kira", "female"), ("Dax", "female"), ("Bashir", "male"), 
-    ("Odo", "male"), ("Quark", "male"), ("Archer", "male"), ("Tucker", "male"),
-    ("Tpol", "female"), ("Reed", "male"), ("Mayweather", "male"), ("Phlox", "male"), 
-    ("Sato", "female"), ("Sevenofnine", "female"), ("Thedoctor", "male"),
-    ("Tomparis", "male"), ("Harrykim", "male"), ("Belanna", "female"), 
-    ("Torres", "female"), ("Jeanluc", "male"), ("Lorca", "male"), ("Burnham", "female"),
-    ("Saru", "male"), ("Stamets", "male"), ("Tilly", "female"), ("Georgiou", "female"), 
-    ("Culber", "male"), ("Cornwell", "female"), ("Leland", "male"),
-    ("Vance", "male"), ("Reno", "female"), ("Booker", "male"), ("Grudge", "female"), 
-    ("Shaxs", "male"), ("Detmer", "female"), ("Owosekun", "female"), ("Rhys", "male"),
-    ("Pike", "male"), ("Number One", "male"), ("Laan", "male"), ("Chapel", "female"), 
-    ("Kyle", "male"), ("Vina", "female"), ("Mudd", "male"), ("Garak", "male"),
-    ("Leyton", "male"), ("Ross", "male"), ("Nog", "male"), ("Jake", "male"), 
-    ("Seven", "female"), ("Janeway", "female"), ("Tuvix", "male"), ("Neelix", "male"),
-    ("Kes", "female"), ("Carey", "male"), ("Vorik", "male"), ("Wildman", "female"), 
-    ("Zahir", "male"), ("Seska", "female"), ("Jonas", "male"), ("Rio", "male"),
-    ("Maxwell", "male"), ("Tryla", "female"), ("Lorian", "male"), ("Icheb", "male"), 
-    ("Q", "male"), ("Guinan", "female"), ("Pulaski", "female"), ("Ro", "female"),
-    ("Hwomyn", "female"), ("Riker", "male"), ("Shelby", "female"), ("Obrien", "male"), 
-    ("Keiko", "female"), ("Molly", "female"), ("Kirayoshi", "male"),
-    ("Naomi", "female"), ("Ezri", "female"), ("Kassidy", "female"), ("Leeta", "female"), 
-    ("Nog", "male"), ("Rom", "male"), ("Brunt", "male"), ("Ishka", "female"), ("Worf", "male"),
-    ("Martok", "male"), ("Grilka", "female"), ("Sharan", "male"), ("Alexander", "male"), 
-    ("Kehleyr", "female"), ("Lwaxana", "female"), ("Kamala", "female"),
-    ("Vash", "female"), ("Tasha", "female"), ("Ogawa", "female"), ("Barclay", "male"), 
-    ("Maddox", "male"), ("Soong", "male"), ("Juliana", "female"), ("Sela", "female"),
-    ("Toral", "male"), ("Ziyal", "female"), ("Dukat", "male"), ("Damar", "male"), 
-    ("Weyoun", "male"), ("Eddington", "male"), ("Michael", "male"),
-    ("Sarina", "female"), ("Hugh", "male"), ("Lore", "male"), ("Elaurian", "male")
-];
-
-pub const DOG_NAMES: &[(&str, &str)] = &[
-    ("Malcolm", "male"), ("Zoe", "female"), ("Wash", "male"), ("Inara", "female"),
-    ("Jayne", "male"), ("Kaylee", "female"), ("Simon", "male"), ("River", "female"),
-    ("Book", "male"), ("Saffron", "female"), ("Badger", "male"), ("Nandi", "female"),
-    ("Bester", "male"), ("Dobson", "male"), ("Atherton", "male"), ("Gabriel", "male"),
-    ("Regan", "female"), ("Tracey", "male"), ("Amnon", "male"), ("Fess", "male"),
-    ("Rance", "male"), ("Magistrate", "male"), ("Lucy", "female"), ("Ruth", "female"),
-    ("Bree", "female")
-];
-
 /**
  * The Health Component 🩸 
  */
@@ -763,53 +302,6 @@ pub struct Health {
     current: u32,
     max: u32,
     hunger: u32,
-}
-
-/**
- * The 🐕 Component
- */
-#[derive(Component)]
-pub struct Dog {
-    name: String,
-}
-
-// Function to generate dog names
-fn generate_dog_name() -> String {
-    let mut rng = thread_rng();
-    let (name, _gender) = DOG_NAMES.choose(&mut rng).unwrap();
-    name.to_string()
-}
-
-fn get_dog_gender(name: &str) -> Option<&'static str> {
-    for &(cat_name, gender) in DOG_NAMES {
-        if cat_name == name {
-            return Some(gender);
-        }
-    }
-    None
-}
-
-/**
- * The 🐈‍⬛ Component
- */
-#[derive(Component)]
-pub struct Cat {
-    name: String,
-}
-
-fn generate_cat_name() -> String {
-    let mut rng = thread_rng();
-    let (name, _gender) = CAT_NAMES.choose(&mut rng).unwrap();
-    name.to_string()
-}
-
-fn get_cat_gender(name: &str) -> Option<&'static str> {
-    for &(cat_name, gender) in CAT_NAMES {
-        if cat_name == name {
-            return Some(gender);
-        }
-    }
-    None
 }
 
 /**
@@ -868,7 +360,7 @@ impl Default for PerfUiCursorWorldCoordinates {
             display_units: false,
             color_gradient: ColorGradient::new_preset_gyr(1.0, 4.0, 8.0).unwrap(),
             digits: 2,
-            precision: 3,
+            precision: 0,
             sort_key: perf_ui::utils::next_sort_key(),
         }
     }
@@ -1204,6 +696,521 @@ impl PerfUiEntry for PerfUiSpaceKeyPressCount {
 
     fn format_value(&self, value: &Self::Value) -> String {
         format!("{}", value)
+    }
+
+    fn width_hint(&self) -> usize {
+        10
+    }
+}
+
+/**
+ * A lot of names for the 🐕.
+ */
+pub const DOG_NAMES: &[(&str, &str)] = &[
+    ("Malcolm", "male"), ("Zoe", "female"), ("Wash", "male"), ("Inara", "female"),
+    ("Jayne", "male"), ("Kaylee", "female"), ("Simon", "male"), ("River", "female"),
+    ("Book", "male"), ("Saffron", "female"), ("Badger", "male"), ("Nandi", "female"),
+    ("Bester", "male"), ("Dobson", "male"), ("Atherton", "male"), ("Gabriel", "male"),
+    ("Regan", "female"), ("Tracey", "male"), ("Amnon", "male"), ("Fess", "male"),
+    ("Rance", "male"), ("Magistrate", "male"), ("Lucy", "female"), ("Ruth", "female"),
+    ("Bree", "female")
+];
+
+/**
+ * The 🐕 Component
+ */
+#[derive(Component)]
+pub struct Dog {
+    name: String,
+}
+
+// Function to generate dog names
+fn generate_dog_name() -> String {
+    let mut rng = thread_rng();
+    let (name, _gender) = DOG_NAMES.choose(&mut rng).unwrap();
+    name.to_string()
+}
+
+fn get_dog_gender(name: &str) -> Option<&'static str> {
+    for &(dog_name, gender) in DOG_NAMES {
+        if dog_name == name {
+            return Some(gender);
+        }
+    }
+    None
+}
+
+fn animate_dog_sprite(
+    time: Res<Time>,
+    mut query: Query<(&mut AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
+) {
+    for (mut indices, mut timer, mut atlas) in query.iter_mut() {
+        timer.tick(time.delta());
+        if timer.just_finished() {
+            indices.current_index = if indices.current_index == indices.last {
+                if indices.first == 4 { // Death animation
+                    4 // Loop back to the first frame of the death animation
+                } else {
+                    indices.first
+                }
+            } else {
+                indices.current_index + 1
+            };
+            atlas.index = indices.current_index;
+        }
+    }
+}
+
+/**
+ * More fucking 🐕 stuff.
+ */
+ #[derive(Component)]
+pub struct PerfUiDogHunger {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiDogHunger {
+    fn default() -> Self {
+        PerfUiDogHunger {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiDogHunger {
+    type Value = u32;
+    type SystemParam = Query<'static, 'static, &'static Health, With<Dog>>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Dog Hunger"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let health = health_query.single();
+        Some(health.hunger)
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        format!("{}", value)
+    }
+
+    fn width_hint(&self) -> usize {
+        3
+    }
+}
+
+#[derive(Component)]
+pub struct PerfUiDogHealth {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiDogHealth {
+    fn default() -> Self {
+        PerfUiDogHealth {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiDogHealth {
+    type Value = String;
+    type SystemParam = Query<'static, 'static, &'static Health, With<Dog>>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Dog Health"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let health = health_query.single();
+        Some(format!("{}/{}", health.current, health.max))
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        value.clone()
+    }
+
+    fn width_hint(&self) -> usize {
+        10
+    }
+}
+
+#[derive(Component)]
+pub struct PerfUiDogName {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiDogName {
+    fn default() -> Self {
+        PerfUiDogName {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiDogName {
+    type Value = String;
+    type SystemParam = Query<'static, 'static, &'static Dog>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Dog Name"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, dog_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let dog = dog_query.single();
+        Some(dog.name.clone())
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        value.clone()
+    }
+
+    fn width_hint(&self) -> usize {
+        20
+    }
+}
+
+/**
+ * This is just for the fucking gender of the 🐕 in the PerfUI lmao
+ */
+#[derive(Component)]
+pub struct PerfUiDogGender {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiDogGender {
+    fn default() -> Self {
+        PerfUiDogGender {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiDogGender {
+    type Value = String;
+    type SystemParam = Query<'static, 'static, &'static Dog>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Dog Gender"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, dog_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let dog = dog_query.single();
+        let gender = get_dog_gender(&dog.name);
+        Some(gender.unwrap_or("Unknown").to_string())
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        value.clone()
+    }
+
+    fn width_hint(&self) -> usize {
+        10
+    }
+}
+
+/**
+ * A lot of names for the 🐈‍⬛.
+ */
+pub const CAT_NAMES: &[(&str, &str)] = &[
+    ("Picard", "male"), ("Beverly", "female"), ("Data", "male"), ("Troi", "female"), 
+    ("Laforge", "male"), ("Crusher", "male"), ("Yar", "female"), ("Kirk", "male"),
+    ("Spock", "male"), ("Mccoy", "male"), ("Scotty", "male"), ("Uhura", "female"), 
+    ("Sulu", "male"), ("Chekov", "male"), ("Chakotay", "male"), ("Tuvok", "male"),
+    ("Sisko", "male"), ("Kira", "female"), ("Dax", "female"), ("Bashir", "male"), 
+    ("Odo", "male"), ("Quark", "male"), ("Archer", "male"), ("Tucker", "male"),
+    ("Tpol", "female"), ("Reed", "male"), ("Mayweather", "male"), ("Phlox", "male"), 
+    ("Sato", "female"), ("Sevenofnine", "female"), ("Thedoctor", "male"),
+    ("Tomparis", "male"), ("Harrykim", "male"), ("Belanna", "female"), 
+    ("Torres", "female"), ("Jeanluc", "male"), ("Lorca", "male"), ("Burnham", "female"),
+    ("Saru", "male"), ("Stamets", "male"), ("Tilly", "female"), ("Georgiou", "female"), 
+    ("Culber", "male"), ("Cornwell", "female"), ("Leland", "male"),
+    ("Vance", "male"), ("Reno", "female"), ("Booker", "male"), ("Grudge", "female"), 
+    ("Shaxs", "male"), ("Detmer", "female"), ("Owosekun", "female"), ("Rhys", "male"),
+    ("Pike", "male"), ("Number One", "male"), ("Laan", "male"), ("Chapel", "female"), 
+    ("Kyle", "male"), ("Vina", "female"), ("Mudd", "male"), ("Garak", "male"),
+    ("Leyton", "male"), ("Ross", "male"), ("Nog", "male"), ("Jake", "male"), 
+    ("Seven", "female"), ("Janeway", "female"), ("Tuvix", "male"), ("Neelix", "male"),
+    ("Kes", "female"), ("Carey", "male"), ("Vorik", "male"), ("Wildman", "female"), 
+    ("Zahir", "male"), ("Seska", "female"), ("Jonas", "male"), ("Rio", "male"),
+    ("Maxwell", "male"), ("Tryla", "female"), ("Lorian", "male"), ("Icheb", "male"), 
+    ("Q", "male"), ("Guinan", "female"), ("Pulaski", "female"), ("Ro", "female"),
+    ("Hwomyn", "female"), ("Riker", "male"), ("Shelby", "female"), ("Obrien", "male"), 
+    ("Keiko", "female"), ("Molly", "female"), ("Kirayoshi", "male"),
+    ("Naomi", "female"), ("Ezri", "female"), ("Kassidy", "female"), ("Leeta", "female"), 
+    ("Nog", "male"), ("Rom", "male"), ("Brunt", "male"), ("Ishka", "female"), ("Worf", "male"),
+    ("Martok", "male"), ("Grilka", "female"), ("Sharan", "male"), ("Alexander", "male"), 
+    ("Kehleyr", "female"), ("Lwaxana", "female"), ("Kamala", "female"),
+    ("Vash", "female"), ("Tasha", "female"), ("Ogawa", "female"), ("Barclay", "male"), 
+    ("Maddox", "male"), ("Soong", "male"), ("Juliana", "female"), ("Sela", "female"),
+    ("Toral", "male"), ("Ziyal", "female"), ("Dukat", "male"), ("Damar", "male"), 
+    ("Weyoun", "male"), ("Eddington", "male"), ("Michael", "male"),
+    ("Sarina", "female"), ("Hugh", "male"), ("Lore", "male"), ("Elaurian", "male")
+];
+
+/**
+ * The 🐈‍⬛ Component
+ */
+#[derive(Component)]
+pub struct Cat {
+    name: String,
+}
+
+fn generate_cat_name() -> String {
+    let mut rng = thread_rng();
+    let (name, _gender) = CAT_NAMES.choose(&mut rng).unwrap();
+    name.to_string()
+}
+
+fn get_cat_gender(name: &str) -> Option<&'static str> {
+    for &(cat_name, gender) in CAT_NAMES {
+        if cat_name == name {
+            return Some(gender);
+        }
+    }
+    None
+}
+
+fn animate_cat_sprite(
+    time: Res<Time>,
+    mut query: Query<(&mut AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
+) {
+    for (mut indices, mut timer, mut atlas) in query.iter_mut() {
+        timer.tick(time.delta());
+        if timer.just_finished() {
+            indices.current_index = if indices.current_index == indices.last {
+                if indices.first == 4 { // Death animation
+                    4 // Loop back to the first frame of the death animation
+                } else {
+                    indices.first
+                }
+            } else {
+                indices.current_index + 1
+            };
+            atlas.index = indices.current_index;
+        }
+    }
+}
+
+/**
+ * More fucking 🐈‍⬛ stuff.
+ */
+ #[derive(Component)]
+pub struct PerfUiCatHunger {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiCatHunger {
+    fn default() -> Self {
+        PerfUiCatHunger {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiCatHunger {
+    type Value = u32;
+    type SystemParam = Query<'static, 'static, &'static Health, With<Cat>>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Cat Hunger"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let health = health_query.single();
+        Some(health.hunger)
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        format!("{}", value)
+    }
+
+    fn width_hint(&self) -> usize {
+        3
+    }
+}
+
+#[derive(Component)]
+pub struct PerfUiCatHealth {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiCatHealth {
+    fn default() -> Self {
+        PerfUiCatHealth {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiCatHealth {
+    type Value = String;
+    type SystemParam = Query<'static, 'static, &'static Health, With<Cat>>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Cat Health"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let health = health_query.single();
+        Some(format!("{}/{}", health.current, health.max))
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        value.clone()
+    }
+
+    fn width_hint(&self) -> usize {
+        10
+    }
+}
+
+#[derive(Component)]
+pub struct PerfUiCatName {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiCatName {
+    fn default() -> Self {
+        PerfUiCatName {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiCatName {
+    type Value = String;
+    type SystemParam = Query<'static, 'static, &'static Cat>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Cat Name"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, cat_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let cat = cat_query.single();
+        Some(cat.name.clone())
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        value.clone()
+    }
+
+    fn width_hint(&self) -> usize {
+        20
+    }
+}
+
+/**
+ * This is just for the fucking gender of the 🐈‍⬛ in the PerfUI lmao
+ */
+#[derive(Component)]
+pub struct PerfUiCatGender {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiCatGender {
+    fn default() -> Self {
+        PerfUiCatGender {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiCatGender {
+    type Value = String;
+    type SystemParam = Query<'static, 'static, &'static Cat>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Cat Gender"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, cat_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let cat = cat_query.single();
+        let gender = get_cat_gender(&cat.name);
+        Some(gender.unwrap_or("Unknown").to_string())
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        value.clone()
     }
 
     fn width_hint(&self) -> usize {
