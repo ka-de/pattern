@@ -276,6 +276,24 @@ impl PerfUiEntry for PerfUiCatGender {
     }
 }
 
+/**
+ * The 💀 state,!
+ */
+
+#[derive(Component)]
+struct DeathState {
+    dead: bool,
+    death_time: Option<Time>,
+}
+
+impl Default for DeathState {
+    fn default() -> Self {
+        DeathState {
+            dead: false,
+            death_time: None,
+        }
+    }
+}
 // Let's be evil to the 🐈‍⬛!
 #[derive(Resource, Default)]
 struct HungerTimer(Timer);
