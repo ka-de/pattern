@@ -53,6 +53,24 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         }
     ));
 
+    // 🐕
+    let dog_name = generate_dog_name();
+    let _dog_entity = commands.spawn((
+        Dog {
+            name: dog_name.clone(),
+        },
+        Health {
+            current: 100,
+            max: 100,
+            hunger: 100,
+        },
+        SpriteBundle {
+            texture: asset_server.load("dog-idle-1.png"),
+            transform: Transform::from_xyz(25.0, 50.0, 0.0),
+            ..Default::default()
+        }
+    ));
+
     // Print the cat's name
     //println!("The cat's name is: {}", cat_name);
 
@@ -81,7 +99,9 @@ fn main() {
         .init_resource::<SpaceKeyPressState>()
         .init_resource::<HungerTimer>()
         .add_systems(Startup, setup)
-        .add_systems(Update, decrease_hunger) // Nyeheh
+        .add_systems(Update, decrease_hunger) // 🐈‍⬛ - Nyeheh
+        .add_systems(Update, check_cat_health) // 🐈‍⬛
+        .add_systems(Update, check_dog_health) // 🐕
         .add_systems(Update, cursor_system)
         .add_systems(Update, handle_click)
         .add_systems(Update, handle_keypress)
@@ -109,7 +129,7 @@ impl Default for PerfUiCatHunger {
 
 impl PerfUiEntry for PerfUiCatHunger {
     type Value = u32;
-    type SystemParam = Query<'static, 'static, &'static Health>;
+    type SystemParam = Query<'static, 'static, &'static Health, With<Cat>>;
 
     fn label(&self) -> &str {
         if self.label.is_empty() {
@@ -154,7 +174,7 @@ impl Default for PerfUiCatHealth {
 
 impl PerfUiEntry for PerfUiCatHealth {
     type Value = String;
-    type SystemParam = Query<'static, 'static, &'static Health>;
+    type SystemParam = Query<'static, 'static, &'static Health, With<Cat>>;
 
     fn label(&self) -> &str {
         if self.label.is_empty() {
@@ -276,36 +296,56 @@ impl PerfUiEntry for PerfUiCatGender {
     }
 }
 
-/**
- * The 💀 state,!
- */
-
-#[derive(Component)]
-struct DeathState {
-    dead: bool,
-    death_time: Option<Time>,
-}
-
-impl Default for DeathState {
-    fn default() -> Self {
-        DeathState {
-            dead: false,
-            death_time: None,
+fn check_dog_health(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    dog_query: Query<(Entity, &Health), With<Dog>>,
+) {
+    for (entity, health) in dog_query.iter() {
+        if health.current == 0 {
+            // Load the dead dog texture
+            let dead_dog_texture = asset_server.load("dog-dead.png"); // Use the appropriate dead dog sprite here
+            // Insert a new SpriteBundle with the dead dog texture
+            commands.entity(entity).insert(SpriteBundle {
+                texture: dead_dog_texture,
+                transform: Transform::from_xyz(25.0, 50.0, 0.0),
+                ..Default::default()
+            });
         }
     }
 }
+
 // Let's be evil to the 🐈‍⬛!
+fn check_cat_health(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    cat_query: Query<(Entity, &Health), With<Cat>>,
+) {
+    for (entity, health) in cat_query.iter() {
+        if health.current == 0 {
+            // Load the dead cat texture
+            let dead_cat_texture = asset_server.load("cat-dead.png");
+            // Insert a new SpriteBundle with the dead cat texture
+            commands.entity(entity).insert(SpriteBundle {
+                texture: dead_cat_texture,
+                transform: Transform::from_xyz(25.0, 50.0, 0.0),
+                ..Default::default()
+            });
+        }
+    }
+}
+
 #[derive(Resource, Default)]
 struct HungerTimer(Timer);
 
 fn decrease_hunger(
     time: Res<Time>,
     mut hunger_timer: ResMut<HungerTimer>,
-    mut cat_query: Query<&mut Health>,
+    mut health_query: Query<&mut Health>,
 ) {
     hunger_timer.0.tick(time.delta());
     if hunger_timer.0.just_finished() {
-        if let Ok(mut health) = cat_query.get_single_mut() {
+        for mut health in health_query.iter_mut() {
             health.hunger = health.hunger.saturating_sub(5);
 
             // If hunger reaches 0, decrease health by 5 every second
@@ -378,6 +418,16 @@ pub const CAT_NAMES: &[(&str, &str)] = &[
     ("Sarina", "female"), ("Hugh", "male"), ("Lore", "male"), ("Elaurian", "male")
 ];
 
+pub const DOG_NAMES: &[(&str, &str)] = &[
+    ("Malcolm", "male"), ("Zoe", "female"), ("Wash", "male"), ("Inara", "female"),
+    ("Jayne", "male"), ("Kaylee", "female"), ("Simon", "male"), ("River", "female"),
+    ("Book", "male"), ("Saffron", "female"), ("Badger", "male"), ("Nandi", "female"),
+    ("Bester", "male"), ("Dobson", "male"), ("Atherton", "male"), ("Gabriel", "male"),
+    ("Regan", "female"), ("Tracey", "male"), ("Amnon", "male"), ("Fess", "male"),
+    ("Rance", "male"), ("Magistrate", "male"), ("Lucy", "female"), ("Ruth", "female"),
+    ("Bree", "female")
+];
+
 /**
  * The Health Component 🩸 
  */
@@ -389,7 +439,22 @@ pub struct Health {
 }
 
 /**
- * The Cat Component 🐈‍⬛
+ * The 🐶 Component
+ */
+#[derive(Component)]
+pub struct Dog {
+    name: String,
+}
+
+// Function to generate dog names
+fn generate_dog_name() -> String {
+    let mut rng = thread_rng();
+    let (name, _gender) = DOG_NAMES.choose(&mut rng).unwrap();
+    name.to_string()
+}
+
+/**
+ * The 🐈‍⬛ Component
  */
 #[derive(Component)]
 pub struct Cat {
