@@ -29,8 +29,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         PerfUiTimeSinceLastClick::default(),
         PerfUiTimeSinceLastKeypress::default(),
         PerfUiSpaceKeyPressCount::default(),
-        PerfUiCatInfo::default(),
-        PerfUiCatName::default(), // Add this line
+        PerfUiCatName::default(),
         PerfUiCatGender::default(),
     ));
 
@@ -278,60 +277,8 @@ struct MainCamera;
 
 
 /**
- * 🐈‍⬛ Info
+ * PerfUI: Struct for tracking the time elapsed since the last click.
  */
-#[derive(Component)]
-pub struct PerfUiCatInfo {
-    pub label: String,
-    pub sort_key: i32,
-}
-
-impl Default for PerfUiCatInfo {
-    fn default() -> Self {
-        PerfUiCatInfo {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-        }
-    }
-}
-
-impl PerfUiEntry for PerfUiCatInfo {
-    type Value = String;
-    type SystemParam = (Query<'static, 'static, &'static Cat>, Query<'static, 'static, &'static Health>);
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Cat Info"
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(&self, (cat_query, health_query): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
-        let cat = cat_query.single();
-        let health = health_query.single();
-        let gender = get_cat_gender(&cat.name);
-        let gender_symbol = match gender {
-            Some("male") => "♂",
-            Some("female") => "♀",
-            _ => "",
-        };
-        Some(format!("{} {} ({}/{})", cat.name, gender_symbol, health.current, health.max))
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        value.clone()
-    }
-
-    fn width_hint(&self) -> usize {
-        30
-    }
-}
-
 #[derive(Component)]
 pub struct PerfUiTimeSinceLastClick {
     pub label: String,
@@ -343,6 +290,9 @@ pub struct PerfUiTimeSinceLastClick {
     pub sort_key: i32,
 }
 
+/**
+ *  PerfUI: Struct for tracking the time elapsed since the last key pressed.
+ */
 #[derive(Component)]
 pub struct PerfUiTimeSinceLastKeypress {
     pub label: String,
