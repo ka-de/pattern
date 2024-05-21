@@ -12,7 +12,10 @@ use bevy::ecs::system::SystemParam;
 use bevy::window::PrimaryWindow;
 use perf_ui::prelude::*;
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup(
+    mut commands: Commands, asset_server: Res<AssetServer>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>
+) {
     commands.spawn((Camera2dBundle::default(), MainCamera));
 
     // Performance UI
@@ -22,7 +25,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             font_value: asset_server.load("fonts/bahnschrift.ttf"),
             font_highlight: asset_server.load("fonts/bahnschrift.ttf"),
             values_col_width: Some(80.0),
-            ..default()
+           ..default()
         },
         PerfUiEntryFPS::default(),
         PerfUiTimeSinceLastClick::default(),
@@ -39,40 +42,58 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 
     // 🐈‍⬛
-    let cat_name = generate_cat_name();
+    let cat_texture = asset_server.load("textures/cat-texture.png");
+    let cat_layout = TextureAtlasLayout::from_grid(Vec2::new(26.0, 26.0), 4, 4, None, None);
+    let cat_texture_atlas_layout = texture_atlas_layouts.add(cat_layout);
+    let cat_animation_indices = AnimationIndices { first: 0, last: 3 }; // idle animation
     let _cat_entity = commands.spawn((
         Cat {
-            name: cat_name.clone(),
+            name: generate_cat_name(),
         },
         Health {
             current: 100,
             max: 100,
             hunger: 100,
         },
-        SpriteBundle {
-            texture: asset_server.load("cat-idle-1.png"),
+        SpriteSheetBundle {
+            texture: cat_texture.clone(),
+            atlas: TextureAtlas {
+                layout: cat_texture_atlas_layout,
+                index: cat_animation_indices.first,
+            },
             transform: Transform::from_xyz(25.0, 50.0, 0.0),
-            ..Default::default()
+           ..Default::default()
         },
+        AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
+        cat_animation_indices.clone(),
         Velocity { x: 2.0, y: 0.0 }
     ));
 
     // 🐕
-    let dog_name = generate_dog_name();
+    let dog_texture = asset_server.load("textures/dog-texture.png");
+    let dog_layout = TextureAtlasLayout::from_grid(Vec2::new(26.0, 26.0), 4, 4, None, None);
+    let dog_texture_atlas_layout = texture_atlas_layouts.add(dog_layout);
+    let dog_animation_indices = AnimationIndices { first: 0, last: 3 }; // idle animation
     let _dog_entity = commands.spawn((
         Dog {
-            name: dog_name.clone(),
+            name: generate_dog_name(),
         },
         Health {
             current: 100,
             max: 100,
             hunger: 100,
         },
-        SpriteBundle {
-            texture: asset_server.load("dog-idle-1.png"),
+        SpriteSheetBundle {
+            texture: dog_texture.clone(),
+            atlas: TextureAtlas {
+                layout: dog_texture_atlas_layout,
+                index: dog_animation_indices.first,
+            },
             transform: Transform::from_xyz(-25.0, 50.0, 0.0),
-            ..Default::default()
+           ..Default::default()
         },
+        AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
+        dog_animation_indices.clone(),
         Velocity { x: -2.0, y: 0.0 }
     ));
 }
@@ -80,37 +101,80 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 fn main() {
     App::new()
         // The ImagePlugin::default_nearest() prevents blurry sprites
-        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
-        .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
-        .add_plugins(PerfUiPlugin)
-        .add_perf_ui_entry_type::<PerfUiTimeSinceLastClick>()
-        .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
-        .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
-        .add_perf_ui_entry_type::<PerfUiCatName>() // I hate this 🐈‍⬛ already omg
-        .add_perf_ui_entry_type::<PerfUiCatGender>()
-        .add_perf_ui_entry_type::<PerfUiCatHealth>()
-        .add_perf_ui_entry_type::<PerfUiCatHunger>()
-        .add_perf_ui_entry_type::<PerfUiDogName>() // Finally the 🐈‍⬛ stuff is over!
-        .add_perf_ui_entry_type::<PerfUiDogGender>()
-        .add_perf_ui_entry_type::<PerfUiDogHealth>()
-        .add_perf_ui_entry_type::<PerfUiDogHunger>()
-        .init_resource::<CursorWorldCoordinates>() // End of 🐕
-        .init_resource::<TimeSinceLastClick>()
-        .init_resource::<TimeSinceLastKeypress>()
-        .init_resource::<SpaceKeyPressCount>()
-        .init_resource::<SpaceKeyPressState>()
-        .init_resource::<HungerTimer>()
-        .add_systems(Startup, setup)
-        .add_systems(Update, decrease_hunger) // Nyeheh
-        .add_systems(Update, check_cat_health) // 🐈‍⬛
-        .add_systems(Update, check_dog_health) // 🐕
-        .add_systems(Update, cursor_system)
-        .add_systems(Update, handle_click)
-        .add_systems(Update, handle_keypress)
-        .add_systems(Update, handle_space_keypress)
-        .add_systems(Update, move_entities)
-        .add_systems(Update, update_facing_direction)
-        .run();
+       .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+       .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
+       .add_plugins(PerfUiPlugin)
+       .add_perf_ui_entry_type::<PerfUiTimeSinceLastClick>()
+       .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
+       .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
+       .add_perf_ui_entry_type::<PerfUiCatName>() // I hate this 🐈‍⬛ already omg
+       .add_perf_ui_entry_type::<PerfUiCatGender>()
+       .add_perf_ui_entry_type::<PerfUiCatHealth>()
+       .add_perf_ui_entry_type::<PerfUiCatHunger>()
+       .add_perf_ui_entry_type::<PerfUiDogName>() // Finally the 🐈‍⬛ stuff is over!
+       .add_perf_ui_entry_type::<PerfUiDogGender>()
+       .add_perf_ui_entry_type::<PerfUiDogHealth>()
+       .add_perf_ui_entry_type::<PerfUiDogHunger>()
+       .init_resource::<CursorWorldCoordinates>() // End of 🐕
+       .init_resource::<TimeSinceLastClick>()
+       .init_resource::<TimeSinceLastKeypress>()
+       .init_resource::<SpaceKeyPressCount>()
+       .init_resource::<SpaceKeyPressState>()
+       .init_resource::<HungerTimer>()
+       .add_systems(Startup, setup)
+       .add_systems(Update, decrease_hunger) // Nyeheh
+       .add_systems(Update, check_cat_health) // 🐈‍⬛
+       .add_systems(Update, check_dog_health) // 🐕
+       .add_systems(Update, cursor_system)
+       .add_systems(Update, handle_click)
+       .add_systems(Update, handle_keypress)
+       .add_systems(Update, handle_space_keypress)
+       .add_systems(Update, move_entities)
+       .add_systems(Update, update_facing_direction)
+       .add_systems(Update, animate_cat_sprite)
+       .add_systems(Update, animate_dog_sprite)
+       .run();
+}
+
+#[derive(Component, Clone)]
+struct AnimationIndices {
+    first: usize,
+    last: usize,
+}
+
+#[derive(Component, Deref, DerefMut)]
+struct AnimationTimer(Timer);
+
+fn animate_cat_sprite(
+    time: Res<Time>,
+    mut query: Query<(&AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
+) {
+    for (indices, mut timer, mut atlas) in &mut query {
+        timer.tick(time.delta());
+        if timer.just_finished() {
+            atlas.index = if atlas.index == indices.last {
+                indices.first
+            } else {
+                atlas.index + 1
+            };
+        }
+    }
+}
+
+fn animate_dog_sprite(
+    time: Res<Time>,
+    mut query: Query<(&AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
+) {
+    for (indices, mut timer, mut atlas) in &mut query {
+        timer.tick(time.delta());
+        if timer.just_finished() {
+            atlas.index = if atlas.index == indices.last {
+                indices.first
+            } else {
+                atlas.index + 1
+            };
+        }
+    }
 }
 
 fn update_facing_direction(
