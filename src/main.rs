@@ -28,6 +28,7 @@ fn setup(
            ..default()
         },
         PerfUiEntryFPS::default(),
+        PerfUiCursorWorldCoordinates::default(),
         PerfUiTimeSinceLastClick::default(),
         PerfUiTimeSinceLastKeypress::default(),
         PerfUiSpaceKeyPressCount::default(),
@@ -106,6 +107,7 @@ fn main() {
        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
        .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
        .add_plugins(PerfUiPlugin)
+       .add_perf_ui_entry_type::<PerfUiCursorWorldCoordinates>()
        .add_perf_ui_entry_type::<PerfUiTimeSinceLastClick>()
        .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
        .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
@@ -692,13 +694,6 @@ impl PerfUiEntry for PerfUiCatGender {
     }
 }
 
-/**
- * Stores the world position of the mouse cursor.
- */
-#[derive(Resource, Default)]
-struct CursorWorldCoordinates(Vec2);
-
-
 #[derive(Resource, Default)]
 pub struct SpaceKeyPressCount {
     count: u32,
@@ -818,11 +813,132 @@ fn get_cat_gender(name: &str) -> Option<&'static str> {
 }
 
 /**
- * Identifies the main camera.
+ * Identifies the main camera. 🎥
  */
 #[derive(Component)]
 struct MainCamera;
 
+/**
+ * Stores the world position of the mouse cursor.
+ */
+#[derive(Resource, Default)]
+pub struct CursorWorldCoordinates(Vec2);
+
+/**
+ * Function to handle the mouse cursor with world coordinates.
+ */
+fn cursor_system(
+    mut coords: ResMut<CursorWorldCoordinates>,
+    // Get the window.
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    // Get the camera transform.
+    camera_query: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+) {
+    // Get the camera info and transform.
+    let (camera, camera_transform) = camera_query.single();
+
+    // There is only one primary window, so we can get it from the query.
+    let window = window_query.single();
+
+    // Check if the cursor is inside the window and get its position
+    // then, ask bevy to convert into world coordinates, and truncate to discard Z.
+    if let Some(world_position) = window.cursor_position()
+        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+        .map(|ray| ray.origin.truncate())
+    {
+        coords.0 = world_position;
+        //eprintln!("CursorWorldCoordinate: {}/{}", world_position.x, world_position.y);
+    }
+}
+
+#[derive(Component)]
+pub struct PerfUiCursorWorldCoordinates {
+    pub label: String,
+    pub display_units: bool,
+    pub color_gradient: ColorGradient,
+    pub digits: u8,
+    pub precision: u8,
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiCursorWorldCoordinates {
+    fn default() -> Self {
+        PerfUiCursorWorldCoordinates {
+            label: String::new(),
+            display_units: false,
+            color_gradient: ColorGradient::new_preset_gyr(1.0, 4.0, 8.0).unwrap(),
+            digits: 2,
+            precision: 3,
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+impl PerfUiEntry for PerfUiCursorWorldCoordinates {
+    type Value = Vec2;
+    type SystemParam = SRes<CursorWorldCoordinates>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Cursor World Coords"
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(
+        &self,
+        coords: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
+    ) -> Option<Self::Value> {
+        Some(coords.0)
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        let x_str = format!("{:.1$}", value.x, self.precision as usize);
+        let y_str = format!("{:.1$}", value.y, self.precision as usize);
+        let mut s = format!("x: {}, y: {}", x_str, y_str);
+        if self.display_units {
+            s.push_str(" units");
+        }
+        s
+    }
+
+    fn width_hint(&self) -> usize {
+        let w = 2 * perf_ui::utils::width_hint_pretty_float(self.digits, self.precision) + 4;
+        if self.display_units {
+            w + 6
+        } else {
+            w
+        }
+    }
+
+    fn value_color(&self, _value: &Self::Value) -> Option<Color> {
+        None
+    }
+
+    fn value_highlight(&self, _value: &Self::Value) -> bool {
+        false
+    }
+}
+
+/**
+ * Function to handle mouse clicks.
+ */
+fn handle_click(
+    time: Res<Time>,
+    mut lastclick: ResMut<TimeSinceLastClick>,
+    mut evr_mouse: EventReader<MouseButtonInput>,
+) {
+    for ev in evr_mouse.read() {
+        if ev.state == ButtonState::Pressed {
+            lastclick.last_click = time.elapsed();
+        }
+    }
+}
 
 /**
  * PerfUI: Struct for tracking the time elapsed since the last click.
@@ -839,19 +955,8 @@ pub struct PerfUiTimeSinceLastClick {
 }
 
 /**
- *  PerfUI: Struct for tracking the time elapsed since the last key pressed.
+ * PerfUI: Implementation for tracking the time elapsed since the last click.
  */
-#[derive(Component)]
-pub struct PerfUiTimeSinceLastKeypress {
-    pub label: String,
-    pub display_units: bool,
-    pub threshold_highlight: Option<f32>,
-    pub color_gradient: ColorGradient,
-    pub digits: u8,
-    pub precision: u8,
-    pub sort_key: i32,
-}
-
 impl Default for PerfUiTimeSinceLastClick {
     fn default() -> Self {
         PerfUiTimeSinceLastClick {
@@ -866,67 +971,9 @@ impl Default for PerfUiTimeSinceLastClick {
     }
 }
 
-impl Default for PerfUiTimeSinceLastKeypress {
-    fn default() -> Self {
-        PerfUiTimeSinceLastKeypress {
-            label: String::new(),
-            display_units: true,
-            threshold_highlight: Some(10.0),
-            color_gradient: ColorGradient::new_preset_gyr(1.0, 4.0, 8.0).unwrap(),
-            digits: 2,
-            precision: 3,
-            sort_key: perf_ui::utils::next_sort_key(),
-        }
-    }
-}
-
-#[derive(Component)]
-pub struct PerfUiSpaceKeyPressCount {
-    pub label: String,
-    pub sort_key: i32,
-}
-
-impl Default for PerfUiSpaceKeyPressCount {
-    fn default() -> Self {
-        PerfUiSpaceKeyPressCount {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-        }
-    }
-}
-
-impl PerfUiEntry for PerfUiSpaceKeyPressCount {
-    type Value = u32;
-    type SystemParam = SRes<SpaceKeyPressCount>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Space key press count"
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(
-        &self,
-        space_key_press_count: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
-    ) -> Option<Self::Value> {
-        Some(space_key_press_count.count)
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        format!("{}", value)
-    }
-
-    fn width_hint(&self) -> usize {
-        10
-    }
-}
-
+/**
+ * PerfUI: PerfUiEntry implementation for tracking the time elapsed since the last click.
+ */
 impl PerfUiEntry for PerfUiTimeSinceLastClick {
     type Value = f64;
     type SystemParam = (SRes<Time>, SRes<TimeSinceLastClick>);
@@ -979,6 +1026,55 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
     }
 }
 
+/**
+ * Function to handle key presses.
+ */
+fn handle_keypress(
+    time: Res<Time>,
+    mut lastkeypress: ResMut<TimeSinceLastKeypress>,
+    mut evr_keyboard: EventReader<KeyboardInput>,
+) {
+    for ev in evr_keyboard.read() {
+        if ev.state == ButtonState::Pressed {
+            lastkeypress.last_keypress = time.elapsed();
+        }
+    }
+}
+
+/**
+ *  PerfUI: Struct for tracking the time elapsed since the last key pressed.
+ */
+#[derive(Component)]
+pub struct PerfUiTimeSinceLastKeypress {
+    pub label: String,
+    pub display_units: bool,
+    pub threshold_highlight: Option<f32>,
+    pub color_gradient: ColorGradient,
+    pub digits: u8,
+    pub precision: u8,
+    pub sort_key: i32,
+}
+
+/**
+ * PerfUI: Default implementation for tracking the time elapsed since the last key pressed.
+ */
+impl Default for PerfUiTimeSinceLastKeypress {
+    fn default() -> Self {
+        PerfUiTimeSinceLastKeypress {
+            label: String::new(),
+            display_units: true,
+            threshold_highlight: Some(10.0),
+            color_gradient: ColorGradient::new_preset_gyr(1.0, 4.0, 8.0).unwrap(),
+            digits: 2,
+            precision: 3,
+            sort_key: perf_ui::utils::next_sort_key(),
+        }
+    }
+}
+
+/**
+ * PerfUI: PerfUIEntry implementation for tracking the time elapsed since the last key pressed.
+ */
 impl PerfUiEntry for PerfUiTimeSinceLastKeypress {
     type Value = f64;
     type SystemParam = (SRes<Time>, SRes<TimeSinceLastKeypress>);
@@ -1031,23 +1127,17 @@ impl PerfUiEntry for PerfUiTimeSinceLastKeypress {
     }
 }
 
-fn handle_click(
-    time: Res<Time>,
-    mut lastclick: ResMut<TimeSinceLastClick>,
-    mut evr_mouse: EventReader<MouseButtonInput>,
-) {
-    for ev in evr_mouse.read() {
-        if ev.state == ButtonState::Pressed {
-            lastclick.last_click = time.elapsed();
-        }
-    }
-}
-
+/**
+ * Struct for tracking if the Space key is being held.
+ */
 #[derive(Resource, Default)]
 struct SpaceKeyPressState {
     last_pressed: bool,
 }
 
+/**
+ * Function to handle when the Space key is being pressed.
+ */
 fn handle_space_keypress(
     mut evr_keyboard: EventReader<KeyboardInput>,
     mut space_key_press_count: ResMut<SpaceKeyPressCount>,
@@ -1065,38 +1155,58 @@ fn handle_space_keypress(
     }
 }
 
-fn handle_keypress(
-    time: Res<Time>,
-    mut lastkeypress: ResMut<TimeSinceLastKeypress>,
-    mut evr_keyboard: EventReader<KeyboardInput>,
-) {
-    for ev in evr_keyboard.read() {
-        if ev.state == ButtonState::Pressed {
-            lastkeypress.last_keypress = time.elapsed();
+/**
+ * PerfUI: Struct for tracking how many times the Space key has been pressed.
+ */
+#[derive(Component)]
+pub struct PerfUiSpaceKeyPressCount {
+    pub label: String,
+    pub sort_key: i32,
+}
+
+/**
+ * PerfUI: Default implementation for tracking how many times the Space key has been pressed.
+ */
+impl Default for PerfUiSpaceKeyPressCount {
+    fn default() -> Self {
+        PerfUiSpaceKeyPressCount {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
         }
     }
 }
 
-fn cursor_system(
-    mut coords: ResMut<CursorWorldCoordinates>,
-    // Get the window.
-    window_query: Query<&Window, With<PrimaryWindow>>,
-    // Get the camera transform.
-    camera_query: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
-) {
-    // Get the camera info and transform.
-    let (camera, camera_transform) = camera_query.single();
+/**
+ * PerfUI: PerfUiEntry implementation for tracking how many times the Space key has been pressed.
+ */
+impl PerfUiEntry for PerfUiSpaceKeyPressCount {
+    type Value = u32;
+    type SystemParam = SRes<SpaceKeyPressCount>;
 
-    // There is only one primary window, so we can get it from the query.
-    let window = window_query.single();
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Space key press count"
+        } else {
+            &self.label
+        }
+    }
 
-    // Check if the cursor is inside the window and get its position
-    // then, ask bevy to convert into world coordinates, and truncate to discard Z.
-    if let Some(world_position) = window.cursor_position()
-        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
-        .map(|ray| ray.origin.truncate())
-    {
-        coords.0 = world_position;
-        //eprintln!("CursorWorldCoordinate: {}/{}", world_position.x, world_position.y);
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(
+        &self,
+        space_key_press_count: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
+    ) -> Option<Self::Value> {
+        Some(space_key_press_count.count)
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        format!("{}", value)
+    }
+
+    fn width_hint(&self) -> usize {
+        10
     }
 }
