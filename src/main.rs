@@ -290,7 +290,10 @@ fn decrease_hunger(
         if let Ok(mut health) = cat_query.get_single_mut() {
             health.hunger = health.hunger.saturating_sub(5);
         }
-        hunger_timer.0.set_duration(Duration::from_secs(30.0 as u64));
+        // Set the timer's duration to 60 seconds for periodic decrease
+        hunger_timer.0.set_duration(Duration::from_secs(1)); // We don't have time for this. TESTING //
+        // Reset the timer to count down again.
+        hunger_timer.0.reset();
     }
 }
 
@@ -331,7 +334,7 @@ pub const CAT_NAMES: &[(&str, &str)] = &[
     ("Culber", "male"), ("Cornwell", "female"), ("Leland", "male"),
     ("Vance", "male"), ("Reno", "female"), ("Booker", "male"), ("Grudge", "female"), 
     ("Shaxs", "male"), ("Detmer", "female"), ("Owosekun", "female"), ("Rhys", "male"),
-    ("Pike", "male"), ("Number-One", "female"), ("Laan", "male"), ("Chapel", "female"), 
+    ("Pike", "male"), ("Number One", "male"), ("Laan", "male"), ("Chapel", "female"), 
     ("Kyle", "male"), ("Vina", "female"), ("Mudd", "male"), ("Garak", "male"),
     ("Leyton", "male"), ("Ross", "male"), ("Nog", "male"), ("Jake", "male"), 
     ("Seven", "female"), ("Janeway", "female"), ("Tuvix", "male"), ("Neelix", "male"),
@@ -349,7 +352,7 @@ pub const CAT_NAMES: &[(&str, &str)] = &[
     ("Maddox", "male"), ("Soong", "male"), ("Juliana", "female"), ("Sela", "female"),
     ("Toral", "male"), ("Ziyal", "female"), ("Dukat", "male"), ("Damar", "male"), 
     ("Weyoun", "male"), ("Eddington", "male"), ("Michael", "male"),
-    ("Sarina", "female"), ("Hugh", "male"), ("Lore", "male"), ("El-Aurian", "male")
+    ("Sarina", "female"), ("Hugh", "male"), ("Lore", "male"), ("Elaurian", "male")
 ];
 
 /**
