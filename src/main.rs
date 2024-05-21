@@ -339,17 +339,14 @@ fn cursor_system(
         .map(|ray| ray.origin.truncate())
     {
         coords.0 = world_position;
-        //eprintln!("CursorWorldCoordinate: {}/{}", world_position.x, world_position.y);
     }
 }
 
 #[derive(Component)]
 pub struct PerfUiCursorWorldCoordinates {
     pub label: String,
-    pub display_units: bool,
     pub color_gradient: ColorGradient,
     pub digits: u8,
-    pub precision: u8,
     pub sort_key: i32,
 }
 
@@ -357,10 +354,8 @@ impl Default for PerfUiCursorWorldCoordinates {
     fn default() -> Self {
         PerfUiCursorWorldCoordinates {
             label: String::new(),
-            display_units: false,
             color_gradient: ColorGradient::new_preset_gyr(1.0, 4.0, 8.0).unwrap(),
-            digits: 2,
-            precision: 0,
+            digits: 4,
             sort_key: perf_ui::utils::next_sort_key(),
         }
     }
@@ -390,22 +385,13 @@ impl PerfUiEntry for PerfUiCursorWorldCoordinates {
     }
 
     fn format_value(&self, value: &Self::Value) -> String {
-        let x_str = format!("{:.1$}", value.x, self.precision as usize);
-        let y_str = format!("{:.1$}", value.y, self.precision as usize);
-        let mut s = format!("x: {}, y: {}", x_str, y_str);
-        if self.display_units {
-            s.push_str(" units");
-        }
+        let s = format!("{},{}", value.x as i32, value.y as i32);
         s
     }
 
     fn width_hint(&self) -> usize {
-        let w = 2 * perf_ui::utils::width_hint_pretty_float(self.digits, self.precision) + 4;
-        if self.display_units {
-            w + 6
-        } else {
-            w
-        }
+        let w = 9;
+        w
     }
 
     fn value_color(&self, _value: &Self::Value) -> Option<Color> {
