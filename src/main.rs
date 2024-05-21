@@ -10,7 +10,6 @@ use bevy::input::ButtonState;
 use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
 use bevy::window::PrimaryWindow;
-use bevy::sprite::TextureAtlasSprite;
 use perf_ui::prelude::*;
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
