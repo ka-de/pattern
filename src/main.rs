@@ -771,12 +771,6 @@ fn get_animal_gender(name: &str) -> Option<&'static str> {
     None
 }
 
-#[derive(Component)]
-struct Animal {
-    name: String,
-    animal_type: AnimalType,
-}
-
 /**
  * The 🐕 Component
  */
