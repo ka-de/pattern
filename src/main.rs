@@ -133,8 +133,8 @@ fn main() {
        .add_systems(Update, handle_space_keypress)
        .add_systems(Update, move_entities)
        .add_systems(Update, update_facing_direction)
-       .add_systems(Update, animate_cat_sprite)
-       .add_systems(Update, animate_dog_sprite)
+       .add_systems(Update, animate_sprite::<Cat>)
+       .add_systems(Update, animate_sprite::<Dog>)
        .add_systems(Update, update_animation)
        .add_systems(Update, play_death_animation)
        .run();
@@ -772,6 +772,14 @@ fn get_animal_gender(name: &str) -> Option<&'static str> {
 }
 
 /**
+ * The 🐈‍⬛ Component
+ */
+#[derive(Component)]
+pub struct Cat {
+    name: String,
+}
+
+/**
  * The 🐕 Component
  */
 #[derive(Component)]
@@ -779,9 +787,9 @@ pub struct Dog {
     name: String,
 }
 
-fn animate_dog_sprite(
+fn animate_sprite<T: Component>(
     time: Res<Time>,
-    mut query: Query<(&mut AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
+    mut query: Query<(&mut AnimationIndices, &mut AnimationTimer, &mut TextureAtlas), With<T>>,
 ) {
     for (mut indices, mut timer, mut atlas) in query.iter_mut() {
         timer.tick(time.delta());
@@ -987,34 +995,7 @@ impl PerfUiEntry for PerfUiDogGender {
     }
 }
 
-/**
- * The 🐈‍⬛ Component
- */
-#[derive(Component)]
-pub struct Cat {
-    name: String,
-}
 
-fn animate_cat_sprite(
-    time: Res<Time>,
-    mut query: Query<(&mut AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
-) {
-    for (mut indices, mut timer, mut atlas) in query.iter_mut() {
-        timer.tick(time.delta());
-        if timer.just_finished() {
-            indices.current_index = if indices.current_index == indices.last {
-                if indices.first == 4 { // Death animation
-                    4 // Loop back to the first frame of the death animation
-                } else {
-                    indices.first
-                }
-            } else {
-                indices.current_index + 1
-            };
-            atlas.index = indices.current_index;
-        }
-    }
-}
 
 /**
  * More fucking 🐈‍⬛ stuff.
