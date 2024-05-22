@@ -777,25 +777,30 @@ fn get_animal_gender(name: &str) -> Option<&'static str> {
 /**
  * The 🐾 struct.
  */
-#[derive(Component)]
-pub struct Animal {
-    name: String,
+pub trait Animal {
+    fn name(&self) -> &String;
 }
 
-/**
- * The 🐈‍⬛ Component.
- */
 #[derive(Component)]
 pub struct Cat {
     name: String,
 }
 
-/**
- * The 🐕 Component.
- */
+impl Animal for Cat {
+    fn name(&self) -> &String {
+        &self.name
+    }
+}
+
 #[derive(Component)]
 pub struct Dog {
     name: String,
+}
+
+impl Animal for Dog {
+    fn name(&self) -> &String {
+        &self.name
+    }
 }
 
 pub trait Named {
@@ -811,6 +816,59 @@ impl Named for Cat {
 impl Named for Dog {
     fn name(&self) -> &String {
         &self.name
+    }
+}
+
+#[derive(Component)]
+pub struct PerfUiAnimalName<T: Component> {
+    pub label: String,
+    pub sort_key: i32,
+    _marker: PhantomData<T>,
+}
+
+impl<T: Component + Named> Default for PerfUiAnimalName<T> {
+    fn default() -> Self {
+        PerfUiAnimalName {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+            _marker: PhantomData,
+        }
+    }
+}
+
+impl<T: Component + Named> PerfUiEntry for PerfUiAnimalName<T> {
+    type Value = String;
+    type SystemParam = Query<'static, 'static, &'static T>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            if TypeId::of::<T>() == TypeId::of::<Cat>() {
+                "Cat Name"
+            } else if TypeId::of::<T>() == TypeId::of::<Dog>() {
+                "Dog Name"
+            } else {
+                "Animal Name"
+            }
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, animal_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let animal = animal_query.single();
+        Some(animal.name().clone())
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        value.clone()
+    }
+
+    fn width_hint(&self) -> usize {
+        20
     }
 }
 
@@ -992,58 +1050,5 @@ impl<T: Component + Named> PerfUiEntry for PerfUiAnimalGender<T> {
 
     fn width_hint(&self) -> usize {
         10
-    }
-}
-
-#[derive(Component)]
-pub struct PerfUiAnimalName<T: Component> {
-    pub label: String,
-    pub sort_key: i32,
-    _marker: PhantomData<T>,
-}
-
-impl<T: Component + Named> Default for PerfUiAnimalName<T> {
-    fn default() -> Self {
-        PerfUiAnimalName {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-            _marker: PhantomData,
-        }
-    }
-}
-
-impl<T: Component + Named> PerfUiEntry for PerfUiAnimalName<T> {
-    type Value = String;
-    type SystemParam = Query<'static, 'static, &'static T>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            if TypeId::of::<T>() == TypeId::of::<Cat>() {
-                "Cat Name"
-            } else if TypeId::of::<T>() == TypeId::of::<Dog>() {
-                "Dog Name"
-            } else {
-                "Animal Name"
-            }
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(&self, animal_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
-        let animal = animal_query.single();
-        Some(animal.name().clone())
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        value.clone()
-    }
-
-    fn width_hint(&self) -> usize {
-        20
     }
 }
