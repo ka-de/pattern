@@ -123,13 +123,12 @@ impl Animal for Dog {
     fn species() -> &'static str {
         "Dog"
     }
-
     fn name(&self) -> &String {
         &self.name
     }
 }
 
-pub(crate) fn spawn_cat(
+pub fn spawn_cat(
     commands: &mut Commands,
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
@@ -170,7 +169,7 @@ pub(crate) fn spawn_cat(
     ));
 }
 
-pub(crate) fn spawn_dog(
+pub fn spawn_dog(
     commands: &mut Commands,
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
