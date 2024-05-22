@@ -5,6 +5,7 @@ use rand::thread_rng;
 use rand::seq::SliceRandom;
 
 use bevy::prelude::*;
+use bevy::render::view::Visibility::Visible;
 use bevy::utils::Duration;
 use bevy::input::mouse::MouseButtonInput;
 use bevy::input::keyboard::KeyboardInput;
@@ -16,14 +17,51 @@ use bevy::window::PrimaryWindow;
 use perf_ui::prelude::*;
 
 #[derive(Component)]
+struct DeathZone {
+    size: Vec2,
+}
+
+
+#[derive(Component)]
 struct Tile {
-    position: Vec2,
     size: Vec2,
     ground: bool,
 }
 
 #[derive(Component, Default)]
 struct GravityScale(f32);
+
+fn handle_death_zone_collisions(
+    mut commands: Commands,
+    death_zone_query: Query<(&DeathZone, &Transform)>,
+    mut entity_query: Query<(Entity, &Transform, &Sprite)>,
+) {
+    for (death_zone, death_zone_transform) in death_zone_query.iter() {
+        let death_zone_position = death_zone_transform.translation.truncate();
+        let death_zone_size = death_zone.size;
+
+        println!("Death Zone Position: {:?}", death_zone_position);
+        println!("Death Zone Size: {:?}", death_zone_size);
+
+        for (entity, entity_transform, entity_sprite) in entity_query.iter_mut() {
+            let entity_position = entity_transform.translation.truncate();
+            let entity_size = entity_sprite.custom_size.unwrap_or(Vec2::splat(1.0));
+
+            println!("Entity Position: {:?}", entity_position);
+            println!("Entity Size: {:?}", entity_size);
+
+            if is_colliding(
+                entity_position,
+                entity_size,
+                death_zone_position,
+                death_zone_size,
+            ) {
+                println!("Collision Detected! Despawning entity: {:?}", entity);
+                commands.entity(entity).despawn();
+            }
+        }
+    }
+}
 
 fn apply_gravity(mut query: Query<(&mut Velocity, &GravityScale)>, time: Res<Time>) {
     const GRAVITY: f32 = 9.81;
@@ -66,6 +104,8 @@ fn is_colliding(a_pos: Vec2, a_size: Vec2, b_pos: Vec2, b_size: Vec2) -> bool {
     let b_min = b_pos - b_size / 2.0;
     let b_max = b_pos + b_size / 2.0;
 
+    println!("a_min: {:?}, a_max: {:?}, b_min: {:?}, b_max: {:?}", a_min, a_max, b_min, b_max);
+
     a_min.x < b_max.x
         && a_max.x > b_min.x
         && a_min.y < b_max.y
@@ -78,11 +118,22 @@ fn setup(
 ) {
     commands.spawn((Camera2dBundle::default(), MainCamera));
 
+    // The 💀 zone.
+    commands.spawn(SpriteBundle {
+        sprite: Sprite {
+            color: Color::rgb(1.0, 0.0, 0.0), // red color for debug
+            custom_size: Some(Vec2::new(800.0, 50.0)), // adjust as needed
+            ..default()
+        },
+        transform: Transform::from_translation(Vec3::new(0.0, -200.0, 0.0)), // adjust as needed
+        ..default()
+    }).insert(Visible);
+
+    // Tiles
     for x in -5..5 {
         let tile_position = Vec2::new(x as f32 * 32.0, -100.0);
         commands.spawn((
             Tile {
-                position: tile_position,
                 size: Vec2::new(32.0, 16.0),
                 ground: true,
             },
@@ -112,11 +163,11 @@ fn setup(
         PerfUiTimeSinceLastClick::default(),
         PerfUiTimeSinceLastKeypress::default(),
         PerfUiSpaceKeyPressCount::default(),
-        PerfUiAnimalName::<Cat>::default(), // 🐈‍⬛
+        PerfUiAnimalName::<Cat>::default(),
         PerfUiAnimalGender::<Cat>::default(),
         PerfUiAnimalHealth::<Cat>::default(),
         PerfUiAnimalHunger::<Cat>::default(),
-        PerfUiAnimalName::<Dog>::default(), // 🐕
+        PerfUiAnimalName::<Dog>::default(),
         PerfUiAnimalGender::<Dog>::default(),
         PerfUiAnimalHealth::<Dog>::default(),
         PerfUiAnimalHunger::<Dog>::default(),
@@ -193,15 +244,15 @@ fn main() {
         .add_perf_ui_entry_type::<PerfUiTimeSinceLastClick>()
         .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
         .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
-        .add_perf_ui_entry_type::<PerfUiAnimalName<Cat>>() // I hate this 🐈‍⬛ already omg
+        .add_perf_ui_entry_type::<PerfUiAnimalName<Cat>>()
         .add_perf_ui_entry_type::<PerfUiAnimalGender<Cat>>()
         .add_perf_ui_entry_type::<PerfUiAnimalHealth<Cat>>()
         .add_perf_ui_entry_type::<PerfUiAnimalHunger<Cat>>()
-        .add_perf_ui_entry_type::<PerfUiAnimalName<Dog>>() // Finally the 🐈‍⬛ stuff is over!
+        .add_perf_ui_entry_type::<PerfUiAnimalName<Dog>>()
         .add_perf_ui_entry_type::<PerfUiAnimalGender<Dog>>()
         .add_perf_ui_entry_type::<PerfUiAnimalHealth<Dog>>()
         .add_perf_ui_entry_type::<PerfUiAnimalHunger<Dog>>()
-        .init_resource::<CursorWorldCoordinates>() // End of 🐕
+        .init_resource::<CursorWorldCoordinates>()
         .init_resource::<TimeSinceLastClick>()
         .init_resource::<TimeSinceLastKeypress>()
         .init_resource::<SpaceKeyPressCount>()
@@ -221,6 +272,7 @@ fn main() {
         .add_systems(Update, play_death_animation)
         .add_systems(Update, apply_gravity)
         .add_systems(Update, handle_collisions)
+        .add_systems(Update, handle_death_zone_collisions)
         .run();
 }
 
@@ -347,16 +399,16 @@ fn decrease_hunger(
     hunger_timer.0.tick(time.delta());
     if hunger_timer.0.just_finished() {
         for mut health in health_query.iter_mut() {
-            // Decrease hunger by 20 every second.
-            health.hunger = health.hunger.saturating_sub(20);
+            // Decrease hunger by n every m second.
+            health.hunger = health.hunger.saturating_sub(1);
 
-            // If hunger reaches 0, decrease health by 20 every second.
+            // If hunger reaches 0, decrease health by n every second.
             if health.hunger == 0 {
-                health.current = health.current.saturating_sub(20);
+                health.current = health.current.saturating_sub(1);
             }
         }
-        // Set the timer's duration to 60 seconds for periodic decrease
-        hunger_timer.0.set_duration(Duration::from_secs(1));
+        // Set the timer's duration to n seconds for periodic decrease
+        hunger_timer.0.set_duration(Duration::from_secs(20));
         // Reset the timer to count down again.
         hunger_timer.0.reset();
     }
