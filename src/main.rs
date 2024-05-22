@@ -1,3 +1,4 @@
+use std::any::TypeId;
 use std::marker::PhantomData;
 
 use rand::thread_rng;
@@ -36,11 +37,11 @@ fn setup(
         PerfUiSpaceKeyPressCount::default(),
         PerfUiCatName::default(), // 🐈‍⬛
         PerfUiCatGender::default(),
-        PerfUiCatHealth::default(),
+        PerfUiAnimalHealth::<Cat>::default(),
         PerfUiAnimalHunger::<Cat>::default(),
         PerfUiDogName::default(), // 🐕
         PerfUiDogGender::default(),
-        PerfUiDogHealth::default(),
+        PerfUiAnimalHealth::<Dog>::default(),
         PerfUiAnimalHunger::<Dog>::default(),
     ));
 
@@ -115,11 +116,11 @@ fn main() {
        .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
        .add_perf_ui_entry_type::<PerfUiCatName>() // I hate this 🐈‍⬛ already omg
        .add_perf_ui_entry_type::<PerfUiCatGender>()
-       .add_perf_ui_entry_type::<PerfUiCatHealth>()
+       .add_perf_ui_entry_type::<PerfUiAnimalHealth<Cat>>()
        .add_perf_ui_entry_type::<PerfUiAnimalHunger<Cat>>()
        .add_perf_ui_entry_type::<PerfUiDogName>() // Finally the 🐈‍⬛ stuff is over!
        .add_perf_ui_entry_type::<PerfUiDogGender>()
-       .add_perf_ui_entry_type::<PerfUiDogHealth>()
+       .add_perf_ui_entry_type::<PerfUiAnimalHealth<Dog>>()
        .add_perf_ui_entry_type::<PerfUiAnimalHunger<Dog>>()
        .init_resource::<CursorWorldCoordinates>() // End of 🐕
        .init_resource::<TimeSinceLastClick>()
@@ -841,7 +842,13 @@ impl<T: Component> PerfUiEntry for PerfUiAnimalHunger<T> {
 
     fn label(&self) -> &str {
         if self.label.is_empty() {
-            "Animal Hunger"
+            if TypeId::of::<T>() == TypeId::of::<Cat>() {
+                "Cat Hunger"
+            } else if TypeId::of::<T>() == TypeId::of::<Dog>() {
+                "Dog Hunger"
+            } else {
+                "Animal Hunger"
+            }
         } else {
             &self.label
         }
@@ -961,7 +968,58 @@ impl PerfUiEntry for PerfUiDogGender {
     }
 }
 
+#[derive(Component)]
+pub struct PerfUiAnimalHealth<T: Component> {
+    pub label: String,
+    pub sort_key: i32,
+    _marker: PhantomData<T>,
+}
 
+impl<T: Component> Default for PerfUiAnimalHealth<T> {
+    fn default() -> Self {
+        PerfUiAnimalHealth {
+            label: String::new(),
+            sort_key: perf_ui::utils::next_sort_key(),
+            _marker: PhantomData,
+        }
+    }
+}
+
+impl<T: Component> PerfUiEntry for PerfUiAnimalHealth<T> {
+    type Value = String;
+    type SystemParam = Query<'static, 'static, &'static Health, With<T>>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            if TypeId::of::<T>() == TypeId::of::<Cat>() {
+                "Cat Health"
+            } else if TypeId::of::<T>() == TypeId::of::<Dog>() {
+                "Dog Health"
+            } else {
+                "Animal Health"
+            }
+        } else {
+            &self.label
+        }
+    }
+
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+
+    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
+        let health = health_query.single();
+        Some(format!("{}/{}", health.current, health.max))
+    }
+
+    fn format_value(&self, value: &Self::Value) -> String {
+        value.clone()
+    }
+
+    fn width_hint(&self) -> usize {
+        10
+    }
+}
 
 /**
  * More fucking 🐈‍⬛ stuff.
