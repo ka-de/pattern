@@ -803,22 +803,6 @@ impl Animal for Dog {
     }
 }
 
-pub trait Named {
-    fn name(&self) -> &String;
-}
-
-impl Named for Cat {
-    fn name(&self) -> &String {
-        &self.name
-    }
-}
-
-impl Named for Dog {
-    fn name(&self) -> &String {
-        &self.name
-    }
-}
-
 #[derive(Component)]
 pub struct PerfUiAnimalName<T: Component> {
     pub label: String,
@@ -826,7 +810,7 @@ pub struct PerfUiAnimalName<T: Component> {
     _marker: PhantomData<T>,
 }
 
-impl<T: Component + Named> Default for PerfUiAnimalName<T> {
+impl<T: Component + Animal> Default for PerfUiAnimalName<T> {
     fn default() -> Self {
         PerfUiAnimalName {
             label: String::new(),
@@ -836,7 +820,7 @@ impl<T: Component + Named> Default for PerfUiAnimalName<T> {
     }
 }
 
-impl<T: Component + Named> PerfUiEntry for PerfUiAnimalName<T> {
+impl<T: Component + Animal> PerfUiEntry for PerfUiAnimalName<T> {
     type Value = String;
     type SystemParam = Query<'static, 'static, &'static T>;
 
@@ -1016,7 +1000,7 @@ impl<T: Component> Default for PerfUiAnimalGender<T> {
     }
 }
 
-impl<T: Component + Named> PerfUiEntry for PerfUiAnimalGender<T> {
+impl<T: Component + Animal> PerfUiEntry for PerfUiAnimalGender<T> {
     type Value = String;
     type SystemParam = Query<'static, 'static, &'static T>;
 
