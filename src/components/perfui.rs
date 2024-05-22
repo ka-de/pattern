@@ -3,9 +3,9 @@ use std::marker::PhantomData;
 
 use crate::components::Health;
 
+use crate::components::animals::{get_animal_gender, Animal, Cat, Dog};
 use crate::components::{
-    get_animal_gender, Animal, Cat, CursorWorldCoordinates, Dog, SpaceKeyPressCount,
-    TimeSinceLastClick, TimeSinceLastKeypress,
+    CursorWorldCoordinates, SpaceKeyPressCount, TimeSinceLastClick, TimeSinceLastKeypress,
 };
 
 use bevy::ecs::system::lifetimeless::SRes;
