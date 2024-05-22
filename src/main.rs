@@ -24,7 +24,8 @@ fn setup(
     components::spawn_cat(&mut commands, &asset_server, texture_atlas_layouts.as_mut());
 
     // 🐕
-    components::spawn_dog(&mut commands, &asset_server, texture_atlas_layouts.as_mut())
+    components::spawn_dog(&mut commands, &asset_server, texture_atlas_layouts.as_mut());
+    components::spawn_dog(&mut commands, &asset_server, texture_atlas_layouts.as_mut());
 }
 
 fn main() {

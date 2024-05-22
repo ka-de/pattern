@@ -4,6 +4,7 @@ use crate::components::{
 
 use rand::seq::SliceRandom;
 use rand::thread_rng;
+use rand::Rng;
 
 use bevy::prelude::*;
 
@@ -133,6 +134,9 @@ pub fn spawn_cat(
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
 ) {
+    let mut rng = thread_rng();
+    let x = rng.gen_range(-25.0..25.0);
+
     let cat_name = generate_animal_name(AnimalType::Cat);
     let cat_texture = asset_server.load("textures/cat-texture.png");
     let cat_layout = TextureAtlasLayout::from_grid(Vec2::new(26.0, 26.0), 4, 4, None, None);
@@ -157,7 +161,7 @@ pub fn spawn_cat(
                 layout: cat_texture_atlas_layout,
                 index: cat_animation_indices.first,
             },
-            transform: Transform::from_xyz(25.0, 50.0, 0.0),
+            transform: Transform::from_xyz(x, 50.0, 0.0),
             ..Default::default()
         },
         AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
@@ -174,6 +178,9 @@ pub fn spawn_dog(
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
 ) {
+    let mut rng = thread_rng();
+    let x = rng.gen_range(-25.0..25.0);
+
     let dog_name = generate_animal_name(AnimalType::Dog);
     let dog_texture = asset_server.load("textures/dog-texture.png");
     let dog_layout = TextureAtlasLayout::from_grid(Vec2::new(26.0, 26.0), 4, 4, None, None);
@@ -198,7 +205,7 @@ pub fn spawn_dog(
                 layout: dog_texture_atlas_layout,
                 index: dog_animation_indices.first,
             },
-            transform: Transform::from_xyz(-25.0, 50.0, 0.0),
+            transform: Transform::from_xyz(x, 50.0, 0.0),
             ..Default::default()
         },
         AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
