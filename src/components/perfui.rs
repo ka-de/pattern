@@ -4,9 +4,7 @@ use std::marker::PhantomData;
 use crate::components::Health;
 
 use crate::components::animals::{Animal, Cat, Dog};
-use crate::components::{
-    CursorWorldCoordinates, SpaceKeyPressCount, TimeSinceLastClick, TimeSinceLastKeypress,
-};
+use crate::components::ui::{CursorWorldCoordinates, SpaceKeyPressCount, TimeSinceLastClick, TimeSinceLastKeypress};
 
 use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;

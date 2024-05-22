@@ -1,8 +1,6 @@
 mod components;
 
-use components::{
-    Cat, CustomPerfUiAppExt as _, CustomResourcesAppExt as _, CustomSystemsAppExt as _, Dog,
-};
+use components::{Cat, CustomPerfUiAppExt as _, CustomSystemsAppExt as _, Dog};
 
 use bevy::prelude::*;
 
