@@ -1,6 +1,6 @@
 mod components;
 
-use components::{CustomPerfUiAppExt as _, CustopRessourcesAppExt as _, CustopSystemsAppExt as _};
+use components::{Dog, Cat, CustomPerfUiAppExt as _, CustopRessourcesAppExt as _, CustopSystemsAppExt as _};
 
 use bevy::prelude::*;
 
@@ -44,9 +44,6 @@ fn setup(
         ));
     }
 
-    // Performance UI
-    components::setup_perfui(&mut commands, &asset_server);
-
     // 🐈‍⬛
     components::spawn_cat(&mut commands, &asset_server, texture_atlas_layouts.as_mut());
 
@@ -60,6 +57,8 @@ fn main() {
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
         .add_custom_perf_ui()
+        .add_animal_perf_ui::<Cat>()
+        .add_animal_perf_ui::<Dog>()
         .add_custom_ressources()
         .add_systems(Startup, setup)
         .add_custom_systems()

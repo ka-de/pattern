@@ -1,7 +1,7 @@
 mod animals;
 mod perfui;
 pub(crate) use animals::{spawn_cat, spawn_dog, Cat, Dog};
-pub(crate) use perfui::{setup_perfui, CustomPerfUiAppExt};
+pub(crate) use perfui::CustomPerfUiAppExt;
 
 use bevy::input::keyboard::KeyCode;
 use bevy::input::keyboard::KeyboardInput;

@@ -528,12 +528,7 @@ impl<T: Component + Animal> PerfUiEntry for PerfUiAnimalGender<T> {
     }
 }
 
-pub(crate) trait CustomPerfUiAppExt {
-    /// Add support for a custom perf UI entry type (component).
-    fn add_custom_perf_ui(&mut self) -> &mut Self;
-}
-
-pub(crate) fn setup_perfui(commands: &mut Commands, asset_server: &Res<AssetServer>) {
+fn setup_perfui(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Performance UI
     commands.spawn((
         PerfUiRoot {
@@ -559,6 +554,22 @@ pub(crate) fn setup_perfui(commands: &mut Commands, asset_server: &Res<AssetServ
     ));
 }
 
+fn setup_animal_perfui<T: Animal + Component>(mut commands: Commands) {
+    commands.spawn((
+        PerfUiAnimalName::<T>::default(),
+        PerfUiAnimalGender::<T>::default(),
+        PerfUiAnimalHealth::<T>::default(),
+        PerfUiAnimalHunger::<T>::default(),
+    ));
+}
+
+pub(crate) trait CustomPerfUiAppExt {
+    /// Add support for a custom perf UI entry type (component).
+    fn add_custom_perf_ui(&mut self) -> &mut Self;
+
+    fn add_animal_perf_ui<T: Component + Animal>(&mut self) -> &mut Self;
+}
+
 impl CustomPerfUiAppExt for App {
     fn add_custom_perf_ui(&mut self) -> &mut Self {
         self.add_plugins(PerfUiPlugin)
@@ -566,13 +577,14 @@ impl CustomPerfUiAppExt for App {
             .add_perf_ui_entry_type::<PerfUiTimeSinceLastClick>()
             .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
             .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
-            .add_perf_ui_entry_type::<PerfUiAnimalName<Cat>>()
-            .add_perf_ui_entry_type::<PerfUiAnimalGender<Cat>>()
-            .add_perf_ui_entry_type::<PerfUiAnimalHealth<Cat>>()
-            .add_perf_ui_entry_type::<PerfUiAnimalHunger<Cat>>()
-            .add_perf_ui_entry_type::<PerfUiAnimalName<Dog>>()
-            .add_perf_ui_entry_type::<PerfUiAnimalGender<Dog>>()
-            .add_perf_ui_entry_type::<PerfUiAnimalHealth<Dog>>()
-            .add_perf_ui_entry_type::<PerfUiAnimalHunger<Dog>>()
+            .add_systems(Startup, setup_perfui)
+    }
+
+    fn add_animal_perf_ui<T: Component + Animal>(&mut self) -> &mut Self {
+        self.add_perf_ui_entry_type::<PerfUiAnimalName<T>>()
+            .add_perf_ui_entry_type::<PerfUiAnimalGender<T>>()
+            .add_perf_ui_entry_type::<PerfUiAnimalHealth<T>>()
+            .add_perf_ui_entry_type::<PerfUiAnimalHunger<T>>()
+            .add_systems(Startup, setup_animal_perfui::<T>)
     }
 }
