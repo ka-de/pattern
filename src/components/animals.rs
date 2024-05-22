@@ -83,10 +83,7 @@ fn generate_animal_name(animal_type: AnimalType) -> String {
     }
 }
 
-/**
- * The 🐾 struct.
- */
-pub trait Animal {
+pub trait Animal: Component {
     fn species() -> &'static str;
     fn name(&self) -> &String;
     fn gender(&self) -> Option<&'static str> {
@@ -129,26 +126,29 @@ impl Animal for Dog {
     }
 }
 
-pub fn spawn_cat(
+fn spawn_animal<T: Animal>(
     commands: &mut Commands,
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
+    animal_type: AnimalType,
+    texture_path: &str,
+    velocity: Velocity,
 ) {
     let mut rng = thread_rng();
     let x = rng.gen_range(-25.0..25.0);
 
-    let cat_name = generate_animal_name(AnimalType::Cat);
-    let cat_texture = asset_server.load("textures/cat-texture.png");
-    let cat_layout = TextureAtlasLayout::from_grid(Vec2::new(26.0, 26.0), 4, 4, None, None);
-    let cat_texture_atlas_layout = texture_atlas_layouts.add(cat_layout);
-    let cat_animation_indices = AnimationIndices {
+    let animal_name = generate_animal_name(animal_type);
+    let animal_texture = asset_server.load(texture_path);
+    let animal_layout = TextureAtlasLayout::from_grid(Vec2::new(26.0, 26.0), 4, 4, None, None);
+    let animal_texture_atlas_layout = texture_atlas_layouts.add(animal_layout);
+    let animal_animation_indices = AnimationIndices {
         first: 0,
         last: 3,
         current_index: 0,
     }; // idle animation
-    let _cat_entity = commands.spawn((
-        Cat {
-            name: cat_name.clone(),
+    let _animal_entity = commands.spawn((
+        T {
+            name: animal_name.clone(),
         },
         Health {
             current: 100,
@@ -156,21 +156,29 @@ pub fn spawn_cat(
             hunger: 100,
         },
         SpriteSheetBundle {
-            texture: cat_texture.clone(),
+            texture: animal_texture.clone(),
             atlas: TextureAtlas {
-                layout: cat_texture_atlas_layout,
-                index: cat_animation_indices.first,
+                layout: animal_texture_atlas_layout,
+                index: animal_animation_indices.first,
             },
             transform: Transform::from_xyz(x, 50.0, 0.0),
             ..Default::default()
         },
         AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
-        cat_animation_indices.clone(),
-        Velocity { x: 15.0, y: 0.0 },
+        animal_animation_indices.clone(),
+        velocity,
         DeathAnimationPlayed(false),
         GravityScale(1.0),
-        Name::new(cat_name.clone()),
+        Name::new(animal_name.clone()),
     ));
+}
+
+pub fn spawn_cat(
+    commands: &mut Commands,
+    asset_server: &AssetServer,
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
+) {
+    spawn_animal::<Cat>(commands, asset_server, texture_atlas_layouts, AnimalType::Cat, "textures/cat-texture.png", Velocity { x: 15.0, y: 0.0 });
 }
 
 pub fn spawn_dog(
@@ -178,41 +186,5 @@ pub fn spawn_dog(
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
 ) {
-    let mut rng = thread_rng();
-    let x = rng.gen_range(-25.0..25.0);
-
-    let dog_name = generate_animal_name(AnimalType::Dog);
-    let dog_texture = asset_server.load("textures/dog-texture.png");
-    let dog_layout = TextureAtlasLayout::from_grid(Vec2::new(26.0, 26.0), 4, 4, None, None);
-    let dog_texture_atlas_layout = texture_atlas_layouts.add(dog_layout);
-    let dog_animation_indices = AnimationIndices {
-        first: 0,
-        last: 3,
-        current_index: 0,
-    }; // idle animation
-    let _dog_entity = commands.spawn((
-        Dog {
-            name: dog_name.clone(),
-        },
-        Health {
-            current: 100,
-            max: 100,
-            hunger: 100,
-        },
-        SpriteSheetBundle {
-            texture: dog_texture.clone(),
-            atlas: TextureAtlas {
-                layout: dog_texture_atlas_layout,
-                index: dog_animation_indices.first,
-            },
-            transform: Transform::from_xyz(x, 50.0, 0.0),
-            ..Default::default()
-        },
-        AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
-        dog_animation_indices.clone(),
-        Velocity { x: -2.0, y: 0.0 },
-        DeathAnimationPlayed(false),
-        GravityScale(1.0),
-        Name::new(dog_name.clone()),
-    ));
+    spawn_animal::<Dog>(commands, asset_server, texture_atlas_layouts, AnimalType::Dog, "textures/dog-texture.png", Velocity { x: -2.0, y: 0.0 });
 }
