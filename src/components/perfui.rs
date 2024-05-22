@@ -533,21 +533,15 @@ fn setup_perfui(mut commands: Commands, asset_server: Res<AssetServer>) {
         PerfUiTimeSinceLastClick::default(),
         PerfUiTimeSinceLastKeypress::default(),
         PerfUiSpaceKeyPressCount::default(),
-        /*
-        PerfUiAnimalName::<Cat>::default(),
-        PerfUiAnimalGender::<Cat>::default(),
-        PerfUiAnimalHealth::<Cat>::default(),
-        PerfUiAnimalHunger::<Cat>::default(),
-        PerfUiAnimalName::<Dog>::default(),
-        PerfUiAnimalGender::<Dog>::default(),
-        PerfUiAnimalHealth::<Dog>::default(),
-        PerfUiAnimalHunger::<Dog>::default(),
-        */
     ));
 }
 
-fn setup_animal_perfui<T: Animal + Component>(mut commands: Commands) {
-    commands.spawn((
+fn setup_animal_perfui<T: Animal + Component>(
+    mut commands: Commands,
+    mut query: Query<Entity, With<PerfUiRoot>>,
+) {
+    let perfui = query.single_mut();
+    commands.entity(perfui).insert((
         PerfUiAnimalName::<T>::default(),
         PerfUiAnimalGender::<T>::default(),
         PerfUiAnimalHealth::<T>::default(),
@@ -569,7 +563,7 @@ impl CustomPerfUiAppExt for App {
             .add_perf_ui_entry_type::<PerfUiTimeSinceLastClick>()
             .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
             .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
-            .add_systems(Startup, setup_perfui)
+            .add_systems(PreStartup, setup_perfui)
     }
 
     fn add_animal_perf_ui<T: Component + Animal>(&mut self) -> &mut Self {

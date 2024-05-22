@@ -123,7 +123,6 @@ impl Animal for Dog {
     fn species() -> &'static str {
         "Dog"
     }
-
     fn name(&self) -> &String {
         &self.name
     }
