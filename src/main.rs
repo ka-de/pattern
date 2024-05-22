@@ -5,7 +5,6 @@ use rand::thread_rng;
 use rand::seq::SliceRandom;
 
 use bevy::prelude::*;
-use bevy::render::view::Visibility::Visible;
 use bevy::utils::Duration;
 use bevy::input::mouse::MouseButtonInput;
 use bevy::input::keyboard::KeyboardInput;
@@ -34,21 +33,19 @@ struct GravityScale(f32);
 fn handle_death_zone_collisions(
     mut commands: Commands,
     death_zone_query: Query<(&DeathZone, &Transform)>,
-    mut entity_query: Query<(Entity, &Transform, &Sprite)>,
+    entity_query: Query<(Entity, &Transform, &Sprite, &Velocity, &Name)>,
 ) {
     for (death_zone, death_zone_transform) in death_zone_query.iter() {
         let death_zone_position = death_zone_transform.translation.truncate();
         let death_zone_size = death_zone.size;
 
-        println!("Death Zone Position: {:?}", death_zone_position);
-        println!("Death Zone Size: {:?}", death_zone_size);
+        println!("Death zone position: {:?}, size: {:?}", death_zone_position, death_zone_size);
 
-        for (entity, entity_transform, entity_sprite) in entity_query.iter_mut() {
-            let entity_position = entity_transform.translation.truncate();
-            let entity_size = entity_sprite.custom_size.unwrap_or(Vec2::splat(1.0));
+        for (entity, transform, sprite, _, name) in entity_query.iter() {
+            let entity_position = transform.translation.truncate();
+            let entity_size = sprite.custom_size.unwrap_or(Vec2::splat(1.0));
 
-            println!("Entity Position: {:?}", entity_position);
-            println!("Entity Size: {:?}", entity_size);
+            println!("Entity {} position: {:?}, size: {:?}", name, entity_position, entity_size);
 
             if is_colliding(
                 entity_position,
@@ -56,7 +53,7 @@ fn handle_death_zone_collisions(
                 death_zone_position,
                 death_zone_size,
             ) {
-                println!("Collision Detected! Despawning entity: {:?}", entity);
+                println!("Collision detected between entity {} and death zone", name);
                 commands.entity(entity).despawn();
             }
         }
@@ -64,7 +61,7 @@ fn handle_death_zone_collisions(
 }
 
 fn apply_gravity(mut query: Query<(&mut Velocity, &GravityScale)>, time: Res<Time>) {
-    const GRAVITY: f32 = 9.81;
+    const GRAVITY: f32 = 19.61;
 
     for (mut velocity, gravity_scale) in query.iter_mut() {
         velocity.y -= GRAVITY * gravity_scale.0 * time.delta_seconds();
@@ -119,15 +116,20 @@ fn setup(
     commands.spawn((Camera2dBundle::default(), MainCamera));
 
     // The 💀 zone.
-    commands.spawn(SpriteBundle {
-        sprite: Sprite {
-            color: Color::rgb(1.0, 0.0, 0.0), // red color for debug
-            custom_size: Some(Vec2::new(800.0, 50.0)), // adjust as needed
-            ..default()
+        commands.spawn((
+        DeathZone {
+            size: Vec2::new(800.0, 50.0), // adjust as needed
         },
-        transform: Transform::from_translation(Vec3::new(0.0, -200.0, 0.0)), // adjust as needed
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::rgb(1.0, 0.0, 0.0), // red color for debug
+                custom_size: Some(Vec2::new(800.0, 50.0)), // adjust as needed
+            ..default()
+            },
+            transform: Transform::from_translation(Vec3::new(0.0, -200.0, 0.0)), // adjust as needed
         ..default()
-    }).insert(Visible);
+        },
+    ));
 
     // Tiles
     for x in -5..5 {
@@ -201,6 +203,7 @@ fn setup(
         Velocity { x: 15.0, y: 0.0 },
         DeathAnimationPlayed(false),
         GravityScale(1.0),
+        Name::new("Cat69"),
     ));
 
     // 🐕
@@ -231,6 +234,7 @@ fn setup(
         Velocity { x: -2.0, y: 0.0 },
         DeathAnimationPlayed(false),
         GravityScale(1.0),
+        Name::new("Dog69"),
     ));
 }
 
