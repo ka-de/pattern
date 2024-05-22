@@ -15,11 +15,88 @@ use bevy::ecs::system::SystemParam;
 use bevy::window::PrimaryWindow;
 use perf_ui::prelude::*;
 
+#[derive(Component)]
+struct Tile {
+    position: Vec2,
+    size: Vec2,
+    ground: bool,
+}
+
+#[derive(Component, Default)]
+struct GravityScale(f32);
+
+fn apply_gravity(mut query: Query<(&mut Velocity, &GravityScale)>, time: Res<Time>) {
+    const GRAVITY: f32 = 9.81;
+
+    for (mut velocity, gravity_scale) in query.iter_mut() {
+        velocity.y -= GRAVITY * gravity_scale.0 * time.delta_seconds();
+    }
+}
+
+fn handle_collisions(
+    mut animal_query: Query<(&mut Velocity, &mut Transform, &Sprite)>,
+    tile_query: Query<(&Tile, &Transform), Without<Velocity>>,
+) {
+    for (mut animal_velocity, mut animal_transform, animal_sprite) in animal_query.iter_mut() {
+        let animal_size = animal_sprite.custom_size.unwrap_or(Vec2::splat(1.0));
+
+        for (tile, tile_transform) in tile_query.iter() {
+            let tile_position = tile_transform.translation.truncate();
+            let tile_size = tile.size;
+
+            // Check for collision between the animal and the tile
+            if tile.ground && is_colliding(
+                animal_transform.translation.truncate(),
+                animal_size,
+                tile_position,
+                tile_size,
+            ) {
+                // Resolve the collision for ground tiles
+                // For example, set the animal's vertical velocity to 0 when landing on a ground tile
+                animal_velocity.y = 0.0;
+                animal_transform.translation.y = tile_position.y + tile_size.y / 2.0 + animal_size.y / 2.0;
+            }
+        }
+    }
+}
+
+fn is_colliding(a_pos: Vec2, a_size: Vec2, b_pos: Vec2, b_size: Vec2) -> bool {
+    let a_min = a_pos - a_size / 2.0;
+    let a_max = a_pos + a_size / 2.0;
+    let b_min = b_pos - b_size / 2.0;
+    let b_max = b_pos + b_size / 2.0;
+
+    a_min.x < b_max.x
+        && a_max.x > b_min.x
+        && a_min.y < b_max.y
+        && a_max.y > b_min.y
+}
+
 fn setup(
     mut commands: Commands, asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>
 ) {
     commands.spawn((Camera2dBundle::default(), MainCamera));
+
+    for x in -5..5 {
+        let tile_position = Vec2::new(x as f32 * 32.0, -100.0);
+        commands.spawn((
+            Tile {
+                position: tile_position,
+                size: Vec2::new(32.0, 16.0),
+                ground: true,
+            },
+            SpriteBundle {
+                sprite: Sprite {
+                    color: Color::rgb(0.5, 0.5, 0.5),
+                    custom_size: Some(Vec2::new(32.0, 16.0)),
+                    ..default()
+                },
+                transform: Transform::from_translation(tile_position.extend(0.0)),
+                ..default()
+            },
+        ));
+    }
 
     // Performance UI
     commands.spawn((
@@ -71,7 +148,8 @@ fn setup(
         AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
         cat_animation_indices.clone(),
         Velocity { x: 5.0, y: 0.0 },
-        DeathAnimationPlayed(false)
+        DeathAnimationPlayed(false),
+        GravityScale(1.0),
     ));
 
     // 🐕
@@ -100,47 +178,50 @@ fn setup(
         AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
         dog_animation_indices.clone(),
         Velocity { x: -2.0, y: 0.0 },
-        DeathAnimationPlayed(false)
+        DeathAnimationPlayed(false),
+        GravityScale(1.0),
     ));
 }
 
 fn main() {
     App::new()
         // The ImagePlugin::default_nearest() prevents blurry sprites
-       .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
-       .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
-       .add_plugins(PerfUiPlugin)
-       .add_perf_ui_entry_type::<PerfUiCursorWorldCoordinates>()
-       .add_perf_ui_entry_type::<PerfUiTimeSinceLastClick>()
-       .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
-       .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
-       .add_perf_ui_entry_type::<PerfUiAnimalName<Cat>>() // I hate this 🐈‍⬛ already omg
-       .add_perf_ui_entry_type::<PerfUiAnimalGender<Cat>>()
-       .add_perf_ui_entry_type::<PerfUiAnimalHealth<Cat>>()
-       .add_perf_ui_entry_type::<PerfUiAnimalHunger<Cat>>()
-       .add_perf_ui_entry_type::<PerfUiAnimalName<Dog>>() // Finally the 🐈‍⬛ stuff is over!
-       .add_perf_ui_entry_type::<PerfUiAnimalGender<Dog>>()
-       .add_perf_ui_entry_type::<PerfUiAnimalHealth<Dog>>()
-       .add_perf_ui_entry_type::<PerfUiAnimalHunger<Dog>>()
-       .init_resource::<CursorWorldCoordinates>() // End of 🐕
-       .init_resource::<TimeSinceLastClick>()
-       .init_resource::<TimeSinceLastKeypress>()
-       .init_resource::<SpaceKeyPressCount>()
-       .init_resource::<SpaceKeyPressState>()
-       .init_resource::<HungerTimer>()
-       .add_systems(Startup, setup)
-       .add_systems(Update, decrease_hunger) // Nyeheh
-       .add_systems(Update, cursor_system)
-       .add_systems(Update, handle_click)
-       .add_systems(Update, handle_keypress)
-       .add_systems(Update, handle_space_keypress)
-       .add_systems(Update, move_entities)
-       .add_systems(Update, update_facing_direction)
-       .add_systems(Update, animate_sprite::<Cat>)
-       .add_systems(Update, animate_sprite::<Dog>)
-       .add_systems(Update, update_animation)
-       .add_systems(Update, play_death_animation)
-       .run();
+        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
+        .add_plugins(PerfUiPlugin)
+        .add_perf_ui_entry_type::<PerfUiCursorWorldCoordinates>()
+        .add_perf_ui_entry_type::<PerfUiTimeSinceLastClick>()
+        .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
+        .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
+        .add_perf_ui_entry_type::<PerfUiAnimalName<Cat>>() // I hate this 🐈‍⬛ already omg
+        .add_perf_ui_entry_type::<PerfUiAnimalGender<Cat>>()
+        .add_perf_ui_entry_type::<PerfUiAnimalHealth<Cat>>()
+        .add_perf_ui_entry_type::<PerfUiAnimalHunger<Cat>>()
+        .add_perf_ui_entry_type::<PerfUiAnimalName<Dog>>() // Finally the 🐈‍⬛ stuff is over!
+        .add_perf_ui_entry_type::<PerfUiAnimalGender<Dog>>()
+        .add_perf_ui_entry_type::<PerfUiAnimalHealth<Dog>>()
+        .add_perf_ui_entry_type::<PerfUiAnimalHunger<Dog>>()
+        .init_resource::<CursorWorldCoordinates>() // End of 🐕
+        .init_resource::<TimeSinceLastClick>()
+        .init_resource::<TimeSinceLastKeypress>()
+        .init_resource::<SpaceKeyPressCount>()
+        .init_resource::<SpaceKeyPressState>()
+        .init_resource::<HungerTimer>()
+        .add_systems(Startup, setup)
+        .add_systems(Update, decrease_hunger) // Nyeheh
+        .add_systems(Update, cursor_system)
+        .add_systems(Update, handle_click)
+        .add_systems(Update, handle_keypress)
+        .add_systems(Update, handle_space_keypress)
+        .add_systems(Update, move_entities)
+        .add_systems(Update, update_facing_direction)
+        .add_systems(Update, animate_sprite::<Cat>)
+        .add_systems(Update, animate_sprite::<Dog>)
+        .add_systems(Update, update_animation)
+        .add_systems(Update, play_death_animation)
+        .add_systems(Update, apply_gravity)
+        .add_systems(Update, handle_collisions)
+        .run();
 }
 
 #[derive(Component, Clone)]
