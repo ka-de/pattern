@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 
 use crate::components::Health;
 
-use crate::components::animals::{get_animal_gender, Animal, Cat, Dog};
+use crate::components::animals::{Animal, Cat, Dog};
 use crate::components::{
     CursorWorldCoordinates, SpaceKeyPressCount, TimeSinceLastClick, TimeSinceLastKeypress,
 };
@@ -478,10 +478,10 @@ pub struct PerfUiAnimalGender<T: Component> {
     _marker: PhantomData<T>,
 }
 
-impl<T: Component> Default for PerfUiAnimalGender<T> {
+impl<T: Component + Animal> Default for PerfUiAnimalGender<T> {
     fn default() -> Self {
         PerfUiAnimalGender {
-            label: String::new(),
+            label: T::species().to_owned() + " Gender",
             sort_key: perf_ui::utils::next_sort_key(),
             _marker: PhantomData,
         }
@@ -493,17 +493,7 @@ impl<T: Component + Animal> PerfUiEntry for PerfUiAnimalGender<T> {
     type SystemParam = Query<'static, 'static, &'static T>;
 
     fn label(&self) -> &str {
-        if self.label.is_empty() {
-            if TypeId::of::<T>() == TypeId::of::<Cat>() {
-                "Cat Gender"
-            } else if TypeId::of::<T>() == TypeId::of::<Dog>() {
-                "Dog Gender"
-            } else {
-                "Animal Gender"
-            }
-        } else {
-            &self.label
-        }
+        &self.label
     }
 
     fn sort_key(&self) -> i32 {
@@ -515,7 +505,7 @@ impl<T: Component + Animal> PerfUiEntry for PerfUiAnimalGender<T> {
         animal_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         let animal = animal_query.single();
-        let gender = get_animal_gender(animal.name());
+        let gender = animal.gender();
         Some(gender.unwrap_or("Unknown").to_string())
     }
 

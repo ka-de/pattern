@@ -82,20 +82,21 @@ fn generate_animal_name(animal_type: AnimalType) -> String {
     }
 }
 
-pub(crate) fn get_animal_gender(name: &str) -> Option<&'static str> {
-    for &(animal_name, gender, _) in ANIMAL_NAMES {
-        if animal_name == name {
-            return Some(gender);
-        }
-    }
-    None
-}
-
 /**
  * The 🐾 struct.
  */
 pub trait Animal {
+    fn species() -> &'static str;
     fn name(&self) -> &String;
+    fn gender(&self) -> Option<&'static str> {
+        let name = self.name();
+        for &(animal_name, gender, _) in ANIMAL_NAMES {
+            if animal_name == name {
+                return Some(gender);
+            }
+        }
+        None
+    }
 }
 
 #[derive(Component)]
@@ -104,6 +105,9 @@ pub struct Cat {
 }
 
 impl Animal for Cat {
+    fn species() -> &'static str {
+        "Cat"
+    }
     fn name(&self) -> &String {
         &self.name
     }
