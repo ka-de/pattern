@@ -75,7 +75,7 @@ fn handle_death_zone_collisions(
                 death_zone_position,
                 death_zone_size,
             ) {
-                println!("Collision detected between entity {} and death zone", name);
+                info!("Collision detected between entity {} and death zone", name);
                 commands.entity(entity).despawn();
             }
         }

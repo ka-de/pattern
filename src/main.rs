@@ -2,6 +2,7 @@ mod components;
 
 use components::{Cat, CustomPerfUiAppExt as _, CustomSystemsAppExt as _, Dog};
 
+use bevy::log::LogPlugin;
 use bevy::prelude::*;
 
 fn setup(
@@ -29,9 +30,28 @@ fn setup(
 }
 
 fn main() {
+    // this code is compiled only if debug assertions are enabled (debug mode)
+    #[cfg(debug_assertions)]
+    let log_plugin = LogPlugin {
+        level: bevy::log::Level::DEBUG,
+        filter: "info,pattern=debug".into(),
+        update_subscriber: None,
+    };
+
+    // this code is compiled only if debug assertions are disabled (release mode)
+    #[cfg(not(debug_assertions))]
+    let logplugin = LogPlugin {
+        level: bevy::log::Level::INFO,
+        filter: "warning,pattern=info".into(),
+    };
+
+    // The ImagePlugin::default_nearest() prevents blurry sprites
     App::new()
-        // The ImagePlugin::default_nearest() prevents blurry sprites
-        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .add_plugins(
+            DefaultPlugins
+                .set(ImagePlugin::default_nearest())
+                .set(log_plugin),
+        )
         .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
         .add_custom_perf_ui()
         .add_animal_perf_ui::<Cat>()
