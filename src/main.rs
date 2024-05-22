@@ -35,10 +35,8 @@ fn main() {
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
         .add_custom_perf_ui()
-        // This just crashes the game when the entities get removed.
-        //.add_animal_perf_ui::<Cat>()
-        //.add_animal_perf_ui::<Dog>()
-        .add_custom_resources()
+        .add_animal_perf_ui::<Cat>()
+        .add_animal_perf_ui::<Dog>()
         .add_systems(Startup, setup)
         .add_custom_systems()
         .run();

@@ -346,8 +346,7 @@ impl<T: Component + Animal> PerfUiEntry for PerfUiAnimalName<T> {
         &self,
         animal_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
-        let animal = animal_query.single();
-        Some(animal.name().clone())
+        animal_query.get_single().ok().map(|animal| animal.name().clone())
     }
 
     fn format_value(&self, value: &Self::Value) -> String {
@@ -402,8 +401,7 @@ impl<T: Component> PerfUiEntry for PerfUiAnimalHunger<T> {
         &self,
         health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
-        let health = health_query.single();
-        Some(health.hunger)
+        health_query.get_single().ok().map(|health| health.hunger)
     }
 
     fn format_value(&self, value: &Self::Value) -> String {
@@ -458,8 +456,7 @@ impl<T: Component> PerfUiEntry for PerfUiAnimalHealth<T> {
         &self,
         health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
-        let health = health_query.single();
-        Some(format!("{}/{}", health.current, health.max))
+        health_query.get_single().ok().map(|health| format!("{}/{}", health.current, health.max))
     }
 
     fn format_value(&self, value: &Self::Value) -> String {
@@ -489,7 +486,7 @@ impl<T: Component + Animal> Default for PerfUiAnimalGender<T> {
 }
 
 impl<T: Component + Animal> PerfUiEntry for PerfUiAnimalGender<T> {
-    type Value = String;
+    type Value = &'static str;
     type SystemParam = Query<'static, 'static, &'static T>;
 
     fn label(&self) -> &str {
@@ -504,13 +501,11 @@ impl<T: Component + Animal> PerfUiEntry for PerfUiAnimalGender<T> {
         &self,
         animal_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
-        let animal = animal_query.single();
-        let gender = animal.gender();
-        Some(gender.unwrap_or("Unknown").to_string())
+        animal_query.get_single().ok().and_then(|animal| animal.gender())
     }
 
     fn format_value(&self, value: &Self::Value) -> String {
-        value.clone()
+        value.to_string()
     }
 
     fn width_hint(&self) -> usize {
