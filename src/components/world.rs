@@ -62,20 +62,12 @@ fn handle_death_zone_collisions(
     for (death_zone, death_zone_transform) in death_zone_query.iter() {
         let death_zone_position = death_zone_transform.translation.truncate();
         let death_zone_size = death_zone.size;
-
-        println!(
-            "Death zone position: {:?}, size: {:?}",
-            death_zone_position, death_zone_size
-        );
+        //println!("Death zone position: {:?}, size: {:?}", death_zone_position, death_zone_size);
 
         for (entity, transform, sprite, _, name) in entity_query.iter() {
             let entity_position = transform.translation.truncate();
             let entity_size = sprite.custom_size.unwrap_or(Vec2::splat(1.0));
-
-            println!(
-                "Entity {} position: {:?}, size: {:?}",
-                name, entity_position, entity_size
-            );
+            //println!("Entity {} position: {:?}, size: {:?}", name, entity_position, entity_size);
 
             if is_colliding(
                 entity_position,
