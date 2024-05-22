@@ -403,12 +403,12 @@ fn animate_sprite<T: Component>(
     }
 }
 
-pub(crate) trait CustopRessourcesAppExt {
-    fn add_custom_ressources(&mut self) -> &mut Self;
+pub(crate) trait CustomResourcesAppExt {
+    fn add_custom_resources(&mut self) -> &mut Self;
 }
 
-impl CustopRessourcesAppExt for App {
-    fn add_custom_ressources(&mut self) -> &mut Self {
+impl CustomResourcesAppExt for App {
+    fn add_custom_resources(&mut self) -> &mut Self {
         self.init_resource::<CursorWorldCoordinates>()
             .init_resource::<TimeSinceLastClick>()
             .init_resource::<TimeSinceLastKeypress>()
@@ -418,11 +418,11 @@ impl CustopRessourcesAppExt for App {
     }
 }
 
-pub(crate) trait CustopSystemsAppExt {
+pub(crate) trait CustomSystemsAppExt {
     fn add_custom_systems(&mut self) -> &mut Self;
 }
 
-impl CustopSystemsAppExt for App {
+impl CustomSystemsAppExt for App {
     fn add_custom_systems(&mut self) -> &mut Self {
         self.add_systems(Update, decrease_hunger) // Nyeheh
             .add_systems(Update, cursor_system)

@@ -1,6 +1,6 @@
 mod components;
 
-use components::{Dog, Cat, CustomPerfUiAppExt as _, CustopRessourcesAppExt as _, CustopSystemsAppExt as _};
+use components::{Dog, Cat, CustomPerfUiAppExt as _, CustomResourcesAppExt as _, CustomSystemsAppExt as _};
 
 use bevy::prelude::*;
 
@@ -59,7 +59,7 @@ fn main() {
         .add_custom_perf_ui()
         .add_animal_perf_ui::<Cat>()
         .add_animal_perf_ui::<Dog>()
-        .add_custom_ressources()
+        .add_custom_resources()
         .add_systems(Startup, setup)
         .add_custom_systems()
         .run();

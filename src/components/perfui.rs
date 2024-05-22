@@ -533,6 +533,7 @@ fn setup_perfui(mut commands: Commands, asset_server: Res<AssetServer>) {
         PerfUiTimeSinceLastClick::default(),
         PerfUiTimeSinceLastKeypress::default(),
         PerfUiSpaceKeyPressCount::default(),
+        /*
         PerfUiAnimalName::<Cat>::default(),
         PerfUiAnimalGender::<Cat>::default(),
         PerfUiAnimalHealth::<Cat>::default(),
@@ -541,6 +542,7 @@ fn setup_perfui(mut commands: Commands, asset_server: Res<AssetServer>) {
         PerfUiAnimalGender::<Dog>::default(),
         PerfUiAnimalHealth::<Dog>::default(),
         PerfUiAnimalHunger::<Dog>::default(),
+        */
     ));
 }
 
