@@ -134,6 +134,7 @@ pub(crate) fn spawn_cat(
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
 ) {
+    let cat_name = generate_animal_name(AnimalType::Cat);
     let cat_texture = asset_server.load("textures/cat-texture.png");
     let cat_layout = TextureAtlasLayout::from_grid(Vec2::new(26.0, 26.0), 4, 4, None, None);
     let cat_texture_atlas_layout = texture_atlas_layouts.add(cat_layout);
@@ -144,7 +145,7 @@ pub(crate) fn spawn_cat(
     }; // idle animation
     let _cat_entity = commands.spawn((
         Cat {
-            name: generate_animal_name(AnimalType::Cat),
+            name: cat_name.clone(),
         },
         Health {
             current: 100,
@@ -165,7 +166,7 @@ pub(crate) fn spawn_cat(
         Velocity { x: 15.0, y: 0.0 },
         DeathAnimationPlayed(false),
         GravityScale(1.0),
-        Name::new(""),
+        Name::new(cat_name.clone()),
     ));
 }
 
@@ -174,6 +175,7 @@ pub(crate) fn spawn_dog(
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
 ) {
+    let dog_name = generate_animal_name(AnimalType::Dog);
     let dog_texture = asset_server.load("textures/dog-texture.png");
     let dog_layout = TextureAtlasLayout::from_grid(Vec2::new(26.0, 26.0), 4, 4, None, None);
     let dog_texture_atlas_layout = texture_atlas_layouts.add(dog_layout);
@@ -184,7 +186,7 @@ pub(crate) fn spawn_dog(
     }; // idle animation
     let _dog_entity = commands.spawn((
         Dog {
-            name: generate_animal_name(AnimalType::Dog),
+            name: dog_name.clone(),
         },
         Health {
             current: 100,
@@ -205,6 +207,6 @@ pub(crate) fn spawn_dog(
         Velocity { x: -2.0, y: 0.0 },
         DeathAnimationPlayed(false),
         GravityScale(1.0),
-        Name::new(""),
+        Name::new(dog_name.clone()),
     ));
 }
