@@ -108,6 +108,7 @@ impl Animal for Cat {
     fn species() -> &'static str {
         "Cat"
     }
+
     fn name(&self) -> &String {
         &self.name
     }
@@ -119,6 +120,10 @@ pub struct Dog {
 }
 
 impl Animal for Dog {
+    fn species() -> &'static str {
+        "Dog"
+    }
+
     fn name(&self) -> &String {
         &self.name
     }
@@ -160,7 +165,7 @@ pub(crate) fn spawn_cat(
         Velocity { x: 15.0, y: 0.0 },
         DeathAnimationPlayed(false),
         GravityScale(1.0),
-        Name::new("Cat69"),
+        Name::new(""),
     ));
 }
 
@@ -200,6 +205,6 @@ pub(crate) fn spawn_dog(
         Velocity { x: -2.0, y: 0.0 },
         DeathAnimationPlayed(false),
         GravityScale(1.0),
-        Name::new("Dog69"),
+        Name::new(""),
     ));
 }
