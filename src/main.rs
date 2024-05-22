@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use rand::thread_rng;
 use rand::seq::SliceRandom;
 
@@ -35,11 +37,11 @@ fn setup(
         PerfUiCatName::default(), // 🐈‍⬛
         PerfUiCatGender::default(),
         PerfUiCatHealth::default(),
-        PerfUiCatHunger::default(),
+        PerfUiAnimalHunger::<Cat>::default(),
         PerfUiDogName::default(), // 🐕
         PerfUiDogGender::default(),
         PerfUiDogHealth::default(),
-        PerfUiDogHunger::default(),
+        PerfUiAnimalHunger::<Dog>::default(),
     ));
 
     // 🐈‍⬛
@@ -114,11 +116,11 @@ fn main() {
        .add_perf_ui_entry_type::<PerfUiCatName>() // I hate this 🐈‍⬛ already omg
        .add_perf_ui_entry_type::<PerfUiCatGender>()
        .add_perf_ui_entry_type::<PerfUiCatHealth>()
-       .add_perf_ui_entry_type::<PerfUiCatHunger>()
+       .add_perf_ui_entry_type::<PerfUiAnimalHunger<Cat>>()
        .add_perf_ui_entry_type::<PerfUiDogName>() // Finally the 🐈‍⬛ stuff is over!
        .add_perf_ui_entry_type::<PerfUiDogGender>()
        .add_perf_ui_entry_type::<PerfUiDogHealth>()
-       .add_perf_ui_entry_type::<PerfUiDogHunger>()
+       .add_perf_ui_entry_type::<PerfUiAnimalHunger<Dog>>()
        .init_resource::<CursorWorldCoordinates>() // End of 🐕
        .init_resource::<TimeSinceLastClick>()
        .init_resource::<TimeSinceLastKeypress>()
@@ -772,7 +774,15 @@ fn get_animal_gender(name: &str) -> Option<&'static str> {
 }
 
 /**
- * The 🐈‍⬛ Component
+ * The 🐾 struct.
+ */
+#[derive(Component)]
+pub struct Animal {
+    name: String,
+}
+
+/**
+ * The 🐈‍⬛ Component.
  */
 #[derive(Component)]
 pub struct Cat {
@@ -780,7 +790,7 @@ pub struct Cat {
 }
 
 /**
- * The 🐕 Component
+ * The 🐕 Component.
  */
 #[derive(Component)]
 pub struct Dog {
@@ -808,31 +818,30 @@ fn animate_sprite<T: Component>(
     }
 }
 
-/**
- * More fucking 🐕 stuff.
- */
- #[derive(Component)]
-pub struct PerfUiDogHunger {
+#[derive(Component)]
+pub struct PerfUiAnimalHunger<T: Component> {
     pub label: String,
     pub sort_key: i32,
+    _marker: PhantomData<T>,
 }
 
-impl Default for PerfUiDogHunger {
+impl<T: Component> Default for PerfUiAnimalHunger<T> {
     fn default() -> Self {
-        PerfUiDogHunger {
+        PerfUiAnimalHunger {
             label: String::new(),
             sort_key: perf_ui::utils::next_sort_key(),
+            _marker: PhantomData,
         }
     }
 }
 
-impl PerfUiEntry for PerfUiDogHunger {
+impl<T: Component> PerfUiEntry for PerfUiAnimalHunger<T> {
     type Value = u32;
-    type SystemParam = Query<'static, 'static, &'static Health, With<Dog>>;
+    type SystemParam = Query<'static, 'static, &'static Health, With<T>>;
 
     fn label(&self) -> &str {
         if self.label.is_empty() {
-            "Dog Hunger"
+            "Animal Hunger"
         } else {
             &self.label
         }
@@ -856,50 +865,7 @@ impl PerfUiEntry for PerfUiDogHunger {
     }
 }
 
-#[derive(Component)]
-pub struct PerfUiDogHealth {
-    pub label: String,
-    pub sort_key: i32,
-}
 
-impl Default for PerfUiDogHealth {
-    fn default() -> Self {
-        PerfUiDogHealth {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-        }
-    }
-}
-
-impl PerfUiEntry for PerfUiDogHealth {
-    type Value = String;
-    type SystemParam = Query<'static, 'static, &'static Health, With<Dog>>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Dog Health"
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
-        let health = health_query.single();
-        Some(format!("{}/{}", health.current, health.max))
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        value.clone()
-    }
-
-    fn width_hint(&self) -> usize {
-        10
-    }
-}
 
 #[derive(Component)]
 pub struct PerfUiDogName {
@@ -1000,95 +966,7 @@ impl PerfUiEntry for PerfUiDogGender {
 /**
  * More fucking 🐈‍⬛ stuff.
  */
- #[derive(Component)]
-pub struct PerfUiCatHunger {
-    pub label: String,
-    pub sort_key: i32,
-}
 
-impl Default for PerfUiCatHunger {
-    fn default() -> Self {
-        PerfUiCatHunger {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-        }
-    }
-}
-
-impl PerfUiEntry for PerfUiCatHunger {
-    type Value = u32;
-    type SystemParam = Query<'static, 'static, &'static Health, With<Cat>>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Cat Hunger"
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
-        let health = health_query.single();
-        Some(health.hunger)
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        format!("{}", value)
-    }
-
-    fn width_hint(&self) -> usize {
-        3
-    }
-}
-
-#[derive(Component)]
-pub struct PerfUiCatHealth {
-    pub label: String,
-    pub sort_key: i32,
-}
-
-impl Default for PerfUiCatHealth {
-    fn default() -> Self {
-        PerfUiCatHealth {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-        }
-    }
-}
-
-impl PerfUiEntry for PerfUiCatHealth {
-    type Value = String;
-    type SystemParam = Query<'static, 'static, &'static Health, With<Cat>>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Cat Health"
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(&self, health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>) -> Option<Self::Value> {
-        let health = health_query.single();
-        Some(format!("{}/{}", health.current, health.max))
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        value.clone()
-    }
-
-    fn width_hint(&self) -> usize {
-        10
-    }
-}
 
 #[derive(Component)]
 pub struct PerfUiCatName {
