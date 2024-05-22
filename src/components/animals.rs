@@ -102,6 +102,12 @@ pub struct Cat {
     name: String,
 }
 
+impl Cat {
+    fn new(name: String) -> Self {
+        Self { name }
+    }
+}
+
 impl Animal for Cat {
     fn species() -> &'static str {
         "Cat"
@@ -115,6 +121,12 @@ impl Animal for Cat {
 #[derive(Component)]
 pub struct Dog {
     name: String,
+}
+
+impl Dog {
+    fn new(name: String) -> Self {
+        Self { name }
+    }
 }
 
 impl Animal for Dog {
@@ -131,14 +143,15 @@ fn spawn_animal<T: Animal>(
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
     animal_type: AnimalType,
-    texture_path: &str,
+    texture_path: String,
     velocity: Velocity,
+    animal_factory: fn(String) -> T,
 ) {
     let mut rng = thread_rng();
     let x = rng.gen_range(-25.0..25.0);
 
     let animal_name = generate_animal_name(animal_type);
-    let animal_texture = asset_server.load(texture_path);
+    let animal_texture = asset_server.load(&texture_path);
     let animal_layout = TextureAtlasLayout::from_grid(Vec2::new(26.0, 26.0), 4, 4, None, None);
     let animal_texture_atlas_layout = texture_atlas_layouts.add(animal_layout);
     let animal_animation_indices = AnimationIndices {
@@ -147,9 +160,7 @@ fn spawn_animal<T: Animal>(
         current_index: 0,
     }; // idle animation
     let _animal_entity = commands.spawn((
-        T {
-            name: animal_name.clone(),
-        },
+        animal_factory(animal_name.clone()),
         Health {
             current: 100,
             max: 100,
@@ -178,7 +189,7 @@ pub fn spawn_cat(
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
 ) {
-    spawn_animal::<Cat>(commands, asset_server, texture_atlas_layouts, AnimalType::Cat, "textures/cat-texture.png", Velocity { x: 15.0, y: 0.0 });
+    spawn_animal::<Cat>(commands, asset_server, texture_atlas_layouts, AnimalType::Cat, "textures/cat-texture.png".to_string(), Velocity { x: 15.0, y: 0.0 }, Cat::new);
 }
 
 pub fn spawn_dog(
@@ -186,5 +197,5 @@ pub fn spawn_dog(
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
 ) {
-    spawn_animal::<Dog>(commands, asset_server, texture_atlas_layouts, AnimalType::Dog, "textures/dog-texture.png", Velocity { x: -2.0, y: 0.0 });
+    spawn_animal::<Dog>(commands, asset_server, texture_atlas_layouts, AnimalType::Dog, "textures/dog-texture.png".to_string(), Velocity { x: -2.0, y: 0.0 }, Dog::new);
 }
