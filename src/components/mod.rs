@@ -1,7 +1,8 @@
 mod animals;
 mod perfui;
-pub(crate) use animals::{spawn_cat, spawn_dog, Cat, Dog};
-pub(crate) use perfui::CustomPerfUiAppExt;
+
+pub use animals::{spawn_cat, spawn_dog, Cat, Dog};
+pub use perfui::CustomPerfUiAppExt;
 
 use bevy::input::keyboard::KeyCode;
 use bevy::input::keyboard::KeyboardInput;
@@ -12,12 +13,12 @@ use bevy::utils::Duration;
 use bevy::window::PrimaryWindow;
 
 #[derive(Component)]
-pub(crate) struct DeathZone {
-    pub(crate) size: Vec2,
+pub struct DeathZone {
+    pub size: Vec2,
 }
 
 #[derive(Component)]
-pub(crate) struct Tile {
+pub struct Tile {
     size: Vec2,
     ground: bool,
 }
@@ -279,7 +280,7 @@ pub struct Health {
  * Identifies the main camera. 🎥
  */
 #[derive(Component)]
-pub(crate) struct MainCamera;
+pub struct MainCamera;
 
 /**
  * Stores the world position of the mouse cursor.
@@ -403,7 +404,7 @@ fn animate_sprite<T: Component>(
     }
 }
 
-pub(crate) trait CustomResourcesAppExt {
+pub trait CustomResourcesAppExt {
     fn add_custom_resources(&mut self) -> &mut Self;
 }
 
@@ -418,7 +419,7 @@ impl CustomResourcesAppExt for App {
     }
 }
 
-pub(crate) trait CustomSystemsAppExt {
+pub trait CustomSystemsAppExt {
     fn add_custom_systems(&mut self) -> &mut Self;
 }
 

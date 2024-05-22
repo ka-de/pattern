@@ -15,11 +15,11 @@ use perf_ui::prelude::*;
 
 #[derive(Component)]
 #[allow(dead_code)]
-pub struct PerfUiCursorWorldCoordinates {
-    pub label: String,
-    pub color_gradient: ColorGradient,
-    pub digits: u8,
-    pub sort_key: i32,
+struct PerfUiCursorWorldCoordinates {
+    label: String,
+    color_gradient: ColorGradient,
+    digits: u8,
+    sort_key: i32,
 }
 
 impl Default for PerfUiCursorWorldCoordinates {
@@ -79,14 +79,14 @@ impl PerfUiEntry for PerfUiCursorWorldCoordinates {
  * PerfUI: Struct for tracking the time elapsed since the last click.
  */
 #[derive(Component)]
-pub struct PerfUiTimeSinceLastClick {
-    pub label: String,
-    pub display_units: bool,
-    pub threshold_highlight: Option<f32>,
-    pub color_gradient: ColorGradient,
-    pub digits: u8,
-    pub precision: u8,
-    pub sort_key: i32,
+struct PerfUiTimeSinceLastClick {
+    label: String,
+    display_units: bool,
+    threshold_highlight: Option<f32>,
+    color_gradient: ColorGradient,
+    digits: u8,
+    precision: u8,
+    sort_key: i32,
 }
 
 /**
@@ -165,14 +165,14 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
  *  PerfUI: Struct for tracking the time elapsed since the last key pressed.
  */
 #[derive(Component)]
-pub struct PerfUiTimeSinceLastKeypress {
-    pub label: String,
-    pub display_units: bool,
-    pub threshold_highlight: Option<f32>,
-    pub color_gradient: ColorGradient,
-    pub digits: u8,
-    pub precision: u8,
-    pub sort_key: i32,
+struct PerfUiTimeSinceLastKeypress {
+    label: String,
+    display_units: bool,
+    threshold_highlight: Option<f32>,
+    color_gradient: ColorGradient,
+    digits: u8,
+    precision: u8,
+    sort_key: i32,
 }
 
 /**
@@ -251,9 +251,9 @@ impl PerfUiEntry for PerfUiTimeSinceLastKeypress {
  * PerfUI: Struct for tracking how many times the Space key has been pressed.
  */
 #[derive(Component)]
-pub struct PerfUiSpaceKeyPressCount {
-    pub label: String,
-    pub sort_key: i32,
+struct PerfUiSpaceKeyPressCount {
+    label: String,
+    sort_key: i32,
 }
 
 /**
@@ -304,9 +304,9 @@ impl PerfUiEntry for PerfUiSpaceKeyPressCount {
 }
 
 #[derive(Component)]
-pub struct PerfUiAnimalName<T: Component> {
-    pub label: String,
-    pub sort_key: i32,
+struct PerfUiAnimalName<T: Component> {
+    label: String,
+    sort_key: i32,
     _marker: PhantomData<T>,
 }
 
@@ -360,9 +360,9 @@ impl<T: Component + Animal> PerfUiEntry for PerfUiAnimalName<T> {
 }
 
 #[derive(Component)]
-pub struct PerfUiAnimalHunger<T: Component> {
-    pub label: String,
-    pub sort_key: i32,
+struct PerfUiAnimalHunger<T: Component> {
+    label: String,
+    sort_key: i32,
     _marker: PhantomData<T>,
 }
 
@@ -416,9 +416,9 @@ impl<T: Component> PerfUiEntry for PerfUiAnimalHunger<T> {
 }
 
 #[derive(Component)]
-pub struct PerfUiAnimalHealth<T: Component> {
-    pub label: String,
-    pub sort_key: i32,
+struct PerfUiAnimalHealth<T: Component> {
+    label: String,
+    sort_key: i32,
     _marker: PhantomData<T>,
 }
 
@@ -472,9 +472,9 @@ impl<T: Component> PerfUiEntry for PerfUiAnimalHealth<T> {
 }
 
 #[derive(Component)]
-pub struct PerfUiAnimalGender<T: Component> {
-    pub label: String,
-    pub sort_key: i32,
+struct PerfUiAnimalGender<T: Component> {
+    label: String,
+    sort_key: i32,
     _marker: PhantomData<T>,
 }
 
@@ -549,7 +549,7 @@ fn setup_animal_perfui<T: Animal + Component>(
     ));
 }
 
-pub(crate) trait CustomPerfUiAppExt {
+pub trait CustomPerfUiAppExt {
     /// Add support for a custom perf UI entry type (component).
     fn add_custom_perf_ui(&mut self) -> &mut Self;
 
