@@ -15,11 +15,12 @@ fn setup(
     commands.spawn((
         components::DeathZone {
             size: Vec2::new(800.0, 50.0), // adjust as needed
+            border_width: 5.0,
         },
         SpriteBundle {
             sprite: Sprite {
                 color: Color::rgb(1.0, 0.0, 0.0),          // red color for debug
-                custom_size: Some(Vec2::new(800.0, 50.0)), // adjust as needed
+                custom_size: Some(Vec2::new(800.0, 50.0)),
                 ..default()
             },
             transform: Transform::from_translation(Vec3::new(0.0, -200.0, 0.0)), // adjust as needed

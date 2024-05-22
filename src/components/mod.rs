@@ -11,22 +11,95 @@ use bevy::prelude::*;
 use bevy::utils::Duration;
 use bevy::window::PrimaryWindow;
 
+/**
+ * The 💀 Zone!
+ */
+
 #[derive(Component)]
 pub(crate) struct DeathZone {
     pub(crate) size: Vec2,
+    pub(crate) border_width: f32,
 }
+
+fn handle_death_zone_collisions(
+    mut commands: Commands,
+    death_zone_query: Query<(&DeathZone, &Transform)>,
+    entity_query: Query<(Entity, &Transform, &Sprite, &Velocity, &Name)>,
+) {
+    for (death_zone, death_zone_transform) in death_zone_query.iter() {
+        let death_zone_position = death_zone_transform.translation.truncate();
+        let death_zone_size = death_zone.size;
+        let border_width = death_zone.border_width;
+
+        let top_left = death_zone_position - death_zone_size / 2.0;
+        let top_right = top_left + Vec2::new(death_zone_size.x, 0.0);
+        let bottom_left = top_left + Vec2::new(0.0, death_zone_size.y);
+        let bottom_right = top_left + death_zone_size;
+
+        let top_edge = (top_left, top_right);
+        let bottom_edge = (bottom_left, bottom_right);
+        let left_edge = (top_left, bottom_left);
+        let right_edge = (top_right, bottom_right);
+
+        for (entity, transform, sprite, _, name) in entity_query.iter() {
+            let entity_position = transform.translation.truncate();
+            let entity_size = sprite.custom_size.unwrap_or(Vec2::splat(1.0));
+
+            if is_colliding_with_edge(entity_position, entity_size, top_edge, border_width)
+                || is_colliding_with_edge(entity_position, entity_size, bottom_edge, border_width)
+                || is_colliding_with_edge(entity_position, entity_size, left_edge, border_width)
+                || is_colliding_with_edge(entity_position, entity_size, right_edge, border_width)
+            {
+                println!("Collision detected between entity {} and death zone", name);
+                commands.entity(entity).despawn();
+            }
+        }
+    }
+}
+
+fn is_colliding_with_edge(
+    entity_position: Vec2,
+    entity_size: Vec2,
+    edge: (Vec2, Vec2),
+    border_width: f32,
+) -> bool {
+    let edge_start = edge.0;
+    let edge_end = edge.1;
+
+    let edge_direction = (edge_end - edge_start).normalize();
+    let edge_normal = Vec2::new(-edge_direction.y, edge_direction.x);
+
+    let distance_to_edge = (entity_position - edge_start).dot(edge_normal);
+    let distance_to_edge_abs = distance_to_edge.abs();
+
+    if distance_to_edge_abs <= border_width {
+        let projection = (entity_position - edge_start).dot(edge_direction);
+        let projection_clamped = projection.clamp(0.0, (edge_end - edge_start).length());
+
+        let closest_point = edge_start + projection_clamped * edge_direction;
+        let distance_to_closest_point = (entity_position - closest_point).length();
+
+        return distance_to_closest_point <= entity_size.x / 2.0;
+    }
+
+    false
+}
+
+/**
+ * Tile
+ */
 
 #[derive(Component)]
 pub(crate) struct Tile {
     size: Vec2,
-    ground: bool,
+    collision: bool,
 }
 
 impl Default for Tile {
     fn default() -> Self {
         Self {
             size: Vec2::new(32.0, 16.0),
-            ground: true,
+            collision: true,
         }
     }
 }
@@ -40,44 +113,12 @@ struct Velocity {
     y: f32,
 }
 
+/**
+ * ⬇️
+ */
 #[derive(Component, Default)]
 struct GravityScale(f32);
 
-fn handle_death_zone_collisions(
-    mut commands: Commands,
-    death_zone_query: Query<(&DeathZone, &Transform)>,
-    entity_query: Query<(Entity, &Transform, &Sprite, &Velocity, &Name)>,
-) {
-    for (death_zone, death_zone_transform) in death_zone_query.iter() {
-        let death_zone_position = death_zone_transform.translation.truncate();
-        let death_zone_size = death_zone.size;
-
-        println!(
-            "Death zone position: {:?}, size: {:?}",
-            death_zone_position, death_zone_size
-        );
-
-        for (entity, transform, sprite, _, name) in entity_query.iter() {
-            let entity_position = transform.translation.truncate();
-            let entity_size = sprite.custom_size.unwrap_or(Vec2::splat(1.0));
-
-            println!(
-                "Entity {} position: {:?}, size: {:?}",
-                name, entity_position, entity_size
-            );
-
-            if is_colliding(
-                entity_position,
-                entity_size,
-                death_zone_position,
-                death_zone_size,
-            ) {
-                println!("Collision detected between entity {} and death zone", name);
-                commands.entity(entity).despawn();
-            }
-        }
-    }
-}
 
 fn apply_gravity(mut query: Query<(&mut Velocity, &GravityScale)>, time: Res<Time>) {
     const GRAVITY: f32 = 19.61;
@@ -99,7 +140,7 @@ fn handle_collisions(
             let tile_size = tile.size;
 
             // Check for collision between the animal and the tile
-            if tile.ground
+            if tile.collision
                 && is_colliding(
                     animal_transform.translation.truncate(),
                     animal_size,
@@ -107,8 +148,8 @@ fn handle_collisions(
                     tile_size,
                 )
             {
-                // Resolve the collision for ground tiles
-                // For example, set the animal's vertical velocity to 0 when landing on a ground tile
+                // Resolve the collision for collision tiles
+                // For example, set the animal's vertical velocity to 0 when landing on a collision tile
                 animal_velocity.y = 0.0;
                 animal_transform.translation.y =
                     tile_position.y + tile_size.y / 2.0 + animal_size.y / 2.0;
