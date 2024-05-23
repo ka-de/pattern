@@ -78,10 +78,20 @@ fn handle_keypress(
     time: Res<Time>,
     mut lastkeypress: ResMut<TimeSinceLastKeypress>,
     mut evr_keyboard: EventReader<KeyboardInput>,
+    mut space_key_press_count: ResMut<SpaceKeyPressCount>,
+    mut space_key_press_state: ResMut<SpaceKeyPressState>,
 ) {
     for ev in evr_keyboard.read() {
-        if ev.state == ButtonState::Pressed {
-            lastkeypress.last_keypress = time.elapsed();
+        lastkeypress.last_keypress = time.elapsed();
+
+        if ev.key_code == KeyCode::Space {
+            if ev.state == ButtonState::Pressed && !space_key_press_state.last_pressed {
+                lastkeypress.last_keypress = time.elapsed();
+                space_key_press_count.count += 1;
+                space_key_press_state.last_pressed = true;
+            } else if ev.state == ButtonState::Released {
+                space_key_press_state.last_pressed = false;
+            }
         }
     }
 }
@@ -94,28 +104,6 @@ struct SpaceKeyPressState {
     last_pressed: bool,
 }
 
-/**
- * Function to handle when the Space key is being pressed.
- */
-fn handle_space_keypress(
-    mut evr_keyboard: EventReader<KeyboardInput>,
-    mut space_key_press_count: ResMut<SpaceKeyPressCount>,
-    mut space_key_press_state: ResMut<SpaceKeyPressState>,
-) {
-    for ev in evr_keyboard.read() {
-        if ev.key_code == KeyCode::Space {
-            if ev.state == ButtonState::Pressed && !space_key_press_state.last_pressed {
-                space_key_press_count.count += 1;
-                *space_key_press_state = SpaceKeyPressState { last_pressed: true };
-            } else if ev.state == ButtonState::Released {
-                *space_key_press_state = SpaceKeyPressState {
-                    last_pressed: false,
-                };
-            }
-        }
-    }
-}
-
 pub fn setup_ui(app: &mut App) -> &mut App {
     app.init_resource::<CursorWorldCoordinates>()
         .init_resource::<TimeSinceLastClick>()
@@ -125,5 +113,4 @@ pub fn setup_ui(app: &mut App) -> &mut App {
         .add_systems(Update, cursor_system)
         .add_systems(Update, handle_click)
         .add_systems(Update, handle_keypress)
-        .add_systems(Update, handle_space_keypress)
 }
