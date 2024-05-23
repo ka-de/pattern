@@ -66,9 +66,6 @@ impl PerfUiEntry for PerfUiCursorWorldCoordinates {
     }
 }
 
-/**
- * PerfUI: Struct for tracking the time elapsed since the last click.
- */
 #[derive(Component)]
 struct PerfUiTimeSinceLastClick {
     label: String,
@@ -80,9 +77,6 @@ struct PerfUiTimeSinceLastClick {
     sort_key: i32,
 }
 
-/**
- * PerfUI: Implementation for tracking the time elapsed since the last click.
- */
 impl Default for PerfUiTimeSinceLastClick {
     fn default() -> Self {
         PerfUiTimeSinceLastClick {
@@ -97,9 +91,6 @@ impl Default for PerfUiTimeSinceLastClick {
     }
 }
 
-/**
- * PerfUI: PerfUiEntry implementation for tracking the time elapsed since the last click.
- */
 impl PerfUiEntry for PerfUiTimeSinceLastClick {
     type Value = f64;
     type SystemParam = (SRes<Time>, SRes<TimeSinceLastClick>);
@@ -152,9 +143,6 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
     }
 }
 
-/**
- *  PerfUI: Struct for tracking the time elapsed since the last key pressed.
- */
 #[derive(Component)]
 struct PerfUiTimeSinceLastKeypress {
     label: String,
@@ -166,9 +154,6 @@ struct PerfUiTimeSinceLastKeypress {
     sort_key: i32,
 }
 
-/**
- * PerfUI: Default implementation for tracking the time elapsed since the last key pressed.
- */
 impl Default for PerfUiTimeSinceLastKeypress {
     fn default() -> Self {
         PerfUiTimeSinceLastKeypress {
@@ -183,9 +168,6 @@ impl Default for PerfUiTimeSinceLastKeypress {
     }
 }
 
-/**
- * PerfUI: PerfUIEntry implementation for tracking the time elapsed since the last key pressed.
- */
 impl PerfUiEntry for PerfUiTimeSinceLastKeypress {
     type Value = f64;
     type SystemParam = (SRes<Time>, SRes<TimeSinceLastKeypress>);
@@ -238,18 +220,12 @@ impl PerfUiEntry for PerfUiTimeSinceLastKeypress {
     }
 }
 
-/**
- * PerfUI: Struct for tracking how many times the Space key has been pressed.
- */
 #[derive(Component)]
 struct PerfUiSpaceKeyPressCount {
     label: String,
     sort_key: i32,
 }
 
-/**
- * PerfUI: Default implementation for tracking how many times the Space key has been pressed.
- */
 impl Default for PerfUiSpaceKeyPressCount {
     fn default() -> Self {
         PerfUiSpaceKeyPressCount {
@@ -259,9 +235,6 @@ impl Default for PerfUiSpaceKeyPressCount {
     }
 }
 
-/**
- * PerfUI: PerfUiEntry implementation for tracking how many times the Space key has been pressed.
- */
 impl PerfUiEntry for PerfUiSpaceKeyPressCount {
     type Value = u32;
     type SystemParam = SRes<SpaceKeyPressCount>;
@@ -295,7 +268,6 @@ impl PerfUiEntry for PerfUiSpaceKeyPressCount {
 }
 
 fn setup_perfui(mut commands: Commands, asset_server: Res<AssetServer>) {
-    // Performance UI
     commands.spawn((
         PerfUiRoot {
             font_label: asset_server.load("fonts/bahnschrift.ttf"),
@@ -313,7 +285,6 @@ fn setup_perfui(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 pub trait CustomPerfUiAppExt {
-    /// Add support for a custom perf UI entry type (component).
     fn add_custom_perf_ui(&mut self) -> &mut Self;
 }
 

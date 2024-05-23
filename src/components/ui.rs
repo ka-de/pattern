@@ -71,9 +71,7 @@ fn handle_click(
     }
 }
 
-/**
- * Function to handle key presses.
- */
+// Function to handle key presses.
 fn handle_keypress(
     time: Res<Time>,
     mut lastkeypress: ResMut<TimeSinceLastKeypress>,
@@ -81,24 +79,29 @@ fn handle_keypress(
     mut space_key_press_count: ResMut<SpaceKeyPressCount>,
     mut space_key_press_state: ResMut<SpaceKeyPressState>,
 ) {
+    // Iterate through all keyboard input events.
     for ev in evr_keyboard.read() {
+        // Update the time since the last key press to the current elapsed time.
         lastkeypress.last_keypress = time.elapsed();
 
+        // Check if the key pressed is the space bar.
         if ev.key_code == KeyCode::Space {
+            // If the space bar is pressed and it was not already pressed,
+            // update the last key press time, increment the count, and set the state to pressed.
             if ev.state == ButtonState::Pressed && !space_key_press_state.last_pressed {
                 lastkeypress.last_keypress = time.elapsed();
                 space_key_press_count.count += 1;
                 space_key_press_state.last_pressed = true;
-            } else if ev.state == ButtonState::Released {
+            } 
+            // If the space bar is released, set the state to not pressed.
+            else if ev.state == ButtonState::Released {
                 space_key_press_state.last_pressed = false;
             }
         }
     }
 }
 
-/**
- * Struct for tracking if the Space key is being held.
- */
+// Struct for tracking if the Space key is being held.
 #[derive(Resource, Default)]
 struct SpaceKeyPressState {
     last_pressed: bool,

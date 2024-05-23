@@ -8,9 +8,190 @@ use rand::Rng;
 
 use bevy::prelude::*;
 
-/**
- * A lot of names for the 🐕 and 🐈‍⬛.
- */
+// Animal types
+#[derive(Component, PartialEq, Eq)]
+enum AnimalType {
+    Dog,
+    Cat,
+}
+
+// 🐾
+pub trait Animal: Component {
+    // A static method that returns a static string reference, representing the species of the animal
+    fn species() -> &'static str;
+    
+    // A method that returns a reference to a String, representing the name of the animal
+    fn name(&self) -> &String;
+    
+    // A method that returns an Option containing a static string reference, representing the gender of the animal
+    fn gender(&self) -> Option<&'static str> {
+        // Get the name of the animal
+        let name = self.name();
+        
+        // Iterate over the ANIMAL_NAMES array
+        for &(animal_name, gender, _) in ANIMAL_NAMES {
+            // If the name of the animal matches the name in the array
+            if animal_name == name {
+                // Return the gender of the animal
+                return Some(gender);
+            }
+        }
+        
+        // If no match is found, return None
+        None
+    }
+}
+
+// 🐈‍⬛
+#[derive(Component)]
+pub struct Cat {
+    name: String,
+}
+
+// Implement methods for the 'Cat' struct
+impl Cat {
+    // Define a new function that takes a String as an argument and returns a new instance of 'Cat'
+    fn new(name: String) -> Self {
+        // Return a new 'Cat' instance with the given name
+        Self { name }
+    }
+}
+
+// Implement the 'Animal' trait for the 'Cat' struct
+impl Animal for Cat {
+    // Define the 'species' method to return the static string "Cat"
+    fn species() -> &'static str {
+        "Cat"
+    }
+
+    // Define the 'name' method to return a reference to the 'name' field of the 'Cat' instance
+    fn name(&self) -> &String {
+        &self.name
+    }
+}
+
+// 🐕
+#[derive(Component)]
+pub struct Dog {
+    name: String,
+}
+
+// Implement methods for the 'Dog' struct
+impl Dog {
+    // Define a new function that takes a String as an argument and returns a new instance of 'Dog'
+    fn new(name: String) -> Self {
+        // Return a new 'Dog' instance with the given name
+        Self { name }
+    }
+}
+
+// Implement the 'Animal' trait for the 'Dog' struct
+impl Animal for Dog {
+    // Define the 'species' method to return the static string "Dog"
+    fn species() -> &'static str {
+        "Dog"
+    }
+
+    // Define the 'name' method to return a reference to the 'name' field of the 'Dog' instance
+    fn name(&self) -> &String {
+        &self.name
+    }
+}
+
+// Function to generate an animal name based on the given animal type
+fn generate_animal_name(animal_type: AnimalType) -> String {
+    // Create a random number generator
+    let mut rng = thread_rng();
+    
+    // Choose a random animal name from the ANIMAL_NAMES array
+    // The chosen element is a tuple containing the name, gender, and type of the animal
+    let (name, _gender, name_type) = ANIMAL_NAMES.choose(&mut rng).unwrap();
+    
+    // If the type of the chosen animal matches the given animal type
+    if *name_type == animal_type {
+        // Return the name of the animal as a string
+        name.to_string()
+    } else {
+        // If the types don't match, recursively call the function until a matching animal name is found
+        generate_animal_name(animal_type)
+    }
+}
+
+// Function to spawn an animal of type T, where T is a type that implements the Animal trait
+fn spawn_animal<T: Animal>(
+    commands: &mut Commands, // Commands to spawn entities and components
+    asset_server: &AssetServer, // Asset server to load assets
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>, // Texture atlas layouts for sprite animation
+    animal_type: AnimalType, // Type of the animal to spawn
+    texture_path: String, // Path to the texture of the animal
+    velocity: Velocity, // Velocity of the animal
+    animal_factory: fn(String) -> T, // Factory function to create an instance of the animal
+) {
+    // Create a random number generator
+    let mut rng = thread_rng();
+    // Generate a random x-coordinate for the animal
+    let x = rng.gen_range(-25.0..25.0);
+
+    // Generate a name for the animal
+    let animal_name = generate_animal_name(animal_type);
+    // Load the texture of the animal
+    let animal_texture = asset_server.load(&texture_path);
+    // Create a texture atlas layout for the animal
+    let animal_layout = TextureAtlasLayout::from_grid(Vec2::new(26.0, 26.0), 4, 4, None, None);
+    // Add the texture atlas layout to the assets
+    let animal_texture_atlas_layout = texture_atlas_layouts.add(animal_layout);
+    // Define the indices for the animal's animation
+    let animal_animation_indices = AnimationIndices {
+        first: 0,
+        last: 3,
+        current_index: 0,
+    }; // idle animation
+    // Spawn the animal entity with its components
+    let _animal_entity = commands.spawn((
+        animal_factory(animal_name.clone()), // Create an instance of the animal
+        Health { // Set the health of the animal
+            current: 100,
+            max: 100,
+            hunger: 100,
+        },
+        SpriteSheetBundle { // Set the sprite sheet bundle for the animal
+            texture: animal_texture.clone(),
+            atlas: TextureAtlas {
+                layout: animal_texture_atlas_layout,
+                index: animal_animation_indices.first,
+            },
+            transform: Transform::from_xyz(x, 50.0, 0.0), // Set the position of the animal
+            ..Default::default()
+        },
+        AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)), // Set the animation timer for the animal
+        animal_animation_indices.clone(), // Set the animation indices for the animal
+        velocity, // Set the velocity of the animal
+        DeathAnimationPlayed(false), // Set the death animation played flag for the animal
+        GravityScale(1.0), // Set the gravity scale for the animal
+        Name::new(animal_name.clone()), // Set the name of the animal
+    ));
+}
+
+// Function to spawn a cat
+pub fn spawn_cat(
+    commands: &mut Commands, // Commands to spawn entities and components
+    asset_server: &AssetServer, // Asset server to load assets
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>, // Texture atlas layouts for sprite animation
+) {
+    // Call the spawn_animal function with the parameters for a cat
+    spawn_animal::<Cat>(commands, asset_server, texture_atlas_layouts, AnimalType::Cat, "textures/cat-texture.png".to_string(), Velocity { x: 15.0, y: 0.0 }, Cat::new);
+}
+
+// Function to spawn a dog
+pub fn spawn_dog(
+    commands: &mut Commands, // Commands to spawn entities and components
+    asset_server: &AssetServer, // Asset server to load assets
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>, // Texture atlas layouts for sprite animation
+) {
+    // Call the spawn_animal function with the parameters for a dog
+    spawn_animal::<Dog>(commands, asset_server, texture_atlas_layouts, AnimalType::Dog, "textures/dog-texture.png".to_string(), Velocity { x: -2.0, y: 0.0 }, Dog::new);
+}
+
 #[rustfmt::skip]
 const ANIMAL_NAMES: &[(&str, &str, AnimalType)] = &[
     ("Malcolm", "male", AnimalType::Dog), ("Zoe", "female", AnimalType::Dog), ("Wash", "male", AnimalType::Dog),
@@ -21,7 +202,13 @@ const ANIMAL_NAMES: &[(&str, &str, AnimalType)] = &[
     ("Gabriel", "male", AnimalType::Dog), ("Regan", "female", AnimalType::Dog), ("Tracey", "male", AnimalType::Dog),
     ("Amnon", "male", AnimalType::Dog), ("Fess", "male", AnimalType::Dog), ("Rance", "male", AnimalType::Dog),
     ("Magistrate", "male", AnimalType::Dog), ("Lucy", "female", AnimalType::Dog), ("Ruth", "female", AnimalType::Dog),
-    ("Bree", "female", AnimalType::Dog), // End of 🐕
+    ("Bree", "female", AnimalType::Dog), ("Jubal", "male", AnimalType::Dog), ("Fanty", "male", AnimalType::Dog),
+    ("Mingo", "male", AnimalType::Dog), ("Durin", "male", AnimalType::Dog), ("Bridget", "female", AnimalType::Dog),
+    ("Matty", "male", AnimalType::Dog), ("Ranse", "male", AnimalType::Dog), ("Heinrich", "male", AnimalType::Dog),
+    ("Lawrence", "male", AnimalType::Dog), ("Lund", "male", AnimalType::Dog), ("Monty", "male", AnimalType::Dog),
+    ("Corbin", "male", AnimalType::Dog), ("Petaline", "female", AnimalType::Dog), ("Helen", "female", AnimalType::Dog),
+    ("Fanti", "male", AnimalType::Dog), ("Kess", "female", AnimalType::Dog), ("Ransome", "male", AnimalType::Dog),
+    ("Sanda", "female", AnimalType::Dog), // End of 🐕
     ("Picard", "male", AnimalType::Cat), ("Beverly", "female", AnimalType::Cat), ("Data", "male", AnimalType::Cat),
     ("Troi", "female", AnimalType::Cat), ("Laforge", "male", AnimalType::Cat), ("Crusher", "male", AnimalType::Cat),
     ("Yar", "female", AnimalType::Cat), ("Kirk", "male", AnimalType::Cat), ("Spock", "male", AnimalType::Cat),
@@ -32,7 +219,7 @@ const ANIMAL_NAMES: &[(&str, &str, AnimalType)] = &[
     ("Quark", "male", AnimalType::Cat), ("Archer", "male", AnimalType::Cat), ("Tucker", "male", AnimalType::Cat),
     ("Tpol", "female", AnimalType::Cat), ("Reed", "male", AnimalType::Cat), ("Mayweather", "male", AnimalType::Cat),
     ("Phlox", "male", AnimalType::Cat), ("Sato", "female", AnimalType::Cat), ("Sevenofnine", "female", AnimalType::Cat),
-    ("Thedoctor", "male", AnimalType::Cat), ("Tomparis", "male", AnimalType::Cat), ("Harrykim", "male", AnimalType::Cat),
+    ("Doctor", "male", AnimalType::Cat), ("Paris", "male", AnimalType::Cat), ("Harrykim", "male", AnimalType::Cat),
     ("Belanna", "female", AnimalType::Cat), ("Torres", "female", AnimalType::Cat), ("Jeanluc", "male", AnimalType::Cat),
     ("Lorca", "male", AnimalType::Cat), ("Burnham", "female", AnimalType::Cat), ("Saru", "male", AnimalType::Cat),
     ("Stamets", "male", AnimalType::Cat), ("Tilly", "female", AnimalType::Cat), ("Georgiou", "female", AnimalType::Cat), 
@@ -64,138 +251,5 @@ const ANIMAL_NAMES: &[(&str, &str, AnimalType)] = &[
     ("Ziyal", "female", AnimalType::Cat), ("Dukat", "male", AnimalType::Cat), ("Damar", "male", AnimalType::Cat), 
     ("Weyoun", "male", AnimalType::Cat), ("Eddington", "male", AnimalType::Cat), ("Michael", "male", AnimalType::Cat),
     ("Sarina", "female", AnimalType::Cat), ("Hugh", "male", AnimalType::Cat), ("Lore", "male", AnimalType::Cat),
-    ("Elaurian", "male", AnimalType::Cat) // End of 🐈‍⬛
+    ("Elaurian", "male", AnimalType::Cat), // End of 🐈‍⬛
 ];
-
-#[derive(Component, PartialEq, Eq)]
-enum AnimalType {
-    Dog,
-    Cat,
-}
-
-fn generate_animal_name(animal_type: AnimalType) -> String {
-    let mut rng = thread_rng();
-    let (name, _gender, name_type) = ANIMAL_NAMES.choose(&mut rng).unwrap();
-    if *name_type == animal_type {
-        name.to_string()
-    } else {
-        generate_animal_name(animal_type)
-    }
-}
-
-pub trait Animal: Component {
-    fn species() -> &'static str;
-    fn name(&self) -> &String;
-    fn gender(&self) -> Option<&'static str> {
-        let name = self.name();
-        for &(animal_name, gender, _) in ANIMAL_NAMES {
-            if animal_name == name {
-                return Some(gender);
-            }
-        }
-        None
-    }
-}
-
-#[derive(Component)]
-pub struct Cat {
-    name: String,
-}
-
-impl Cat {
-    fn new(name: String) -> Self {
-        Self { name }
-    }
-}
-
-impl Animal for Cat {
-    fn species() -> &'static str {
-        "Cat"
-    }
-
-    fn name(&self) -> &String {
-        &self.name
-    }
-}
-
-#[derive(Component)]
-pub struct Dog {
-    name: String,
-}
-
-impl Dog {
-    fn new(name: String) -> Self {
-        Self { name }
-    }
-}
-
-impl Animal for Dog {
-    fn species() -> &'static str {
-        "Dog"
-    }
-    fn name(&self) -> &String {
-        &self.name
-    }
-}
-
-fn spawn_animal<T: Animal>(
-    commands: &mut Commands,
-    asset_server: &AssetServer,
-    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
-    animal_type: AnimalType,
-    texture_path: String,
-    velocity: Velocity,
-    animal_factory: fn(String) -> T,
-) {
-    let mut rng = thread_rng();
-    let x = rng.gen_range(-25.0..25.0);
-
-    let animal_name = generate_animal_name(animal_type);
-    let animal_texture = asset_server.load(&texture_path);
-    let animal_layout = TextureAtlasLayout::from_grid(Vec2::new(26.0, 26.0), 4, 4, None, None);
-    let animal_texture_atlas_layout = texture_atlas_layouts.add(animal_layout);
-    let animal_animation_indices = AnimationIndices {
-        first: 0,
-        last: 3,
-        current_index: 0,
-    }; // idle animation
-    let _animal_entity = commands.spawn((
-        animal_factory(animal_name.clone()),
-        Health {
-            current: 100,
-            max: 100,
-            hunger: 100,
-        },
-        SpriteSheetBundle {
-            texture: animal_texture.clone(),
-            atlas: TextureAtlas {
-                layout: animal_texture_atlas_layout,
-                index: animal_animation_indices.first,
-            },
-            transform: Transform::from_xyz(x, 50.0, 0.0),
-            ..Default::default()
-        },
-        AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
-        animal_animation_indices.clone(),
-        velocity,
-        DeathAnimationPlayed(false),
-        GravityScale(1.0),
-        Name::new(animal_name.clone()),
-    ));
-}
-
-pub fn spawn_cat(
-    commands: &mut Commands,
-    asset_server: &AssetServer,
-    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
-) {
-    spawn_animal::<Cat>(commands, asset_server, texture_atlas_layouts, AnimalType::Cat, "textures/cat-texture.png".to_string(), Velocity { x: 15.0, y: 0.0 }, Cat::new);
-}
-
-pub fn spawn_dog(
-    commands: &mut Commands,
-    asset_server: &AssetServer,
-    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
-) {
-    spawn_animal::<Dog>(commands, asset_server, texture_atlas_layouts, AnimalType::Dog, "textures/dog-texture.png".to_string(), Velocity { x: -2.0, y: 0.0 }, Dog::new);
-}
