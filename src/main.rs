@@ -1,6 +1,6 @@
 mod components;
 
-use components::{Cat, CustomPerfUiAppExt as _, CustomSystemsAppExt as _, Dog};
+use components::{CustomPerfUiAppExt as _, CustomSystemsAppExt as _};
 
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
@@ -54,8 +54,6 @@ fn main() {
         )
         .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
         .add_custom_perf_ui()
-        .add_animal_perf_ui::<Cat>()
-        .add_animal_perf_ui::<Dog>()
         .add_systems(Startup, setup)
         .add_custom_systems()
         .run();

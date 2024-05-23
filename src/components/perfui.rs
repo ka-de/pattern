@@ -1,9 +1,3 @@
-use std::any::TypeId;
-use std::marker::PhantomData;
-
-use crate::components::Health;
-
-use crate::components::animals::{Animal, Cat, Dog};
 use crate::components::ui::{CursorWorldCoordinates, SpaceKeyPressCount, TimeSinceLastClick, TimeSinceLastKeypress};
 
 use bevy::ecs::system::lifetimeless::SRes;
@@ -12,7 +6,6 @@ use bevy::prelude::*;
 use perf_ui::prelude::*;
 
 #[derive(Component)]
-#[allow(dead_code)]
 struct PerfUiCursorWorldCoordinates {
     label: String,
     color_gradient: ColorGradient,
@@ -301,216 +294,6 @@ impl PerfUiEntry for PerfUiSpaceKeyPressCount {
     }
 }
 
-#[derive(Component)]
-struct PerfUiAnimalName<T: Component> {
-    label: String,
-    sort_key: i32,
-    _marker: PhantomData<T>,
-}
-
-impl<T: Component + Animal> Default for PerfUiAnimalName<T> {
-    fn default() -> Self {
-        PerfUiAnimalName {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-            _marker: PhantomData,
-        }
-    }
-}
-
-impl<T: Component + Animal> PerfUiEntry for PerfUiAnimalName<T> {
-    type Value = String;
-    type SystemParam = Query<'static, 'static, &'static T>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            if TypeId::of::<T>() == TypeId::of::<Cat>() {
-                "Cat Name"
-            } else if TypeId::of::<T>() == TypeId::of::<Dog>() {
-                "Dog Name"
-            } else {
-                "Animal Name"
-            }
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(
-        &self,
-        animal_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
-    ) -> Option<Self::Value> {
-        animal_query.get_single().ok().map(|animal| animal.name().clone())
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        value.clone()
-    }
-
-    fn width_hint(&self) -> usize {
-        20
-    }
-}
-
-#[derive(Component)]
-struct PerfUiAnimalHunger<T: Component> {
-    label: String,
-    sort_key: i32,
-    _marker: PhantomData<T>,
-}
-
-impl<T: Component> Default for PerfUiAnimalHunger<T> {
-    fn default() -> Self {
-        PerfUiAnimalHunger {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-            _marker: PhantomData,
-        }
-    }
-}
-
-impl<T: Component> PerfUiEntry for PerfUiAnimalHunger<T> {
-    type Value = u32;
-    type SystemParam = Query<'static, 'static, &'static Health, With<T>>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            if TypeId::of::<T>() == TypeId::of::<Cat>() {
-                "Cat Hunger"
-            } else if TypeId::of::<T>() == TypeId::of::<Dog>() {
-                "Dog Hunger"
-            } else {
-                "Animal Hunger"
-            }
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(
-        &self,
-        health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
-    ) -> Option<Self::Value> {
-        health_query.get_single().ok().map(|health| health.hunger)
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        format!("{}", value)
-    }
-
-    fn width_hint(&self) -> usize {
-        3
-    }
-}
-
-#[derive(Component)]
-struct PerfUiAnimalHealth<T: Component> {
-    label: String,
-    sort_key: i32,
-    _marker: PhantomData<T>,
-}
-
-impl<T: Component> Default for PerfUiAnimalHealth<T> {
-    fn default() -> Self {
-        PerfUiAnimalHealth {
-            label: String::new(),
-            sort_key: perf_ui::utils::next_sort_key(),
-            _marker: PhantomData,
-        }
-    }
-}
-
-impl<T: Component> PerfUiEntry for PerfUiAnimalHealth<T> {
-    type Value = String;
-    type SystemParam = Query<'static, 'static, &'static Health, With<T>>;
-
-    fn label(&self) -> &str {
-        if self.label.is_empty() {
-            if TypeId::of::<T>() == TypeId::of::<Cat>() {
-                "Cat Health"
-            } else if TypeId::of::<T>() == TypeId::of::<Dog>() {
-                "Dog Health"
-            } else {
-                "Animal Health"
-            }
-        } else {
-            &self.label
-        }
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(
-        &self,
-        health_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
-    ) -> Option<Self::Value> {
-        health_query.get_single().ok().map(|health| format!("{}/{}", health.current, health.max))
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        value.clone()
-    }
-
-    fn width_hint(&self) -> usize {
-        10
-    }
-}
-
-#[derive(Component)]
-struct PerfUiAnimalGender<T: Component> {
-    label: String,
-    sort_key: i32,
-    _marker: PhantomData<T>,
-}
-
-impl<T: Component + Animal> Default for PerfUiAnimalGender<T> {
-    fn default() -> Self {
-        PerfUiAnimalGender {
-            label: T::species().to_owned() + " Gender",
-            sort_key: perf_ui::utils::next_sort_key(),
-            _marker: PhantomData,
-        }
-    }
-}
-
-impl<T: Component + Animal> PerfUiEntry for PerfUiAnimalGender<T> {
-    type Value = &'static str;
-    type SystemParam = Query<'static, 'static, &'static T>;
-
-    fn label(&self) -> &str {
-        &self.label
-    }
-
-    fn sort_key(&self) -> i32 {
-        self.sort_key
-    }
-
-    fn update_value(
-        &self,
-        animal_query: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
-    ) -> Option<Self::Value> {
-        animal_query.get_single().ok().and_then(|animal| animal.gender())
-    }
-
-    fn format_value(&self, value: &Self::Value) -> String {
-        value.to_string()
-    }
-
-    fn width_hint(&self) -> usize {
-        10
-    }
-}
-
 fn setup_perfui(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Performance UI
     commands.spawn((
@@ -529,24 +312,9 @@ fn setup_perfui(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
-fn setup_animal_perfui<T: Animal + Component>(
-    mut commands: Commands,
-    mut query: Query<Entity, With<PerfUiRoot>>,
-) {
-    let perfui = query.single_mut();
-    commands.entity(perfui).insert((
-        PerfUiAnimalName::<T>::default(),
-        PerfUiAnimalGender::<T>::default(),
-        PerfUiAnimalHealth::<T>::default(),
-        PerfUiAnimalHunger::<T>::default(),
-    ));
-}
-
 pub trait CustomPerfUiAppExt {
     /// Add support for a custom perf UI entry type (component).
     fn add_custom_perf_ui(&mut self) -> &mut Self;
-
-    fn add_animal_perf_ui<T: Component + Animal>(&mut self) -> &mut Self;
 }
 
 impl CustomPerfUiAppExt for App {
@@ -557,13 +325,5 @@ impl CustomPerfUiAppExt for App {
             .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
             .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
             .add_systems(PreStartup, setup_perfui)
-    }
-
-    fn add_animal_perf_ui<T: Component + Animal>(&mut self) -> &mut Self {
-        self.add_perf_ui_entry_type::<PerfUiAnimalName<T>>()
-            .add_perf_ui_entry_type::<PerfUiAnimalGender<T>>()
-            .add_perf_ui_entry_type::<PerfUiAnimalHealth<T>>()
-            .add_perf_ui_entry_type::<PerfUiAnimalHunger<T>>()
-            .add_systems(Startup, setup_animal_perfui::<T>)
     }
 }
