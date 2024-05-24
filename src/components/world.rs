@@ -143,7 +143,7 @@ fn handle_collisions(
                 }
             }
         }
-        if max_penetration_depth > 0.0 {
+        if max_penetration_depth > 0.0 && animal_velocity.y < 0.0 {
             animal_velocity.y = 0.0;
             animal_transform.translation.y += max_penetration_depth * gravity_scale.0;
         } else {
