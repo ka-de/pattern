@@ -152,7 +152,13 @@ fn spawn_animal<T: Animal>(
     // Load the texture of the animal
     let animal_texture = asset_server.load(&texture_path);
     // Create a texture atlas layout for the animal
-    let animal_layout = TextureAtlasLayout::from_grid(Vec2::new(26.0, 26.0), 4, 4, None, None);
+    let animal_layout = TextureAtlasLayout::from_grid(
+        Vec2::new(26.0, 26.0),
+        4,
+        4,
+        Some(Vec2::new(2.0, 2.0)),
+        None
+    );
     // Add the texture atlas layout to the assets
     let animal_texture_atlas_layout = texture_atlas_layouts.add(animal_layout);
     // Define the indices for the animal's animation
