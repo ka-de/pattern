@@ -122,28 +122,31 @@ fn handle_collisions(
     ) in animal_query.iter_mut()
     {
         let animal_size = animal_sprite.custom_size.unwrap_or(Vec2::splat(1.0));
-        let animal_aabb = Aabb2d {
-            min: animal_transform.translation.truncate() - animal_size / 2.0,
-            max: animal_transform.translation.truncate() + animal_size / 2.0,
-        };
         let mut max_penetration_depth: f32 = 0.0;
+
         for (tile, tile_transform) in tile_query.iter() {
             let tile_position = tile_transform.translation.truncate();
             let tile_size = tile.size;
-            let tile_aabb = Aabb2d {
-                min: tile_position - tile_size / 2.0,
-                max: tile_position + tile_size / 2.0,
-            };
-            if tile.ground && animal_aabb.intersects(&tile_aabb) {
+
+            if tile.ground
+                && is_colliding(
+                    animal_transform.translation.truncate(),
+                    animal_size,
+                    tile_position,
+                    tile_size,
+                )
+            {
                 let tile_top = tile_position.y + tile_size.y;
                 let animal_bottom = animal_transform.translation.y - animal_size.y / 2.0;
                 let penetration_depth = animal_bottom - tile_top;
+
                 if penetration_depth < 0.0 {
                     max_penetration_depth = max_penetration_depth.max(-penetration_depth);
                 }
             }
         }
-        if max_penetration_depth > 0.0 && animal_velocity.y < 0.0 {
+
+        if max_penetration_depth > 0.0 {
             animal_velocity.y = 0.0;
             animal_transform.translation.y += max_penetration_depth * gravity_scale.0;
         } else {
