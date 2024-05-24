@@ -170,7 +170,7 @@ fn is_colliding(a_pos: Vec2, a_size: Vec2, b_pos: Vec2, b_size: Vec2) -> bool {
     let b_min = b_pos - b_size - Vec2::splat(threshold);
     let b_max = b_pos + b_size + Vec2::splat(threshold);
 
-    /**
+    /*
      * Checks if the rectangles are colliding by comparing the x and y coordinates of the minimum and maximum points.
      * If the maximum x coordinate of rectangle a is greater than the minimum x coordinate of rectangle b AND
      * the minimum x coordinate of rectangle a is less than the maximum x coordinate of rectangle b AND
@@ -179,7 +179,7 @@ fn is_colliding(a_pos: Vec2, a_size: Vec2, b_pos: Vec2, b_size: Vec2) -> bool {
      * then the rectangles are colliding and the function returns true.
      * Otherwise, it returns false.
      */
-    a_min.x < b_max.x && a_max.x > b_min.x && a_min.y < b_max.y && a_max.y > b_min.y
+    (a_min.x < b_max.x) && (a_max.x > b_min.x) && (a_min.y < b_max.y) && (a_max.y > b_min.y)
 }
 
 // Function to add the gravity, collision, and death zone collision systems to the Bevy app
