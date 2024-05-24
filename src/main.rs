@@ -49,9 +49,7 @@ fn main() {
     #[cfg(target_arch = "wasm32")]
     let window_plugin = WindowPlugin {
         primary_window: Some(Window {
-            // provide the ID selector string here
             canvas: Some("#pattern-canvas".into()),
-            // ... any other window properties ...
             ..default()
         }),
         ..default()
