@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 use crate::components::{GravityScale, Velocity};
+use crate::components::animals::FacingDirection;
 
 const GRAVITY: f32 = 19.61;
 const TILE_SIZE: f32 = 32.0;
@@ -98,51 +99,91 @@ fn apply_gravity(mut query: Query<(&mut Velocity, &GravityScale)>, time: Res<Tim
 
 // System to handle collisions between "animal" entities and tiles
 fn handle_collisions(
-    mut animal_query: Query<(&mut Velocity, &mut Transform, &Sprite, &GravityScale)>,
+    mut animal_query: Query<(
+        &mut Velocity,
+        &mut Transform,
+        &Sprite,
+        &GravityScale,
+        &mut FacingDirection,
+        &mut HasReachedEdge,
+    )>,
     tile_query: Query<(&Tile, &Transform), Without<Velocity>>,
     time: Res<Time>,
 ) {
-    for (mut animal_velocity, mut animal_transform, animal_sprite, gravity_scale) in animal_query.iter_mut() {
+    for (
+        mut animal_velocity,
+        mut animal_transform,
+        animal_sprite,
+        gravity_scale,
+        mut facing_direction,
+        mut has_reached_edge,
+    ) in animal_query.iter_mut()
+    {
         let animal_size = animal_sprite.custom_size.unwrap_or(Vec2::splat(1.0));
-        let mut collision_resolved = false;
+        let mut on_ground = false;
+        let mut ground_normal = Vec2::ZERO;
 
         for (tile, tile_transform) in tile_query.iter() {
             let tile_position = tile_transform.translation.truncate();
             let tile_size = tile.size;
 
-            if tile.ground
-                && is_colliding(
+            if tile.ground {
+                let collision_info = get_collision_info(
                     animal_transform.translation.truncate(),
                     animal_size,
                     tile_position,
                     tile_size,
-                )
-            {
-                let tile_top = tile_position.y + tile_size.y / 2.0;
-                let animal_bottom = animal_transform.translation.y - animal_size.y / 2.0;
-                let penetration_depth = animal_bottom - tile_top;
+                );
 
-                if penetration_depth < 0.0 {
-                    animal_velocity.y = 0.0;
-                    animal_transform.translation.y += -penetration_depth * gravity_scale.0;
-                    collision_resolved = true;
-                    break;
+                if let Some(info) = collision_info {
+                    on_ground = true;
+                    ground_normal = info.normal;
+
+                    // Resolve collisions based on the ground normal
+                    animal_velocity.y = animal_velocity.y.max(0.0);
+                    animal_transform.translation += info.normal * info.depth;
+
+                    // Handle edge collisions
+                    if info.normal.x != 0.0 {
+                        let animal_left = animal_transform.translation.x - animal_size.x / 2.0;
+                        let animal_right = animal_transform.translation.x + animal_size.x / 2.0;
+                        let tile_left = tile_position.x;
+                        let tile_right = tile_position.x + tile_size.x;
+
+                        if animal_left < tile_left && !has_reached_edge.left {
+                            // Collision with the left edge
+                            animal_velocity.x = animal_velocity.x.abs();
+                            facing_direction.x = 1.0;
+                            has_reached_edge.left = true;
+                        } else if animal_right > tile_right && !has_reached_edge.right {
+                            // Collision with the right edge
+                            animal_velocity.x = -animal_velocity.x.abs();
+                            facing_direction.x = -1.0;
+                            has_reached_edge.right = true;
+                        }
+                    }
                 }
             }
         }
 
-        if !collision_resolved {
+        if !on_ground {
             animal_velocity.y -= GRAVITY * gravity_scale.0 * time.delta_seconds();
+        } else {
+            // Reset the HasReachedEdge flags when the animal is on the ground
+            has_reached_edge.left = false;
+            has_reached_edge.right = false;
         }
     }
 }
 
 // Helper function to check if two rectangles are colliding
 fn is_colliding(a_pos: Vec2, a_size: Vec2, b_pos: Vec2, b_size: Vec2) -> bool {
-    let a_min = a_pos - a_size / 2.0;
-    let a_max = a_pos + a_size / 2.0;
-    let b_min = b_pos - b_size / 2.0;
-    let b_max = b_pos + b_size / 2.0;
+    // Adjust the size of the rectangles by a small threshold value
+    let threshold = 0.1;
+    let a_min = a_pos - a_size - Vec2::splat(threshold);
+    let a_max = a_pos + a_size + Vec2::splat(threshold);
+    let b_min = b_pos - b_size - Vec2::splat(threshold);
+    let b_max = b_pos + b_size + Vec2::splat(threshold);
 
     a_min.x < b_max.x && a_max.x > b_min.x && a_min.y < b_max.y && a_max.y > b_min.y
 }

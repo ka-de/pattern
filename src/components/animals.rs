@@ -8,6 +8,12 @@ use rand::Rng;
 
 use bevy::prelude::*;
 
+// Keeps track of the facing direction of each animal.
+#[derive(Component)]
+pub struct FacingDirection {
+    pub x: f32,
+}
+
 // Animal types
 #[derive(Component, PartialEq, Eq)]
 enum AnimalType {
@@ -132,6 +138,10 @@ fn spawn_animal<T: Animal>(
     // Generate a random x-coordinate for the animal
     let x = rng.gen_range(-25.0..25.0);
 
+    let facing_direction = FacingDirection {
+        x: velocity.x.signum(),
+    };
+   
     // Generate a name for the animal
     let animal_name = generate_animal_name(animal_type);
     // Load the texture of the animal
@@ -169,6 +179,7 @@ fn spawn_animal<T: Animal>(
         DeathAnimationPlayed(false), // Set the death animation played flag for the animal
         GravityScale(1.0), // Set the gravity scale for the animal
         Name::new(animal_name.clone()), // Set the name of the animal
+        facing_direction, // Keeps track of the facing direction of each animal.
     ));
 }
 
