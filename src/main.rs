@@ -40,9 +40,11 @@ fn main() {
 
     // this code is compiled only if debug assertions are disabled (release mode)
     #[cfg(not(debug_assertions))]
-    let logplugin = LogPlugin {
+    let log_plugin = LogPlugin {
         level: bevy::log::Level::INFO,
         filter: "warning,pattern=info".into(),
+        update_subscriber: None,
+    };
 
     #[cfg(target_arch = "wasm32")]
     let window_plugin = WindowPlugin {
