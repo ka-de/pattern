@@ -1,4 +1,6 @@
 use bevy::prelude::*;
+use bevy::math::bounding::Aabb2d;
+use bevy::math::bounding::IntersectsVolume;
 
 use crate::components::{GravityScale, Velocity};
 use crate::components::animals::FacingDirection;
@@ -70,19 +72,19 @@ fn handle_death_zone_collisions(
     entity_query: Query<(Entity, &Transform, &Sprite, &Velocity, &Name)>,
 ) {
     for (death_zone, death_zone_transform) in death_zone_query.iter() {
-        let death_zone_position = death_zone_transform.translation.truncate();
-        let death_zone_size = death_zone.size;
+        let death_zone_aabb = Aabb2d {
+            min: death_zone_transform.translation.truncate() - death_zone.size / 2.0,
+            max: death_zone_transform.translation.truncate() + death_zone.size / 2.0,
+        };
 
         for (entity, transform, sprite, _, name) in entity_query.iter() {
-            let entity_position = transform.translation.truncate();
             let entity_size = sprite.custom_size.unwrap_or(Vec2::splat(1.0));
+            let entity_aabb = Aabb2d {
+                min: transform.translation.truncate() - entity_size / 2.0,
+                max: transform.translation.truncate() + entity_size / 2.0,
+            };
 
-            if is_colliding(
-                entity_position,
-                entity_size,
-                death_zone_position,
-                death_zone_size,
-            ) {
+            if death_zone_aabb.intersects(&entity_aabb) {
                 info!("Collision detected between entity {} and death zone", name);
                 commands.entity(entity).despawn();
             }
@@ -170,15 +172,12 @@ fn is_colliding(a_pos: Vec2, a_size: Vec2, b_pos: Vec2, b_size: Vec2) -> bool {
     let b_min = b_pos - b_size - Vec2::splat(threshold);
     let b_max = b_pos + b_size + Vec2::splat(threshold);
 
-    /**
-     * Checks if the rectangles are colliding by comparing the x and y coordinates of the minimum and maximum points.
-     * If the maximum x coordinate of rectangle a is greater than the minimum x coordinate of rectangle b AND
-     * the minimum x coordinate of rectangle a is less than the maximum x coordinate of rectangle b AND
-     * the maximum y coordinate of rectangle a is greater than the minimum y coordinate of rectangle b AND
-     * the minimum y coordinate of rectangle a is less than the maximum y coordinate of rectangle b,
-     * then the rectangles are colliding and the function returns true.
-     * Otherwise, it returns false.
-     */
+    // Checks if two rectangles are colliding.
+    // A collision occurs if:
+    // - Rectangle A's right edge is to the right of Rectangle B's left edge AND
+    // - Rectangle A's left edge is to the left of Rectangle B's right edge AND
+    // - Rectangle A's top edge is above Rectangle B's bottom edge AND
+    // - Rectangle A's bottom edge is below Rectangle B's top edge.
     a_min.x < b_max.x && a_max.x > b_min.x && a_min.y < b_max.y && a_max.y > b_min.y
 }
 
