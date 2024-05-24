@@ -34,7 +34,7 @@ fn main() {
     #[cfg(debug_assertions)]
     let log_plugin = LogPlugin {
         level: bevy::log::Level::DEBUG,
-        filter: "info,pattern=debug".into(),
+        filter: "info,pattern=debug,wgpu_core=warn,wgpu_hal=warn,pattern=debug,vulkan=error".into(),
         update_subscriber: None,
     };
 

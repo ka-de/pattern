@@ -161,24 +161,9 @@ fn handle_collisions(
  * It takes four parameters: the positions and sizes of two rectangles (a and b).
  */
 fn is_colliding(a_pos: Vec2, a_size: Vec2, b_pos: Vec2, b_size: Vec2) -> bool {
-    // A small threshold value is defined. This is used to adjust the size of the rectangles.
-    let threshold = 0.1;
-
-    // The minimum and maximum points of rectangle a are calculated by subtracting and adding the size and threshold to the position respectively.
-    let a_min = a_pos - a_size - Vec2::splat(threshold);
-    let a_max = a_pos + a_size + Vec2::splat(threshold);
-
-    // The minimum and maximum points of rectangle b are calculated in the same way.
-    let b_min = b_pos - b_size - Vec2::splat(threshold);
-    let b_max = b_pos + b_size + Vec2::splat(threshold);
-
-    // Checks if two rectangles are colliding.
-    // A collision occurs if:
-    // - Rectangle A's right edge is to the right of Rectangle B's left edge AND
-    // - Rectangle A's left edge is to the left of Rectangle B's right edge AND
-    // - Rectangle A's top edge is above Rectangle B's bottom edge AND
-    // - Rectangle A's bottom edge is below Rectangle B's top edge.
-    a_min.x < b_max.x && a_max.x > b_min.x && a_min.y < b_max.y && a_max.y > b_min.y
+    let a_aabb = Aabb2d::new(a_pos, a_size);
+    let b_aabb = Aabb2d::new(b_pos, b_size);
+    a_aabb.intersects(&b_aabb)
 }
 
 // Function to add the gravity, collision, and death zone collision systems to the Bevy app
