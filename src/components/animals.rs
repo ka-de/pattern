@@ -193,15 +193,7 @@ fn spawn_animal<T: Animal>(
             Name::new(animal_name.clone()),
             facing_direction_clone, // Clone the facing_direction
         ))
-        .id();
-
-    commands.entity(animal_entity).with_children(|parent| {
-        let text_transform = if facing_direction_clone.x < 0.0 {
-            Transform::from_xyz(0.0, 10.0, 1.0).with_scale(Vec3::new(-1.0, 1.0, 1.0))
-        } else {
-            Transform::from_xyz(0.0, 10.0, 1.0)
-        };
-
+        .with_children(|parent| {
         parent.spawn(Text2dBundle {
             text: Text {
                 sections: vec![TextSection {
@@ -214,7 +206,7 @@ fn spawn_animal<T: Animal>(
                 }],
                 ..Default::default()
             },
-            transform: text_transform,
+                transform: Transform::from_xyz(0.0, 10.0, 1.0),
             ..Default::default()
         });
     });

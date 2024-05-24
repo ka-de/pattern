@@ -97,18 +97,11 @@ fn update_animation(mut query: Query<(&mut AnimationIndices, &Velocity, &Health)
 }
 
 // Function to update the facing direction of the entities based on their velocity
-fn update_facing_direction(mut query: Query<(&mut Transform, &Velocity)>) {
+fn update_facing_direction(mut query: Query<(&mut Sprite, &Velocity)>) {
     // Iterate over the entities
-    for (mut transform, velocity) in query.iter_mut() {
-        // If the x-component of the velocity is less than 0
-        if velocity.x < 0.0 {
-            // Flip the sprite to face left
-            transform.scale.x = transform.scale.x.abs() * -1.0;
-            // If the x-component of the velocity is greater than or equal to 0
-        } else {
-            // Flip the sprite to face right
-            transform.scale.x = transform.scale.x.abs();
-        }
+    for (mut sprite, velocity) in query.iter_mut() {
+        // Flip the sprite if the x-component of the velocity is less than 0
+        sprite.flip_x = velocity.x < 0.0;
     }
 }
 
