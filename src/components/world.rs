@@ -153,15 +153,32 @@ fn handle_collisions(
     }
 }
 
-// Helper function to check if two rectangles are colliding
+/**
+ * This function uses the Axis-Aligned Bounding Box (AABB) collision detection method,
+ * which is a common and simple method used to check if two rectangles are colliding.
+ * It takes four parameters: the positions and sizes of two rectangles (a and b).
+ */
 fn is_colliding(a_pos: Vec2, a_size: Vec2, b_pos: Vec2, b_size: Vec2) -> bool {
-    // Adjust the size of the rectangles by a small threshold value
+    // A small threshold value is defined. This is used to adjust the size of the rectangles.
     let threshold = 0.1;
+
+    // The minimum and maximum points of rectangle a are calculated by subtracting and adding the size and threshold to the position respectively.
     let a_min = a_pos - a_size - Vec2::splat(threshold);
     let a_max = a_pos + a_size + Vec2::splat(threshold);
+
+    // The minimum and maximum points of rectangle b are calculated in the same way.
     let b_min = b_pos - b_size - Vec2::splat(threshold);
     let b_max = b_pos + b_size + Vec2::splat(threshold);
 
+    /**
+     * Checks if the rectangles are colliding by comparing the x and y coordinates of the minimum and maximum points.
+     * If the maximum x coordinate of rectangle a is greater than the minimum x coordinate of rectangle b AND
+     * the minimum x coordinate of rectangle a is less than the maximum x coordinate of rectangle b AND
+     * the maximum y coordinate of rectangle a is greater than the minimum y coordinate of rectangle b AND
+     * the minimum y coordinate of rectangle a is less than the maximum y coordinate of rectangle b,
+     * then the rectangles are colliding and the function returns true.
+     * Otherwise, it returns false.
+     */
     a_min.x < b_max.x && a_max.x > b_min.x && a_min.y < b_max.y && a_max.y > b_min.y
 }
 
