@@ -1,6 +1,6 @@
 mod components;
 
-use components::{CustomPerfUiAppExt as _, CustomSystemsAppExt as _};
+use components::{ CustomPerfUiAppExt as _, CustomSystemsAppExt as _ };
 
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
@@ -8,7 +8,7 @@ use bevy::prelude::*;
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>
 ) {
     commands.spawn((Camera2dBundle::default(), components::MainCamera));
 
@@ -61,10 +61,7 @@ fn main() {
     // The ImagePlugin::default_nearest() prevents blurry sprites
     App::new()
         .add_plugins(
-            DefaultPlugins
-                .set(window_plugin)
-                .set(ImagePlugin::default_nearest())
-                .set(log_plugin),
+            DefaultPlugins.set(window_plugin).set(ImagePlugin::default_nearest()).set(log_plugin)
         )
         .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
         .add_custom_perf_ui()

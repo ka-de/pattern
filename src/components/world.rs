@@ -86,7 +86,7 @@ fn handle_death_zone_collisions(
 
             if death_zone_aabb.intersects(&entity_aabb) {
                 info!("Collision detected between entity {} and death zone", name);
-                commands.entity(entity).despawn();
+                commands.entity(entity).despawn_recursive();
             }
         }
     }

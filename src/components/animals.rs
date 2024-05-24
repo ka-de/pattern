@@ -14,9 +14,14 @@ use rand::Rng;
 use bevy::prelude::*;
 
 // Keeps track of the facing direction of each animal.
-#[derive(Component)]
+#[derive(Component, Clone, Copy)]
 pub struct FacingDirection {
     pub x: f32,
+}
+
+// Stores the entity ID of the associated text entity.
+pub struct TextEntities {
+    pub entity: Entity,
 }
 
 // Animal types
@@ -167,33 +172,57 @@ fn spawn_animal<T: Animal>(
         last: 3,
         current_index: 0,
     }; // idle animation
-    // Spawn the animal entity with its components
-    let _animal_entity = commands.spawn((
-        animal_factory(animal_name.clone()), // Create an instance of the animal
-        Health {
-            // Set the health of the animal
-            current: 100,
-            max: 100,
-            hunger: 100,
-        },
-        SpriteSheetBundle {
-            // Set the sprite sheet bundle for the animal
-            texture: animal_texture.clone(),
-            atlas: TextureAtlas {
-                layout: animal_texture_atlas_layout,
-                index: animal_animation_indices.first,
+    let facing_direction_clone = facing_direction.clone();
+    let animal_entity = commands
+        .spawn((
+            animal_factory(animal_name.clone()),
+            Health {
+                current: 100,
+                max: 100,
+                hunger: 100,
             },
-            transform: Transform::from_xyz(x, 50.0, 0.0), // Set the position of the animal
+            SpriteSheetBundle {
+                texture: animal_texture.clone(),
+                atlas: TextureAtlas {
+                    layout: animal_texture_atlas_layout,
+                    index: animal_animation_indices.first,
+                },
+                transform: Transform::from_xyz(x, 50.0, 0.0),
+                ..Default::default()
+            },
+            AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
+            animal_animation_indices.clone(),
+            velocity,
+            DeathAnimationPlayed(false),
+            GravityScale(1.0),
+            Name::new(animal_name.clone()),
+            facing_direction_clone, // Clone the facing_direction
+        ))
+        .id();
+
+    commands.entity(animal_entity).with_children(|parent| {
+        let text_transform = if facing_direction_clone.x < 0.0 {
+            Transform::from_xyz(0.0, 10.0, 1.0).with_scale(Vec3::new(-1.0, 1.0, 1.0))
+        } else {
+            Transform::from_xyz(0.0, 10.0, 1.0)
+        };
+
+        parent.spawn(Text2dBundle {
+            text: Text {
+                sections: vec![TextSection {
+                    value: animal_name.clone(),
+                    style: TextStyle {
+                        font: asset_server.load("fonts/bahnschrift.ttf"),
+                        font_size: 9.0,
+                        color: Color::WHITE,
+                    },
+                }],
+                ..Default::default()
+            },
+            transform: text_transform,
             ..Default::default()
-        },
-        AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)), // Set the animation timer for the animal
-        animal_animation_indices.clone(), // Set the animation indices for the animal
-        velocity, // Set the velocity of the animal
-        DeathAnimationPlayed(false), // Set the death animation played flag for the animal
-        GravityScale(1.0), // Set the gravity scale for the animal
-        Name::new(animal_name.clone()), // Set the name of the animal
-        facing_direction, // Keeps track of the facing direction of each animal.
-    ));
+        });
+    });
 }
 
 // Function to spawn a cat
