@@ -105,6 +105,7 @@ fn handle_collisions(
         &Sprite,
         &GravityScale,
         &mut FacingDirection,
+        &Name,
     )>,
     tile_query: Query<(&Tile, &Transform), Without<Velocity>>,
     time: Res<Time>,
@@ -115,6 +116,7 @@ fn handle_collisions(
         animal_sprite,
         gravity_scale,
         mut facing_direction,
+        name,
     ) in animal_query.iter_mut()
     {
         let animal_size = animal_sprite.custom_size.unwrap_or(Vec2::splat(1.0));
@@ -138,22 +140,6 @@ fn handle_collisions(
 
                 if penetration_depth < 0.0 {
                     max_penetration_depth = max_penetration_depth.max(-penetration_depth);
-                } else {
-                    // Check if the animal is colliding with the left or right edge of the platform
-                    let animal_left = animal_transform.translation.x - animal_size.x / 2.0;
-                    let animal_right = animal_transform.translation.x + animal_size.x / 2.0;
-                    let tile_left = tile_position.x;
-                    let tile_right = tile_position.x + tile_size.x;
-
-                    if animal_left < tile_left {
-                        // Collision with the left edge
-                        animal_velocity.x = animal_velocity.x.abs();
-                        facing_direction.x = 1.0;
-                    } else if animal_right > tile_right {
-                        // Collision with the right edge
-                        animal_velocity.x = -animal_velocity.x.abs();
-                        facing_direction.x = -1.0;
-                    }
                 }
             }
         }
