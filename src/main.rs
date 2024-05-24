@@ -5,6 +5,14 @@ use components::{ CustomPerfUiAppExt as _, CustomSystemsAppExt as _ };
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 
+#[derive(States, Default, Debug, Hash, PartialEq, Eq, Clone, Copy)]
+enum GameState {
+    #[default]
+    Loading,
+    MainMenu,
+    Playing,
+}
+
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,

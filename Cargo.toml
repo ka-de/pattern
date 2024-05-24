@@ -7,6 +7,7 @@ edition = "2021"
 bevy = { version = "0.13.2", default-features = false }
 terminal = { git = "https://github.com/ka-de/terminal" }
 perf_ui = { git = "https://github.com/ka-de/perf_ui" }
+bevy_healthbar = { git = "https://github.com/ka-de/bevy_healthbar" }
 rand = "0.8.5"
 
 # Only enable dynamic linking when not building wasm32.
