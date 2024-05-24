@@ -105,7 +105,6 @@ fn handle_collisions(
         &Sprite,
         &GravityScale,
         &mut FacingDirection,
-        &mut HasReachedEdge,
     )>,
     tile_query: Query<(&Tile, &Transform), Without<Velocity>>,
     time: Res<Time>,
@@ -116,62 +115,54 @@ fn handle_collisions(
         animal_sprite,
         gravity_scale,
         mut facing_direction,
-        mut has_reached_edge,
     ) in animal_query.iter_mut()
     {
         let animal_size = animal_sprite.custom_size.unwrap_or(Vec2::splat(1.0));
-        let mut on_ground = false;
-        let mut ground_normal = Vec2::ZERO;
+        let mut max_penetration_depth: f32 = 0.0;
 
         for (tile, tile_transform) in tile_query.iter() {
             let tile_position = tile_transform.translation.truncate();
             let tile_size = tile.size;
 
-            if tile.ground {
-                let collision_info = get_collision_info(
+            if tile.ground
+                && is_colliding(
                     animal_transform.translation.truncate(),
                     animal_size,
                     tile_position,
                     tile_size,
-                );
+                )
+            {
+                let tile_top = tile_position.y + tile_size.y;
+                let animal_bottom = animal_transform.translation.y - animal_size.y / 2.0;
+                let penetration_depth = animal_bottom - tile_top;
 
-                if let Some(info) = collision_info {
-                    on_ground = true;
-                    ground_normal = info.normal;
+                if penetration_depth < 0.0 {
+                    max_penetration_depth = max_penetration_depth.max(-penetration_depth);
+                } else {
+                    // Check if the animal is colliding with the left or right edge of the platform
+                    let animal_left = animal_transform.translation.x - animal_size.x / 2.0;
+                    let animal_right = animal_transform.translation.x + animal_size.x / 2.0;
+                    let tile_left = tile_position.x;
+                    let tile_right = tile_position.x + tile_size.x;
 
-                    // Resolve collisions based on the ground normal
-                    animal_velocity.y = animal_velocity.y.max(0.0);
-                    animal_transform.translation += info.normal * info.depth;
-
-                    // Handle edge collisions
-                    if info.normal.x != 0.0 {
-                        let animal_left = animal_transform.translation.x - animal_size.x / 2.0;
-                        let animal_right = animal_transform.translation.x + animal_size.x / 2.0;
-                        let tile_left = tile_position.x;
-                        let tile_right = tile_position.x + tile_size.x;
-
-                        if animal_left < tile_left && !has_reached_edge.left {
-                            // Collision with the left edge
-                            animal_velocity.x = animal_velocity.x.abs();
-                            facing_direction.x = 1.0;
-                            has_reached_edge.left = true;
-                        } else if animal_right > tile_right && !has_reached_edge.right {
-                            // Collision with the right edge
-                            animal_velocity.x = -animal_velocity.x.abs();
-                            facing_direction.x = -1.0;
-                            has_reached_edge.right = true;
-                        }
+                    if animal_left < tile_left {
+                        // Collision with the left edge
+                        animal_velocity.x = animal_velocity.x.abs();
+                        facing_direction.x = 1.0;
+                    } else if animal_right > tile_right {
+                        // Collision with the right edge
+                        animal_velocity.x = -animal_velocity.x.abs();
+                        facing_direction.x = -1.0;
                     }
                 }
             }
         }
 
-        if !on_ground {
-            animal_velocity.y -= GRAVITY * gravity_scale.0 * time.delta_seconds();
+        if max_penetration_depth > 0.0 {
+            animal_velocity.y = 0.0;
+            animal_transform.translation.y += max_penetration_depth * gravity_scale.0;
         } else {
-            // Reset the HasReachedEdge flags when the animal is on the ground
-            has_reached_edge.left = false;
-            has_reached_edge.right = false;
+            animal_velocity.y -= GRAVITY * gravity_scale.0 * time.delta_seconds();
         }
     }
 }
