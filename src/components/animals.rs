@@ -19,11 +19,6 @@ pub struct FacingDirection {
     pub x: f32,
 }
 
-// Stores the entity ID of the associated text entity.
-pub struct TextEntities {
-    pub entity: Entity,
-}
-
 // Animal types
 #[derive(Component, PartialEq, Eq)]
 enum AnimalType {
