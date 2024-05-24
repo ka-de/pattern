@@ -4,9 +4,10 @@ version = "1.0.0"
 edition = "2021"
 
 [dependencies]
-rand = "0.8.5"
 bevy = { version = "0.13.2", default-features = false }
+terminal = { git = "https://github.com/ka-de/terminal" }
 perf_ui = { git = "https://github.com/ka-de/perf_ui" }
+rand = "0.8.5"
 
 # Only enable dynamic linking when not building wasm32.
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]

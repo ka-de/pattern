@@ -40,15 +40,31 @@ fn main() {
 
     // this code is compiled only if debug assertions are disabled (release mode)
     #[cfg(not(debug_assertions))]
-    let logplugin = LogPlugin {
+    let log_plugin = LogPlugin {
         level: bevy::log::Level::INFO,
         filter: "warning,pattern=info".into(),
+        update_subscriber: None,
     };
+
+    #[cfg(target_arch = "wasm32")]
+    let window_plugin = WindowPlugin {
+        primary_window: Some(Window {
+            // provide the ID selector string here
+            canvas: Some("#pattern-canvas".into()),
+            // ... any other window properties ...
+            ..default()
+        }),
+        ..default()
+    };
+
+    #[cfg(not(target_arch = "wasm32"))]
+    let window_plugin = WindowPlugin::default();
 
     // The ImagePlugin::default_nearest() prevents blurry sprites
     App::new()
         .add_plugins(
             DefaultPlugins
+                .set(window_plugin)
                 .set(ImagePlugin::default_nearest())
                 .set(log_plugin),
         )
