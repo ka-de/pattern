@@ -3,9 +3,9 @@ mod perfui;
 mod ui;
 mod world;
 
-pub use animals::{spawn_cat, spawn_dog, Cat, Dog};
+pub use animals::{ spawn_cat, spawn_dog, Cat, Dog };
 pub use perfui::CustomPerfUiAppExt;
-pub use world::{death_zone_bundle, tile_bundle};
+pub use world::{ death_zone_bundle, tile_bundle };
 
 use bevy::prelude::*;
 use bevy::utils::Duration;
@@ -67,7 +67,7 @@ fn update_animation(mut query: Query<(&mut AnimationIndices, &Velocity, &Health)
                     animation_indices.last = 3;
                     animation_indices.current_index = 0;
                 }
-            // If the absolute velocity is less than 2.1
+                // If the absolute velocity is less than 2.1
             } else if abs_velocity < 2.1 {
                 // Set the indices for the walking animation
                 if animation_indices.first != 8 {
@@ -75,7 +75,7 @@ fn update_animation(mut query: Query<(&mut AnimationIndices, &Velocity, &Health)
                     animation_indices.last = 11;
                     animation_indices.current_index = 8;
                 }
-            // If the absolute velocity is greater than or equal to 2.1
+                // If the absolute velocity is greater than or equal to 2.1
             } else {
                 // Set the indices for the running animation
                 if animation_indices.first != 12 {
@@ -84,7 +84,7 @@ fn update_animation(mut query: Query<(&mut AnimationIndices, &Velocity, &Health)
                     animation_indices.current_index = 12;
                 }
             }
-        // If the health of the entity is less than or equal to 0
+            // If the health of the entity is less than or equal to 0
         } else {
             // Set the indices for the death animation
             if animation_indices.first != 4 {
@@ -104,7 +104,7 @@ fn update_facing_direction(mut query: Query<(&mut Transform, &Velocity)>) {
         if velocity.x < 0.0 {
             // Flip the sprite to face left
             transform.scale.x = transform.scale.x.abs() * -1.0;
-        // If the x-component of the velocity is greater than or equal to 0
+            // If the x-component of the velocity is greater than or equal to 0
         } else {
             // Flip the sprite to face right
             transform.scale.x = transform.scale.x.abs();
@@ -114,12 +114,7 @@ fn update_facing_direction(mut query: Query<(&mut Transform, &Velocity)>) {
 
 // Function to play the death animation for entities with 0 health
 fn play_death_animation(
-    mut query: Query<(
-        &mut AnimationIndices,
-        &Health,
-        &mut DeathAnimationPlayed,
-        &mut TextureAtlas,
-    )>,
+    mut query: Query<(&mut AnimationIndices, &Health, &mut DeathAnimationPlayed, &mut TextureAtlas)>
 ) {
     // Iterate over the entities
     for (mut animation_indices, health, mut death_animation_played, mut atlas) in query.iter_mut() {
@@ -148,7 +143,7 @@ fn move_entities(time: Res<Time>, mut query: Query<(&mut Transform, &mut Velocit
             // Update the position of the entity based on its velocity and the change in time
             transform.translation.x += velocity.x * delta_seconds;
             transform.translation.y += velocity.y * delta_seconds;
-        // If the health of the entity is 0
+            // If the health of the entity is 0
         } else {
             // Set the velocity of the entity to 0
             velocity.x = 0.0;
@@ -161,7 +156,7 @@ fn move_entities(time: Res<Time>, mut query: Query<(&mut Transform, &mut Velocit
 fn decrease_hunger(
     time: Res<Time>, // The current time
     mut hunger_timer: ResMut<HungerTimer>, // The hunger timer
-    mut health_query: Query<&mut Health>, // The health of the entities
+    mut health_query: Query<&mut Health> // The health of the entities
 ) {
     // Update the hunger timer
     hunger_timer.0.tick(time.delta());
@@ -186,14 +181,7 @@ fn decrease_hunger(
 // Function to animate the sprite of entities of type T
 fn animate_sprite<T: Component>(
     time: Res<Time>, // The current time
-    mut query: Query<
-        (
-            &mut AnimationIndices,
-            &mut AnimationTimer,
-            &mut TextureAtlas,
-        ),
-        With<T>,
-    >,
+    mut query: Query<(&mut AnimationIndices, &mut AnimationTimer, &mut TextureAtlas), With<T>>
 ) {
     // Iterate over the entities
     for (mut indices, mut timer, mut atlas) in query.iter_mut() {
@@ -232,20 +220,20 @@ impl CustomSystemsAppExt for App {
     fn add_custom_systems(&mut self) -> &mut Self {
         // Initialize the hunger timer resource
         self.init_resource::<HungerTimer>()
-        // Add the decrease_hunger system to the update stage
-        .add_systems(Update, decrease_hunger)
-        // Add the move_entities system to the update stage
-        .add_systems(Update, move_entities)
-        // Add the update_facing_direction system to the update stage
-        .add_systems(Update, update_facing_direction)
-        // Add the animate_sprite system for the Cat component to the update stage
-        .add_systems(Update, animate_sprite::<Cat>)
-        // Add the animate_sprite system for the Dog component to the update stage
-        .add_systems(Update, animate_sprite::<Dog>)
-        // Add the update_animation system to the update stage
-        .add_systems(Update, update_animation)
-        // Add the play_death_animation system to the update stage
-        .add_systems(Update, play_death_animation);
+            // Add the decrease_hunger system to the update stage
+            .add_systems(Update, decrease_hunger)
+            // Add the move_entities system to the update stage
+            .add_systems(Update, move_entities)
+            // Add the update_facing_direction system to the update stage
+            .add_systems(Update, update_facing_direction)
+            // Add the animate_sprite system for the Cat component to the update stage
+            .add_systems(Update, animate_sprite::<Cat>)
+            // Add the animate_sprite system for the Dog component to the update stage
+            .add_systems(Update, animate_sprite::<Dog>)
+            // Add the update_animation system to the update stage
+            .add_systems(Update, update_animation)
+            // Add the play_death_animation system to the update stage
+            .add_systems(Update, play_death_animation);
 
         // Setup world systems
         world::setup_world_systems(self);

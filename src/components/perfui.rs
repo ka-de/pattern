@@ -1,4 +1,9 @@
-use crate::components::ui::{CursorWorldCoordinates, SpaceKeyPressCount, TimeSinceLastClick, TimeSinceLastKeypress};
+use crate::components::ui::{
+    CursorWorldCoordinates,
+    SpaceKeyPressCount,
+    TimeSinceLastClick,
+    TimeSinceLastKeypress,
+};
 
 use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
@@ -29,11 +34,7 @@ impl PerfUiEntry for PerfUiCursorWorldCoordinates {
     type SystemParam = SRes<CursorWorldCoordinates>;
 
     fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Cursor World Coords"
-        } else {
-            &self.label
-        }
+        if self.label.is_empty() { "Cursor World Coords" } else { &self.label }
     }
 
     fn sort_key(&self) -> i32 {
@@ -42,7 +43,7 @@ impl PerfUiEntry for PerfUiCursorWorldCoordinates {
 
     fn update_value(
         &self,
-        coords: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
+        coords: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>
     ) -> Option<Self::Value> {
         Some(coords.0)
     }
@@ -96,11 +97,7 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
     type SystemParam = (SRes<Time>, SRes<TimeSinceLastClick>);
 
     fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Time since last click"
-        } else {
-            &self.label
-        }
+        if self.label.is_empty() { "Time since last click" } else { &self.label }
     }
 
     fn sort_key(&self) -> i32 {
@@ -109,7 +106,7 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
 
     fn update_value(
         &self,
-        (time, lastclick): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
+        (time, lastclick): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>
     ) -> Option<Self::Value> {
         let d = time.elapsed() - lastclick.last_click;
         Some(d.as_secs_f64())
@@ -137,9 +134,7 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
     }
 
     fn value_highlight(&self, value: &Self::Value) -> bool {
-        self.threshold_highlight
-            .map(|t| (*value as f32) > t)
-            .unwrap_or(false)
+        self.threshold_highlight.map(|t| (*value as f32) > t).unwrap_or(false)
     }
 }
 
@@ -173,11 +168,7 @@ impl PerfUiEntry for PerfUiTimeSinceLastKeypress {
     type SystemParam = (SRes<Time>, SRes<TimeSinceLastKeypress>);
 
     fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Time since last key press"
-        } else {
-            &self.label
-        }
+        if self.label.is_empty() { "Time since last key press" } else { &self.label }
     }
 
     fn sort_key(&self) -> i32 {
@@ -186,7 +177,7 @@ impl PerfUiEntry for PerfUiTimeSinceLastKeypress {
 
     fn update_value(
         &self,
-        (time, lastkeypress): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
+        (time, lastkeypress): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>
     ) -> Option<Self::Value> {
         let d = time.elapsed() - lastkeypress.last_keypress;
         Some(d.as_secs_f64())
@@ -214,9 +205,7 @@ impl PerfUiEntry for PerfUiTimeSinceLastKeypress {
     }
 
     fn value_highlight(&self, value: &Self::Value) -> bool {
-        self.threshold_highlight
-            .map(|t| (*value as f32) > t)
-            .unwrap_or(false)
+        self.threshold_highlight.map(|t| (*value as f32) > t).unwrap_or(false)
     }
 }
 
@@ -240,11 +229,7 @@ impl PerfUiEntry for PerfUiSpaceKeyPressCount {
     type SystemParam = SRes<SpaceKeyPressCount>;
 
     fn label(&self) -> &str {
-        if self.label.is_empty() {
-            "Space key press count"
-        } else {
-            &self.label
-        }
+        if self.label.is_empty() { "Space key press count" } else { &self.label }
     }
 
     fn sort_key(&self) -> i32 {
@@ -253,7 +238,7 @@ impl PerfUiEntry for PerfUiSpaceKeyPressCount {
 
     fn update_value(
         &self,
-        space_key_press_count: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
+        space_key_press_count: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>
     ) -> Option<Self::Value> {
         Some(space_key_press_count.count)
     }

@@ -1,5 +1,10 @@
 use crate::components::{
-    AnimationIndices, AnimationTimer, DeathAnimationPlayed, GravityScale, Health, Velocity,
+    AnimationIndices,
+    AnimationTimer,
+    DeathAnimationPlayed,
+    GravityScale,
+    Health,
+    Velocity,
 };
 
 use rand::seq::SliceRandom;
@@ -25,15 +30,15 @@ enum AnimalType {
 pub trait Animal: Component {
     // A static method that returns a static string reference, representing the species of the animal
     fn species() -> &'static str;
-    
+
     // A method that returns a reference to a String, representing the name of the animal
     fn name(&self) -> &String;
-    
+
     // A method that returns an Option containing a static string reference, representing the gender of the animal
     fn gender(&self) -> Option<&'static str> {
         // Get the name of the animal
         let name = self.name();
-        
+
         // Iterate over the ANIMAL_NAMES array
         for &(animal_name, gender, _) in ANIMAL_NAMES {
             // If the name of the animal matches the name in the array
@@ -42,7 +47,7 @@ pub trait Animal: Component {
                 return Some(gender);
             }
         }
-        
+
         // If no match is found, return None
         None
     }
@@ -108,11 +113,11 @@ impl Animal for Dog {
 fn generate_animal_name(animal_type: AnimalType) -> String {
     // Create a random number generator
     let mut rng = thread_rng();
-    
+
     // Choose a random animal name from the ANIMAL_NAMES array
     // The chosen element is a tuple containing the name, gender, and type of the animal
     let (name, _gender, name_type) = ANIMAL_NAMES.choose(&mut rng).unwrap();
-    
+
     // If the type of the chosen animal matches the given animal type
     if *name_type == animal_type {
         // Return the name of the animal as a string
@@ -131,7 +136,7 @@ fn spawn_animal<T: Animal>(
     animal_type: AnimalType, // Type of the animal to spawn
     texture_path: String, // Path to the texture of the animal
     velocity: Velocity, // Velocity of the animal
-    animal_factory: fn(String) -> T, // Factory function to create an instance of the animal
+    animal_factory: fn(String) -> T // Factory function to create an instance of the animal
 ) {
     // Create a random number generator
     let mut rng = thread_rng();
@@ -141,7 +146,7 @@ fn spawn_animal<T: Animal>(
     let facing_direction = FacingDirection {
         x: velocity.x.signum(),
     };
-   
+
     // Generate a name for the animal
     let animal_name = generate_animal_name(animal_type);
     // Load the texture of the animal
@@ -159,12 +164,14 @@ fn spawn_animal<T: Animal>(
     // Spawn the animal entity with its components
     let _animal_entity = commands.spawn((
         animal_factory(animal_name.clone()), // Create an instance of the animal
-        Health { // Set the health of the animal
+        Health {
+            // Set the health of the animal
             current: 100,
             max: 100,
             hunger: 100,
         },
-        SpriteSheetBundle { // Set the sprite sheet bundle for the animal
+        SpriteSheetBundle {
+            // Set the sprite sheet bundle for the animal
             texture: animal_texture.clone(),
             atlas: TextureAtlas {
                 layout: animal_texture_atlas_layout,
@@ -187,20 +194,36 @@ fn spawn_animal<T: Animal>(
 pub fn spawn_cat(
     commands: &mut Commands, // Commands to spawn entities and components
     asset_server: &AssetServer, // Asset server to load assets
-    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>, // Texture atlas layouts for sprite animation
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout> // Texture atlas layouts for sprite animation
 ) {
     // Call the spawn_animal function with the parameters for a cat
-    spawn_animal::<Cat>(commands, asset_server, texture_atlas_layouts, AnimalType::Cat, "textures/cat-texture.png".to_string(), Velocity { x: 15.0, y: 0.0 }, Cat::new);
+    spawn_animal::<Cat>(
+        commands,
+        asset_server,
+        texture_atlas_layouts,
+        AnimalType::Cat,
+        "textures/cat-texture.png".to_string(),
+        Velocity { x: 15.0, y: 0.0 },
+        Cat::new
+    );
 }
 
 // Function to spawn a dog
 pub fn spawn_dog(
     commands: &mut Commands, // Commands to spawn entities and components
     asset_server: &AssetServer, // Asset server to load assets
-    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>, // Texture atlas layouts for sprite animation
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout> // Texture atlas layouts for sprite animation
 ) {
     // Call the spawn_animal function with the parameters for a dog
-    spawn_animal::<Dog>(commands, asset_server, texture_atlas_layouts, AnimalType::Dog, "textures/dog-texture.png".to_string(), Velocity { x: -2.0, y: 0.0 }, Dog::new);
+    spawn_animal::<Dog>(
+        commands,
+        asset_server,
+        texture_atlas_layouts,
+        AnimalType::Dog,
+        "textures/dog-texture.png".to_string(),
+        Velocity { x: -2.0, y: 0.0 },
+        Dog::new
+    );
 }
 
 #[rustfmt::skip]

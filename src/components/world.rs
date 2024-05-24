@@ -1,9 +1,9 @@
-use bevy::prelude::*;
 use bevy::math::bounding::Aabb2d;
 use bevy::math::bounding::IntersectsVolume;
+use bevy::prelude::*;
 
-use crate::components::{GravityScale, Velocity};
 use crate::components::animals::FacingDirection;
+use crate::components::{ GravityScale, Velocity };
 
 const GRAVITY: f32 = 19.61;
 const TILE_SIZE: f32 = 32.0;
@@ -39,7 +39,7 @@ pub fn death_zone_bundle() -> impl Bundle {
         },
         SpriteBundle {
             sprite: Sprite {
-                color: Color::rgb(1.0, 0.0, 0.0),          // red color for debug
+                color: Color::rgb(1.0, 0.0, 0.0), // red color for debug
                 custom_size: Some(Vec2::new(800.0, 50.0)),
                 ..default()
             },
@@ -69,7 +69,7 @@ pub fn tile_bundle(tile_position: Vec2) -> impl Bundle {
 fn handle_death_zone_collisions(
     mut commands: Commands,
     death_zone_query: Query<(&DeathZone, &Transform)>,
-    entity_query: Query<(Entity, &Transform, &Sprite, &Velocity, &Name)>,
+    entity_query: Query<(Entity, &Transform, &Sprite, &Velocity, &Name)>
 ) {
     for (death_zone, death_zone_transform) in death_zone_query.iter() {
         let death_zone_aabb = Aabb2d {
@@ -101,16 +101,11 @@ fn apply_gravity(mut query: Query<(&mut Velocity, &GravityScale)>, time: Res<Tim
 
 // System to handle collisions between "animal" entities and tiles
 fn handle_collisions(
-    mut animal_query: Query<(
-        &mut Velocity,
-        &mut Transform,
-        &Sprite,
-        &GravityScale,
-        &mut FacingDirection,
-        &Name,
-    )>,
+    mut animal_query: Query<
+        (&mut Velocity, &mut Transform, &Sprite, &GravityScale, &mut FacingDirection, &Name)
+    >,
     tile_query: Query<(&Tile, &Transform), Without<Velocity>>,
-    time: Res<Time>,
+    time: Res<Time>
 ) {
     for (
         mut animal_velocity,
@@ -119,8 +114,7 @@ fn handle_collisions(
         gravity_scale,
         mut facing_direction,
         name,
-    ) in animal_query.iter_mut()
-    {
+    ) in animal_query.iter_mut() {
         let animal_size = animal_sprite.custom_size.unwrap_or(Vec2::splat(1.0));
         let mut max_penetration_depth: f32 = 0.0;
 
@@ -128,12 +122,13 @@ fn handle_collisions(
             let tile_position = tile_transform.translation.truncate();
             let tile_size = tile.size;
 
-            if tile.ground
-                && is_colliding(
+            if
+                tile.ground &&
+                is_colliding(
                     animal_transform.translation.truncate(),
                     animal_size,
                     tile_position,
-                    tile_size,
+                    tile_size
                 )
             {
                 let tile_top = tile_position.y + tile_size.y;

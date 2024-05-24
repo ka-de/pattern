@@ -37,7 +37,7 @@ fn cursor_system(
     // Get the window.
     window_query: Query<&Window, With<PrimaryWindow>>,
     // Get the camera transform.
-    camera_query: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+    camera_query: Query<(&Camera, &GlobalTransform), With<MainCamera>>
 ) {
     // Get the camera info and transform.
     let (camera, camera_transform) = camera_query.single();
@@ -47,10 +47,11 @@ fn cursor_system(
 
     // Check if the cursor is inside the window and get its position
     // then, ask bevy to convert into world coordinates, and truncate to discard Z.
-    if let Some(world_position) = window
-        .cursor_position()
-        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
-        .map(|ray| ray.origin.truncate())
+    if
+        let Some(world_position) = window
+            .cursor_position()
+            .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+            .map(|ray| ray.origin.truncate())
     {
         coords.0 = world_position;
     }
@@ -62,7 +63,7 @@ fn cursor_system(
 fn handle_click(
     time: Res<Time>,
     mut lastclick: ResMut<TimeSinceLastClick>,
-    mut evr_mouse: EventReader<MouseButtonInput>,
+    mut evr_mouse: EventReader<MouseButtonInput>
 ) {
     for ev in evr_mouse.read() {
         if ev.state == ButtonState::Pressed {
@@ -77,7 +78,7 @@ fn handle_keypress(
     mut lastkeypress: ResMut<TimeSinceLastKeypress>,
     mut evr_keyboard: EventReader<KeyboardInput>,
     mut space_key_press_count: ResMut<SpaceKeyPressCount>,
-    mut space_key_press_state: ResMut<SpaceKeyPressState>,
+    mut space_key_press_state: ResMut<SpaceKeyPressState>
 ) {
     // Iterate through all keyboard input events.
     for ev in evr_keyboard.read() {
@@ -92,9 +93,10 @@ fn handle_keypress(
                 lastkeypress.last_keypress = time.elapsed();
                 space_key_press_count.count += 1;
                 space_key_press_state.last_pressed = true;
-            } 
-            // If the space bar is released, set the state to not pressed.
-            else if ev.state == ButtonState::Released {
+            } else if
+                // If the space bar is released, set the state to not pressed.
+                ev.state == ButtonState::Released
+            {
                 space_key_press_state.last_pressed = false;
             }
         }

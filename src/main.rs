@@ -17,7 +17,7 @@ fn setup(
 
     // Tiles
     for x in -5..5 {
-        let tile_position = Vec2::new(x as f32 * 32.0, -100.0);
+        let tile_position = Vec2::new((x as f32) * 32.0, -100.0);
         commands.spawn(components::tile_bundle(tile_position));
     }
 
