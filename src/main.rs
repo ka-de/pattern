@@ -147,7 +147,7 @@ fn main() {
         .register_ldtk_int_cell::<components::misc::WallBundle>(1)
         .register_ldtk_int_cell::<components::misc::LadderBundle>(2)
         .register_ldtk_int_cell::<components::misc::WallBundle>(3)
-        .register_ldtk_entity::<components::misc::PlayerBundle>("Player")
+        .register_ldtk_entity::<components::player::PlayerBundle>("Player")
         .register_ldtk_entity::<components::misc::MobBundle>("Mob")
         .register_ldtk_entity::<components::misc::ChestBundle>("Chest")
         .register_ldtk_entity::<components::misc::PumpkinsBundle>("Pumpkins")

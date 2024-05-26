@@ -1,69 +1,19 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::{ prelude::*, utils::ldtk_pixel_coords_to_translation_pivoted };
-
 use std::collections::HashSet;
-
 use bevy_rapier2d::prelude::*;
+
+use crate::components::colliderbundle::ColliderBundle;
 
 /*
  * LDTK
  */
-
-#[derive(Clone, Default, Bundle, LdtkIntCell)]
-pub struct ColliderBundle {
-    pub collider: Collider,
-    pub rigid_body: RigidBody,
-    pub velocity: Velocity,
-    pub rotation_constraints: LockedAxes,
-    pub gravity_scale: GravityScale,
-    pub friction: Friction,
-    pub density: ColliderMassProperties,
-}
-
 #[derive(Clone, Default, Bundle, LdtkIntCell)]
 pub struct SensorBundle {
     pub collider: Collider,
     pub sensor: Sensor,
     pub active_events: ActiveEvents,
     pub rotation_constraints: LockedAxes,
-}
-
-impl From<&EntityInstance> for ColliderBundle {
-    fn from(entity_instance: &EntityInstance) -> ColliderBundle {
-        let rotation_constraints = LockedAxes::ROTATION_LOCKED;
-
-        match entity_instance.identifier.as_ref() {
-            "Player" =>
-                ColliderBundle {
-                    collider: Collider::cuboid(6.0, 14.0),
-                    rigid_body: RigidBody::Dynamic,
-                    friction: Friction {
-                        coefficient: 0.0,
-                        combine_rule: CoefficientCombineRule::Min,
-                    },
-                    rotation_constraints,
-                    ..Default::default()
-                },
-            "Mob" =>
-                ColliderBundle {
-                    collider: Collider::cuboid(5.0, 5.0),
-                    rigid_body: RigidBody::KinematicVelocityBased,
-                    rotation_constraints,
-                    ..Default::default()
-                },
-            "Chest" =>
-                ColliderBundle {
-                    collider: Collider::cuboid(8.0, 8.0),
-                    rigid_body: RigidBody::Dynamic,
-                    rotation_constraints,
-                    gravity_scale: GravityScale(1.0),
-                    friction: Friction::new(0.5),
-                    density: ColliderMassProperties::Density(15.0),
-                    ..Default::default()
-                },
-            _ => ColliderBundle::default(),
-        }
-    }
 }
 
 impl From<IntGridCell> for SensorBundle {
@@ -82,51 +32,6 @@ impl From<IntGridCell> for SensorBundle {
             SensorBundle::default()
         }
     }
-}
-
-#[derive(Clone, Component, Debug, Eq, Default, PartialEq)]
-pub struct Items(Vec<String>);
-
-impl From<&EntityInstance> for Items {
-    fn from(entity_instance: &EntityInstance) -> Self {
-        Items(
-            entity_instance
-                .iter_enums_field("items")
-                .expect("items field should be correctly typed")
-                .cloned()
-                .collect()
-        )
-    }
-}
-
-#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
-pub struct Player;
-
-#[derive(Clone, Eq, PartialEq, Debug, Default, Component)]
-pub struct Climber {
-    pub climbing: bool,
-    pub intersecting_climbables: HashSet<Entity>,
-}
-
-#[derive(Clone, Default, Bundle, LdtkEntity)]
-pub struct PlayerBundle {
-    #[sprite_bundle("player.png")]
-    pub sprite_bundle: SpriteBundle,
-    #[from_entity_instance]
-    pub collider_bundle: ColliderBundle,
-    pub player: Player,
-    #[worldly]
-    pub worldly: Worldly,
-    pub climber: Climber,
-    pub ground_detection: GroundDetection,
-
-    // Build Items Component manually by using `impl From<&EntityInstance>`
-    #[from_entity_instance]
-    items: Items,
-
-    // The whole EntityInstance can be stored directly as an EntityInstance component
-    #[from_entity_instance]
-    entity_instance: EntityInstance,
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
@@ -231,11 +136,6 @@ pub struct ChestBundle {
 pub struct PumpkinsBundle {
     #[sprite_sheet_bundle(no_grid)]
     pub sprite_sheet_bundle: SpriteSheetBundle,
-}
-
-#[derive(Clone, Default, Component)]
-pub struct GroundDetection {
-    pub on_ground: bool,
 }
 
 #[derive(Component)]

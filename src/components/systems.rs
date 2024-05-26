@@ -1,9 +1,13 @@
 use crate::components::misc::*;
-use bevy::prelude::*;
-use bevy_ecs_ldtk::prelude::*;
+use crate::components::climber::Climber;
+use crate::components::player::Player;
+use crate::components::grounddetection::GroundDetection;
+use crate::components::items::Items;
 
 use std::collections::{ HashMap, HashSet };
 
+use bevy::prelude::*;
+use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {

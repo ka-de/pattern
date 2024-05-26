@@ -6,6 +6,11 @@ pub(crate) mod misc;
 pub(crate) mod systems;
 pub(crate) mod health;
 pub(crate) mod gamestate;
+pub(crate) mod climber;
+pub(crate) mod player;
+pub(crate) mod colliderbundle;
+pub(crate) mod grounddetection;
+pub(crate) mod items;
 
 pub use animals::{ spawn_cat, spawn_dog, Cat, Dog };
 pub use perfui::CustomPerfUiAppExt;
