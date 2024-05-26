@@ -6,7 +6,7 @@ use bevy_ecs_ldtk::{ EntityInstance, LdtkEntity, Worldly };
 use super::{
     climber::Climber,
     colliderbundle::ColliderBundle,
-    grounddetection::GroundDetection,
+    ground::GroundDetection,
     items::Items,
 };
 

@@ -112,9 +112,3 @@ pub struct PumpkinsBundle {
     #[sprite_sheet_bundle(no_grid)]
     pub sprite_sheet_bundle: SpriteSheetBundle,
 }
-
-#[derive(Component)]
-pub struct GroundSensor {
-    pub ground_detection_entity: Entity,
-    pub intersecting_ground_entities: HashSet<Entity>,
-}
