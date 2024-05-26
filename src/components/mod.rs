@@ -1,13 +1,16 @@
-mod animals;
-mod perfui;
-mod ui;
-mod world;
+pub(crate) mod animals;
+pub(crate) mod perfui;
+pub(crate) mod ui;
+pub(crate) mod world;
 pub(crate) mod misc;
 pub(crate) mod systems;
+pub(crate) mod health;
 
 pub use animals::{ spawn_cat, spawn_dog, Cat, Dog };
 pub use perfui::CustomPerfUiAppExt;
 pub use world::{ death_zone_bundle, tile_bundle };
+
+use crate::components::health::Health;
 
 use bevy::prelude::*;
 use bevy::utils::Duration;
@@ -36,14 +39,6 @@ struct AnimationTimer(Timer); // The timer for the animation
 
 #[derive(Component)]
 struct DeathAnimationPlayed(bool); // A boolean to track if the death animation has been played
-
-// 🩸
-#[derive(Component)]
-pub struct Health {
-    current: u32, // The current health of the entity
-    max: u32, // The maximum health of the entity
-    hunger: u32, // The hunger of the entity
-}
 
 // 🍗
 #[derive(Resource, Default)]
