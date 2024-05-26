@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::ecs::component::Component;
 use bevy_ecs_ldtk::{ ldtk::ldtk_fields::LdtkFields, EntityInstance };
 
 #[derive(Clone, Component, Debug, Eq, Default, PartialEq)]

@@ -2,8 +2,7 @@ use bevy::math::bounding::Aabb2d;
 use bevy::math::bounding::IntersectsVolume;
 use bevy::prelude::*;
 
-use crate::components::animals::FacingDirection;
-use crate::components::{ GravityScale, Velocity };
+use super::{ animals::FacingDirection, GravityScale, Velocity };
 
 const GRAVITY: f32 = 19.61;
 const TILE_SIZE: f32 = 32.0;

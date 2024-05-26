@@ -1,10 +1,14 @@
-use bevy::prelude::*;
-use bevy_ecs_ldtk::prelude::*;
+use bevy::ecs::bundle::Bundle;
+use bevy::ecs::component::Component;
+use bevy::sprite::SpriteBundle;
+use bevy_ecs_ldtk::{ EntityInstance, LdtkEntity, Worldly };
 
-use crate::components::climber::Climber;
-use crate::components::colliderbundle::ColliderBundle;
-use crate::components::grounddetection::GroundDetection;
-use crate::components::items::Items;
+use super::{
+    climber::Climber,
+    colliderbundle::ColliderBundle,
+    grounddetection::GroundDetection,
+    items::Items,
+};
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct Player;

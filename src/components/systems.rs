@@ -1,8 +1,10 @@
-use crate::components::misc::*;
-use crate::components::climber::Climber;
-use crate::components::player::Player;
-use crate::components::grounddetection::GroundDetection;
-use crate::components::items::Items;
+use super::{
+    climber::Climber,
+    grounddetection::GroundDetection,
+    items::Items,
+    misc::*,
+    player::Player,
+};
 
 use std::collections::{ HashMap, HashSet };
 

@@ -1,4 +1,4 @@
-use crate::components::ui::{ SpaceKeyPressCount, TimeSinceLastKeypress };
+use super::ui::{ SpaceKeyPressCount, TimeSinceLastKeypress };
 
 use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
