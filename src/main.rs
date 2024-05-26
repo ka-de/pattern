@@ -1,3 +1,6 @@
+// Turn clippy into a real bitch
+#![warn(clippy::all, clippy::pedantic)]
+
 mod components;
 
 use components::{ CustomPerfUiAppExt as _, CustomSystemsAppExt as _ };
