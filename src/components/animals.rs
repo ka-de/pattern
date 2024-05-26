@@ -121,7 +121,7 @@ fn generate_animal_name(animal_type: AnimalType) -> String {
     // If the type of the chosen animal matches the given animal type
     if *name_type == animal_type {
         // Return the name of the animal as a string
-        name.to_string()
+        (*name).to_string()
     } else {
         // If the types don't match, recursively call the function until a matching animal name is found
         generate_animal_name(animal_type)
@@ -167,7 +167,7 @@ fn spawn_animal<T: Animal>(
         last: 3,
         current_index: 0,
     }; // idle animation
-    let facing_direction_clone = facing_direction.clone();
+    let facing_direction_clone = facing_direction;
     let animal_entity = commands
         .spawn((
             animal_factory(animal_name.clone()),

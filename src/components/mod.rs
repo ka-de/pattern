@@ -54,7 +54,7 @@ pub struct MainCamera;
 // Function to update the animation based on the velocity and health of the entities
 fn update_animation(mut query: Query<(&mut AnimationIndices, &Velocity, &Health)>) {
     // Iterate over the entities
-    for (mut animation_indices, velocity, health) in query.iter_mut() {
+    for (mut animation_indices, velocity, health) in &mut query {
         // If the health of the entity is greater than 0
         if health.current > 0 {
             // Get the absolute value of the x-component of the velocity
@@ -99,7 +99,7 @@ fn update_animation(mut query: Query<(&mut AnimationIndices, &Velocity, &Health)
 // Function to update the facing direction of the entities based on their velocity
 fn update_facing_direction(mut query: Query<(&mut Sprite, &Velocity)>) {
     // Iterate over the entities
-    for (mut sprite, velocity) in query.iter_mut() {
+    for (mut sprite, velocity) in &mut query {
         // Flip the sprite if the x-component of the velocity is less than 0
         sprite.flip_x = velocity.x < 0.0;
     }
@@ -110,7 +110,7 @@ fn play_death_animation(
     mut query: Query<(&mut AnimationIndices, &Health, &mut DeathAnimationPlayed, &mut TextureAtlas)>
 ) {
     // Iterate over the entities
-    for (mut animation_indices, health, mut death_animation_played, mut atlas) in query.iter_mut() {
+    for (mut animation_indices, health, mut death_animation_played, mut atlas) in &mut query {
         // If the health of the entity is 0 and the death animation has not been played
         if health.current == 0 && !death_animation_played.0 {
             // Set the indices for the death animation
@@ -128,7 +128,7 @@ fn play_death_animation(
 // Function to move entities based on their velocity and health
 fn move_entities(time: Res<Time>, mut query: Query<(&mut Transform, &mut Velocity, &Health)>) {
     // Iterate over the entities
-    for (mut transform, mut velocity, health) in query.iter_mut() {
+    for (mut transform, mut velocity, health) in &mut query {
         // If the health of the entity is greater than 0
         if health.current > 0 {
             // Calculate the change in time
@@ -156,7 +156,7 @@ fn decrease_hunger(
     // If the hunger timer has just finished
     if hunger_timer.0.just_finished() {
         // Iterate over the entities
-        for mut health in health_query.iter_mut() {
+        for mut health in &mut health_query {
             // Decrease the hunger of the entity by 1
             health.hunger = health.hunger.saturating_sub(1);
             // If the hunger of the entity reaches 0, decrease its health by 1
@@ -177,7 +177,7 @@ fn animate_sprite<T: Component>(
     mut query: Query<(&mut AnimationIndices, &mut AnimationTimer, &mut TextureAtlas), With<T>>
 ) {
     // Iterate over the entities
-    for (mut indices, mut timer, mut atlas) in query.iter_mut() {
+    for (mut indices, mut timer, mut atlas) in &mut query {
         // Update the animation timer
         timer.tick(time.delta());
         // If the animation timer has just finished

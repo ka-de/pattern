@@ -94,7 +94,7 @@ fn handle_death_zone_collisions(
 
 // System to apply gravity to all entities with a Velocity and GravityScale component
 fn apply_gravity(mut query: Query<(&mut Velocity, &GravityScale)>, time: Res<Time>) {
-    for (mut velocity, gravity_scale) in query.iter_mut() {
+    for (mut velocity, gravity_scale) in &mut query {
         velocity.y -= GRAVITY * gravity_scale.0 * time.delta_seconds();
     }
 }
@@ -112,9 +112,9 @@ fn handle_collisions(
         mut animal_transform,
         animal_sprite,
         gravity_scale,
-        mut facing_direction,
+        facing_direction,
         name,
-    ) in animal_query.iter_mut() {
+    ) in &mut animal_query {
         let animal_size = animal_sprite.custom_size.unwrap_or(Vec2::splat(1.0));
         let mut max_penetration_depth: f32 = 0.0;
 

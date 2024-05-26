@@ -54,8 +54,8 @@ impl PerfUiEntry for PerfUiCursorWorldCoordinates {
     }
 
     fn width_hint(&self) -> usize {
-        let w = 9;
-        w
+        
+        9
     }
 
     fn value_color(&self, _value: &Self::Value) -> Option<Color> {
@@ -134,7 +134,7 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
     }
 
     fn value_highlight(&self, value: &Self::Value) -> bool {
-        self.threshold_highlight.map(|t| (*value as f32) > t).unwrap_or(false)
+        self.threshold_highlight.is_some_and(|t| (*value as f32) > t)
     }
 }
 
@@ -205,7 +205,7 @@ impl PerfUiEntry for PerfUiTimeSinceLastKeypress {
     }
 
     fn value_highlight(&self, value: &Self::Value) -> bool {
-        self.threshold_highlight.map(|t| (*value as f32) > t).unwrap_or(false)
+        self.threshold_highlight.is_some_and(|t| (*value as f32) > t)
     }
 }
 
@@ -244,7 +244,7 @@ impl PerfUiEntry for PerfUiSpaceKeyPressCount {
     }
 
     fn format_value(&self, value: &Self::Value) -> String {
-        format!("{}", value)
+        format!("{value}")
     }
 
     fn width_hint(&self) -> usize {
