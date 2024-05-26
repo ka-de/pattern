@@ -2,6 +2,8 @@ mod animals;
 mod perfui;
 mod ui;
 mod world;
+pub(crate) mod misc;
+pub(crate) mod systems;
 
 pub use animals::{ spawn_cat, spawn_dog, Cat, Dog };
 pub use perfui::CustomPerfUiAppExt;

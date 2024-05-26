@@ -9,6 +9,7 @@ perf_ui = { git = "https://github.com/ka-de/perf_ui" }
 bevy_ecs_ldtk = { git = "https://github.com/ka-de/bevy_ecs_ldtk" }
 bevy-inspector-egui = { git = "https://github.com/ka-de/bevy-inspector-egui" }
 rand = "0.8.5"
+bevy_rapier2d = { version = "0.26.0", features = ["simd-stable"] }
 
 # Only enable dynamic linking when not building wasm32.
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
