@@ -1,7 +1,9 @@
-use bevy::prelude::*;
+use bevy::{ ecs::schedule::States, reflect::Reflect };
 
 /*
- * GameState
+ * The GameState
+ * 
+ *  
  */
 
 #[derive(States, Default, Debug, Clone, Eq, PartialEq, Hash, Reflect)]

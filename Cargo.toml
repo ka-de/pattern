@@ -4,16 +4,43 @@ version = "1.0.0"
 edition = "2021"
 
 [dependencies]
-bevy = { version = "0.13.2", default-features = false }
 perf_ui = { git = "https://github.com/ka-de/perf_ui" }
 bevy_ecs_ldtk = { git = "https://github.com/ka-de/bevy_ecs_ldtk" }
 bevy-inspector-egui = { git = "https://github.com/ka-de/bevy-inspector-egui" }
+bevy_splashscreen = { git = "https://github.com/ka-de/bevy_splashscreen" }
+bevy_tweening = { git = "https://github.com/ka-de/bevy_tweening" }
+bevy_progress = { git = "https://github.com/ka-de/bevy_progress", features = [
+  "assets",
+  "debug",
+] }
 rand = "0.8.5"
 bevy_rapier2d = { version = "0.26.0", features = ["simd-stable"] }
 
+[dependencies.bevy]
+version = "0.13.2"
+default-features = false
+features = [
+  "png",
+  "vorbis",
+  "animation",
+  "bevy_audio",
+  "bevy_gilrs",           # gamepad support
+  "bevy_gizmos",
+  "bevy_sprite",
+  "bevy_animation",
+  "bevy_ui",
+  "bevy_text",
+  "subpixel_glyph_atlas",
+]
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.bevy]
+version = "0.13.2"
+features = ["webgpu"]
+
 # Only enable dynamic linking when not building wasm32.
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-bevy = { version = "0.13.2", features = ["dynamic_linking"] }
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies.bevy]
+version = "0.13.2"
+features = ["dynamic_linking", "multi-threaded", "file_watcher", "bevy_winit"]
 
 [workspace]
 resolver = "2"
@@ -23,4 +50,3 @@ opt-level = 1
 
 [profile.dev.package."*"]
 opt-level = 3
-

@@ -3,6 +3,7 @@
 
 mod components;
 
+use bevy::render::camera::ScalingMode;
 use components::gamestate::{
     set_state_loading,
     set_state_mainmenu,
@@ -19,8 +20,20 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_inspector_egui::quick::StateInspectorPlugin;
+use bevy_splashscreen::prelude::*;
 
 fn main() {
+    // Splash Screen Configuration
+    let config = SplashScreenConfiguration {
+        run_state: GameState::SplashScreen,
+        next_state: GameState::MainMenu,
+        path: String::from("splash_screens"),
+        custom_size: Some(Vec2::ONE),
+        splash_timer: 3.0,
+        clear_color: Color::BLACK,
+        camera_scaling_mode: ScalingMode::Fixed { width: 1.0, height: 1.0 },
+    };
+
     // this code is compiled only if debug assertions are enabled (debug mode)
     #[cfg(debug_assertions)]
     let log_plugin = LogPlugin {
@@ -58,6 +71,8 @@ fn main() {
      */
 
     App::new()
+        // Splash Screen
+        .add_plugins(SplashScreenPlugin(config))
         // Disable Multi-Sample Anti-Aliasing
         .insert_resource(Msaa::Off)
         // DefaultPlugins

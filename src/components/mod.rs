@@ -12,6 +12,7 @@ pub(crate) mod colliderbundle;
 pub(crate) mod ground;
 pub(crate) mod items;
 pub(crate) mod sensorbundle;
+pub(crate) mod gamemode;
 
 pub use animals::{ spawn_cat, spawn_dog, Cat, Dog };
 pub use perfui::CustomPerfUiAppExt;
