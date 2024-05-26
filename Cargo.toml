@@ -5,10 +5,10 @@ edition = "2021"
 
 [dependencies]
 bevy = { version = "0.13.2", default-features = false }
-terminal = { git = "https://github.com/ka-de/terminal" }
 perf_ui = { git = "https://github.com/ka-de/perf_ui" }
-bevy_healthbar = { git = "https://github.com/ka-de/bevy_healthbar" }
+bevy_ecs_ldtk = { git = "https://github.com/ka-de/bevy_ecs_ldtk" }
 rand = "0.8.5"
+#terminal = { git = "https://github.com/ka-de/terminal" }
 
 # Only enable dynamic linking when not building wasm32.
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
@@ -22,3 +22,4 @@ opt-level = 1
 
 [profile.dev.package."*"]
 opt-level = 3
+

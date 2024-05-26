@@ -4,6 +4,38 @@ use components::{ CustomPerfUiAppExt as _, CustomSystemsAppExt as _ };
 
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
+use bevy_ecs_ldtk::prelude::*;
+
+/*
+ * Player
+ */
+
+#[derive(Default, Component)]
+struct PlayerChild;
+
+#[derive(Default, Component)]
+struct Player;
+
+#[derive(Default, Bundle, LdtkEntity)]
+struct PlayerBundle {
+    player: Player,
+    #[sprite_bundle]
+    sprite_bundle: SpriteBundle,
+}
+
+fn process_player(
+    mut commands: Commands,
+    new_players: Query<Entity, Added<Player>>,
+    assets: Res<AssetServer>
+) {
+    for player_entity in new_players.iter() {
+        commands.spawn(PlayerChild).set_parent(player_entity);
+    }
+}
+
+/*
+ * GameState
+ */
 
 #[derive(States, Default, Debug, Hash, PartialEq, Eq, Clone, Copy)]
 enum GameState {
@@ -71,6 +103,8 @@ fn main() {
         .add_plugins(
             DefaultPlugins.set(window_plugin).set(ImagePlugin::default_nearest()).set(log_plugin)
         )
+        .register_ldtk_entity::<PlayerBundle>("Player")
+        .add_systems(Update, process_player)
         .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
         .add_custom_perf_ui()
         .add_systems(Startup, setup)

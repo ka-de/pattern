@@ -194,22 +194,22 @@ fn spawn_animal<T: Animal>(
             facing_direction_clone, // Clone the facing_direction
         ))
         .with_children(|parent| {
-        parent.spawn(Text2dBundle {
-            text: Text {
-                sections: vec![TextSection {
-                    value: animal_name.clone(),
-                    style: TextStyle {
-                        font: asset_server.load("fonts/bahnschrift.ttf"),
-                        font_size: 9.0,
-                        color: Color::WHITE,
-                    },
-                }],
-                ..Default::default()
-            },
+            parent.spawn(Text2dBundle {
+                text: Text {
+                    sections: vec![TextSection {
+                        value: animal_name.clone(),
+                        style: TextStyle {
+                            font: asset_server.load("fonts/bahnschrift.ttf"),
+                            font_size: 9.0,
+                            color: Color::WHITE,
+                        },
+                    }],
+                    ..Default::default()
+                },
                 transform: Transform::from_xyz(0.0, 10.0, 1.0),
-            ..Default::default()
+                ..Default::default()
+            });
         });
-    });
 }
 
 // Function to spawn a cat
