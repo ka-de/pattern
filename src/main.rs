@@ -71,8 +71,7 @@ fn main() {
         )
         .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
         .add_custom_perf_ui()
-        .add_custom_systems()
-        // LDTK
+        // Start of LDTK
         .add_plugins((LdtkPlugin, RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0)))
         .insert_resource(RapierConfiguration {
             gravity: Vec2::new(0.0, -2000.0),
@@ -114,5 +113,7 @@ fn main() {
         .register_ldtk_entity::<components::misc::MobBundle>("Mob")
         .register_ldtk_entity::<components::misc::ChestBundle>("Chest")
         .register_ldtk_entity::<components::misc::PumpkinsBundle>("Pumpkins")
+        // End of LDTK
+        .add_custom_systems()
         .run();
 }

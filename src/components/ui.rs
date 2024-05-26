@@ -1,12 +1,8 @@
 use bevy::input::keyboard::KeyCode;
 use bevy::input::keyboard::KeyboardInput;
-use bevy::input::mouse::MouseButtonInput;
 use bevy::input::ButtonState;
 use bevy::prelude::*;
 use bevy::utils::Duration;
-use bevy::window::PrimaryWindow;
-
-use crate::components::MainCamera;
 
 #[derive(Resource, Default)]
 pub struct SpaceKeyPressCount {
@@ -14,62 +10,8 @@ pub struct SpaceKeyPressCount {
 }
 
 #[derive(Resource, Default)]
-pub struct TimeSinceLastClick {
-    pub last_click: Duration,
-}
-
-#[derive(Resource, Default)]
 pub struct TimeSinceLastKeypress {
     pub last_keypress: Duration,
-}
-
-/**
- * Stores the world position of the mouse cursor.
- */
-#[derive(Resource, Default)]
-pub struct CursorWorldCoordinates(pub Vec2);
-
-/**
- * Function to handle the mouse cursor with world coordinates.
- */
-fn cursor_system(
-    mut coords: ResMut<CursorWorldCoordinates>,
-    // Get the window.
-    window_query: Query<&Window, With<PrimaryWindow>>,
-    // Get the camera transform.
-    camera_query: Query<(&Camera, &GlobalTransform), With<MainCamera>>
-) {
-    // Get the camera info and transform.
-    let (camera, camera_transform) = camera_query.single();
-
-    // There is only one primary window, so we can get it from the query.
-    let window = window_query.single();
-
-    // Check if the cursor is inside the window and get its position
-    // then, ask bevy to convert into world coordinates, and truncate to discard Z.
-    if
-        let Some(world_position) = window
-            .cursor_position()
-            .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
-            .map(|ray| ray.origin.truncate())
-    {
-        coords.0 = world_position;
-    }
-}
-
-/**
- * Function to handle mouse clicks.
- */
-fn handle_click(
-    time: Res<Time>,
-    mut lastclick: ResMut<TimeSinceLastClick>,
-    mut evr_mouse: EventReader<MouseButtonInput>
-) {
-    for ev in evr_mouse.read() {
-        if ev.state == ButtonState::Pressed {
-            lastclick.last_click = time.elapsed();
-        }
-    }
 }
 
 // Function to handle key presses.
@@ -110,12 +52,8 @@ struct SpaceKeyPressState {
 }
 
 pub fn setup_ui(app: &mut App) -> &mut App {
-    app.init_resource::<CursorWorldCoordinates>()
-        .init_resource::<TimeSinceLastClick>()
-        .init_resource::<TimeSinceLastKeypress>()
+    app.init_resource::<TimeSinceLastKeypress>()
         .init_resource::<SpaceKeyPressCount>()
         .init_resource::<SpaceKeyPressState>()
-        //.add_systems(Update, cursor_system)
-        .add_systems(Update, handle_click)
         .add_systems(Update, handle_keypress)
 }
