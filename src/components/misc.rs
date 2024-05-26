@@ -6,18 +6,6 @@ use std::collections::HashSet;
 use bevy_rapier2d::prelude::*;
 
 /*
- * GameState
- */
-
-#[derive(States, Default, Debug, Hash, PartialEq, Eq, Clone, Copy)]
-enum GameState {
-    #[default]
-    Loading,
-    MainMenu,
-    Playing,
-}
-
-/*
  * LDTK
  */
 
