@@ -20,32 +20,6 @@ use bevy_rapier2d::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_inspector_egui::quick::StateInspectorPlugin;
 
-/*
-fn setup(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>
-) {
-    commands.spawn((Camera2dBundle::default(), components::MainCamera));
-
-    // The 💀 zone.
-    commands.spawn(components::death_zone_bundle());
-
-    // Tiles
-    for x in -5..5 {
-        let tile_position = Vec2::new((x as f32) * 32.0, -100.0);
-        commands.spawn(components::tile_bundle(tile_position));
-    }
-
-    // 🐈‍⬛
-    components::spawn_cat(&mut commands, &asset_server, texture_atlas_layouts.as_mut());
-
-    // 🐕
-    components::spawn_dog(&mut commands, &asset_server, texture_atlas_layouts.as_mut());
-    components::spawn_dog(&mut commands, &asset_server, texture_atlas_layouts.as_mut());
-}
-*/
-
 fn main() {
     // this code is compiled only if debug assertions are enabled (debug mode)
     #[cfg(debug_assertions)]
@@ -84,6 +58,8 @@ fn main() {
      */
 
     App::new()
+        // Disable Multi-Sample Anti-Aliasing
+        .insert_resource(Msaa::Off)
         // DefaultPlugins
         .add_plugins(
             DefaultPlugins.set(window_plugin).set(ImagePlugin::default_nearest()).set(log_plugin)
