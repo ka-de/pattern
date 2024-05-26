@@ -4,7 +4,7 @@ version = "1.0.0"
 edition = "2021"
 
 [dependencies]
-bevy = { git = "https://github.com/ka-de/bevy", default-features = false }
+bevy = { version = "0.13.2", default-features = false }
 perf_ui = { git = "https://github.com/ka-de/perf_ui" }
 bevy_ecs_ldtk = { git = "https://github.com/ka-de/bevy_ecs_ldtk" }
 bevy-inspector-egui = { git = "https://github.com/ka-de/bevy-inspector-egui" }
@@ -12,7 +12,7 @@ rand = "0.8.5"
 
 # Only enable dynamic linking when not building wasm32.
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-bevy = { git = "https://github.com/ka-de/bevy", features = ["dynamic_linking"] }
+bevy = { version = "0.13.2", features = ["dynamic_linking"] }
 
 [workspace]
 resolver = "2"
