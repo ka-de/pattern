@@ -115,7 +115,7 @@ pub fn setup_ui(app: &mut App) -> &mut App {
         .init_resource::<TimeSinceLastKeypress>()
         .init_resource::<SpaceKeyPressCount>()
         .init_resource::<SpaceKeyPressState>()
-        .add_systems(Update, cursor_system)
+        //.add_systems(Update, cursor_system)
         .add_systems(Update, handle_click)
         .add_systems(Update, handle_keypress)
 }
