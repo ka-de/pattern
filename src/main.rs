@@ -78,12 +78,16 @@ fn main() {
     /*
      * Debugging keyboard shortcuts:
      *
-     * F10 - StateInspector
+     * F10 - StateInspector (GameState)
      * F11 - WorldInspector
      * F12 - PerformanceUI (Not yet implemented)
      */
 
     App::new()
+        // DefaultPlugins
+        .add_plugins(
+            DefaultPlugins.set(window_plugin).set(ImagePlugin::default_nearest()).set(log_plugin)
+        )
         // GameState
         .init_state::<GameState>()
         .register_type::<GameState>()
@@ -91,10 +95,6 @@ fn main() {
         .add_systems(OnEnter(GameState::Loading), set_state_loading)
         .add_systems(OnEnter(GameState::MainMenu), set_state_mainmenu)
         .add_systems(OnEnter(GameState::Playing), set_state_playing)
-        // DefaultPlugins
-        .add_plugins(
-            DefaultPlugins.set(window_plugin).set(ImagePlugin::default_nearest()).set(log_plugin)
-        )
         // FrameTimeDiagnosticsPlugin
         .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
         // WorldInspectorPlugin
