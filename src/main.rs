@@ -71,8 +71,6 @@ fn main() {
      */
 
     App::new()
-        // Splash Screen
-        .add_plugins(SplashScreenPlugin(config))
         // Disable Multi-Sample Anti-Aliasing
         .insert_resource(Msaa::Off)
         // DefaultPlugins
@@ -86,6 +84,8 @@ fn main() {
         .add_systems(OnEnter(GameState::Loading), set_state_loading)
         .add_systems(OnEnter(GameState::MainMenu), set_state_mainmenu)
         .add_systems(OnEnter(GameState::Playing), set_state_playing)
+        // Splash Screen
+        .add_plugins(SplashScreenPlugin(config))
         // FrameTimeDiagnosticsPlugin
         .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
         // WorldInspectorPlugin
@@ -128,7 +128,7 @@ fn main() {
         .add_systems(Update, components::systems::detect_climb_range)
         .add_systems(Update, components::systems::ignore_gravity_if_climbing)
         .add_systems(Update, components::systems::patrol)
-        .add_systems(Update, components::systems::camera_fit_inside_current_level)
+        .add_systems(Update, components::camera::fit_inside_current_level)
         .add_systems(Update, components::systems::update_level_selection)
         .add_systems(Update, components::systems::dbg_player_items)
         .add_systems(Update, components::ground::spawn_ground_sensor)

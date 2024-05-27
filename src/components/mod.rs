@@ -13,6 +13,9 @@ pub(crate) mod ground;
 pub(crate) mod items;
 pub(crate) mod sensorbundle;
 pub(crate) mod gamemode;
+pub(crate) mod camera;
+pub(crate) mod hunger;
+pub(crate) mod names;
 
 pub use animals::{ spawn_cat, spawn_dog, Cat, Dog };
 pub use perfui::CustomPerfUiAppExt;
@@ -21,7 +24,6 @@ pub use world::{ death_zone_bundle, tile_bundle };
 use crate::components::health::Health;
 
 use bevy::prelude::*;
-use bevy::utils::Duration;
 
 // ↗️
 #[derive(Component, Debug)]
@@ -47,14 +49,6 @@ struct AnimationTimer(Timer); // The timer for the animation
 
 #[derive(Component)]
 struct DeathAnimationPlayed(bool); // A boolean to track if the death animation has been played
-
-// 🍗
-#[derive(Resource, Default)]
-struct HungerTimer(Timer); // A timer to track the hunger of entities
-
-// 🎥
-#[derive(Component)]
-pub struct MainCamera;
 
 // Function to update the animation based on the velocity and health of the entities
 fn update_animation(mut query: Query<(&mut AnimationIndices, &Velocity, &Health)>) {
@@ -150,32 +144,6 @@ fn move_entities(time: Res<Time>, mut query: Query<(&mut Transform, &mut Velocit
     }
 }
 
-// Function to decrease the hunger of entities over time
-fn decrease_hunger(
-    time: Res<Time>, // The current time
-    mut hunger_timer: ResMut<HungerTimer>, // The hunger timer
-    mut health_query: Query<&mut Health> // The health of the entities
-) {
-    // Update the hunger timer
-    hunger_timer.0.tick(time.delta());
-    // If the hunger timer has just finished
-    if hunger_timer.0.just_finished() {
-        // Iterate over the entities
-        for mut health in &mut health_query {
-            // Decrease the hunger of the entity by 1
-            health.hunger = health.hunger.saturating_sub(1);
-            // If the hunger of the entity reaches 0, decrease its health by 1
-            if health.hunger == 0 {
-                health.current = health.current.saturating_sub(1);
-            }
-        }
-        // Set the duration of the hunger timer to 20 seconds
-        hunger_timer.0.set_duration(Duration::from_secs(20));
-        // Reset the hunger timer to count down again
-        hunger_timer.0.reset();
-    }
-}
-
 // Function to animate the sprite of entities of type T
 fn animate_sprite<T: Component>(
     time: Res<Time>, // The current time
@@ -217,9 +185,9 @@ impl CustomSystemsAppExt for App {
     // Method to add custom systems to the app
     fn add_custom_systems(&mut self) -> &mut Self {
         // Initialize the hunger timer resource
-        self.init_resource::<HungerTimer>()
+        self.init_resource::<hunger::HungerTimer>()
             // Add the decrease_hunger system to the update stage
-            .add_systems(Update, decrease_hunger)
+            .add_systems(Update, hunger::decrease_hunger)
             // Add the move_entities system to the update stage
             .add_systems(Update, move_entities)
             // Add the update_facing_direction system to the update stage
