@@ -8,6 +8,7 @@ use super::{
     Velocity,
 };
 
+use rand::seq::SliceRandom;
 use rand::thread_rng;
 use rand::Rng;
 
@@ -116,7 +117,7 @@ fn generate_animal_name(animal_type: AnimalType) -> String {
 
     // Choose a random animal name from the ANIMAL_NAMES array
     // The chosen element is a tuple containing the name, gender, and type of the animal
-    let (name, _gender, name_type) = ANIMAL_NAMES.choose(&mut rng).unwrap();
+    let (name, _gender, name_type) = names::ANIMAL_NAMES.choose(&mut rng).unwrap();
 
     // If the type of the chosen animal matches the given animal type
     if *name_type == animal_type {
