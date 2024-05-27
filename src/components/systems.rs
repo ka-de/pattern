@@ -7,10 +7,8 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    //let camera = Camera2dBundle::default();
-    //commands.spawn(camera);
-
     let ldtk_handle = asset_server.load("first_level.ldtk");
+
     commands.spawn(LdtkWorldBundle {
         ldtk_handle,
         ..Default::default()
