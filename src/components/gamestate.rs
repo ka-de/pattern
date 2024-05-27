@@ -1,9 +1,14 @@
-use bevy::{ ecs::schedule::States, reflect::Reflect };
+use bevy::{
+    core_pipeline::core_2d::Camera2dBundle,
+    ecs::{ schedule::States, system::Commands },
+    log::info,
+    reflect::Reflect,
+};
 
 /*
  * The GameState
- * 
- *  
+ *
+ *
  */
 
 #[derive(States, Default, Debug, Clone, Eq, PartialEq, Hash, Reflect)]
@@ -16,17 +21,19 @@ pub enum GameState {
 }
 
 pub fn set_state_splashscreen() {
-    println!("SplashScreen...")
+    info!("Set State: SplashScreen");
 }
 
 pub fn set_state_loading() {
-    println!("Loading...")
+    info!("Set State: Loading");
 }
 
-pub fn set_state_mainmenu() {
-    println!("MainMenu...")
+pub fn set_state_mainmenu(mut commands: Commands) {
+    let camera = Camera2dBundle::default();
+    commands.spawn(camera);
+    info!("Set State: MainMenu");
 }
 
 pub fn set_state_playing() {
-    println!("Playing...")
+    info!("Set State: Playing");
 }
