@@ -134,15 +134,9 @@ fn setup_perfui(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
-pub trait CustomPerfUiAppExt {
-    fn add_custom_perf_ui(&mut self) -> &mut Self;
-}
-
-impl CustomPerfUiAppExt for App {
-    fn add_custom_perf_ui(&mut self) -> &mut Self {
-        self.add_plugins(PerfUiPlugin)
-            .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
-            .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
-            .add_systems(PreStartup, setup_perfui)
-    }
+pub fn setup_perf_ui(app: &mut App) {
+    app.add_plugins(PerfUiPlugin)
+    .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
+    .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
+    .add_systems(PreStartup, setup_perfui);
 }

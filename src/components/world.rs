@@ -161,8 +161,8 @@ fn is_colliding(a_pos: Vec2, a_size: Vec2, b_pos: Vec2, b_size: Vec2) -> bool {
 }
 
 // Function to add the gravity, collision, and death zone collision systems to the Bevy app
-pub fn setup_world_systems(app: &mut App) -> &mut App {
+pub fn setup_world_systems(app: &mut App) {
     app.add_systems(Update, apply_gravity)
         .add_systems(Update, handle_collisions)
-        .add_systems(Update, handle_death_zone_collisions)
+        .add_systems(Update, handle_death_zone_collisions);
 }

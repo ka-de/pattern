@@ -51,9 +51,9 @@ struct SpaceKeyPressState {
     last_pressed: bool,
 }
 
-pub fn setup_ui(app: &mut App) -> &mut App {
+pub fn setup_ui(app: &mut App) {
     app.init_resource::<TimeSinceLastKeypress>()
         .init_resource::<SpaceKeyPressCount>()
         .init_resource::<SpaceKeyPressState>()
-        .add_systems(Update, handle_keypress)
+        .add_systems(Update, handle_keypress);
 }
