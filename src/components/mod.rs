@@ -16,6 +16,7 @@ pub(crate) mod gamemode;
 pub(crate) mod camera;
 pub(crate) mod hunger;
 pub(crate) mod names;
+pub(crate) mod armor;
 
 pub use animals::{ spawn_cat, spawn_dog, Cat, Dog };
 pub use perfui::CustomPerfUiAppExt;

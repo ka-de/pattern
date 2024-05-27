@@ -3,6 +3,9 @@ use bevy::ecs::component::Component;
 use bevy::sprite::SpriteBundle;
 use bevy_ecs_ldtk::{ EntityInstance, LdtkEntity, Worldly };
 
+use super::armor::Armor;
+use super::Health;
+
 use super::{
     climber::Climber,
     colliderbundle::ColliderBundle,
@@ -24,6 +27,8 @@ pub struct PlayerBundle {
     pub worldly: Worldly,
     pub climber: Climber,
     pub ground_detection: GroundDetection,
+    pub health: Health,
+    pub armor: Armor,
 
     // Build Items Component manually by using `impl From<&EntityInstance>`
     #[from_entity_instance]

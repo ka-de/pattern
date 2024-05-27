@@ -1,7 +1,8 @@
 use bevy::{
     app::{ App, Startup, Update },
+    asset::{ AssetApp, AssetServer },
     core_pipeline::core_2d::Camera2dBundle,
-    ecs::{ schedule::States, system::Commands },
+    ecs::{ schedule::States, system::{ Commands, Res } },
     log::info,
     math::Vec2,
     reflect::Reflect,
@@ -16,26 +17,22 @@ use bevy_ecs_ldtk::{
 };
 use bevy_rapier2d::plugin::{ NoUserData, RapierConfiguration, RapierPhysicsPlugin, TimestepMode };
 
-/*
+/**
  * The GameState
  *
- *
+ * TODO: Write the doc lmao
  */
-
 #[derive(States, Default, Debug, Clone, Eq, PartialEq, Hash, Reflect)]
 pub enum GameState {
     #[default]
     SplashScreen,
+    Playing,
     Loading,
     MainMenu,
-    Playing,
 }
 
-pub fn set_state_splashscreen(mut commands: Commands) {
+pub fn set_state_splashscreen() {
     info!("Set GameState: SplashScreen");
-    let camera = Camera2dBundle::default();
-    commands.spawn(camera);
-    info!("Camera spawned during GameState SplashScreen");
 }
 
 pub fn set_state_loading() {
@@ -46,11 +43,15 @@ pub fn set_state_mainmenu() {
     info!("Set GameState: MainMenu");
 }
 
-pub fn set_state_playing() {
+pub fn set_state_playing(mut commands: Commands, asset_server: Res<AssetServer>) {
     info!("Set GameState: Playing");
+    // 🎥
+    let camera = Camera2dBundle::default();
+    commands.spawn(camera);
+
     let mut app = App::new();
 
-    app.add_plugins((LdtkPlugin, RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0)))
+    app.add_systems(Startup, super::systems::setup)
         .insert_resource(RapierConfiguration {
             gravity: Vec2::new(0.0, -2000.0),
             physics_pipeline_active: true,
@@ -71,7 +72,6 @@ pub fn set_state_playing() {
             set_clear_color: SetClearColor::FromLevelBackground,
             ..Default::default()
         })
-        .add_systems(Startup, super::systems::setup)
         .register_ldtk_int_cell::<super::misc::WallBundle>(1)
         .register_ldtk_int_cell::<super::misc::LadderBundle>(2)
         .register_ldtk_int_cell::<super::misc::WallBundle>(3)

@@ -4,6 +4,8 @@
 mod components;
 
 use bevy::render::camera::ScalingMode;
+use bevy_ecs_ldtk::{ LdtkPlugin, LdtkSettings, LevelSelection, LevelSpawnBehavior, SetClearColor };
+use bevy_rapier2d::plugin::{ NoUserData, RapierConfiguration, RapierPhysicsPlugin, TimestepMode };
 use components::gamestate::{
     set_state_loading,
     set_state_mainmenu,
@@ -38,7 +40,9 @@ fn main() {
     // Splash Screen Configuration
     let config = SplashScreenConfiguration {
         run_state: GameState::SplashScreen,
-        next_state: GameState::MainMenu,
+        next_state: GameState::Playing,
+        // TODO: Implement this motherfucker!
+        //next_state: GameState::MainMenu,
         path: String::from("splash_screens"),
         custom_size: Some(Vec2::ONE),
         splash_timer: 3.0,
@@ -119,6 +123,9 @@ fn main() {
         )
         // PerformanceUI
         .add_custom_perf_ui()
+        // Custom Systems
         .add_custom_systems()
+        //
+        .add_plugins((LdtkPlugin, RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0)))
         .run();
 }
