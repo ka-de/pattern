@@ -205,6 +205,10 @@ impl CustomSystemsAppExt for App {
         // Setup world systems
         world::setup_world_systems(self);
         // Setup UI
-        ui::setup_ui(self)
+        ui::setup_ui(self);
+
+        systems::setup_ldtk(self);
+
+        self
     }
 }
