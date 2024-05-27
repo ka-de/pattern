@@ -22,6 +22,20 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_inspector_egui::quick::StateInspectorPlugin;
 use bevy_splashscreen::prelude::*;
 
+fn toggle_framepace(
+    mut settings: ResMut<bevy_framepace::FramepaceSettings>,
+    input: Res<ButtonInput<KeyCode>>
+) {
+    if input.just_pressed(KeyCode::F9) {
+        use bevy_framepace::Limiter;
+        settings.limiter = match settings.limiter {
+            Limiter::Auto => Limiter::Off,
+            Limiter::Off => Limiter::from_framerate(60.0),
+            Limiter::Manual(_) => Limiter::Auto,
+        };
+    }
+}
+
 fn main() {
     // Splash Screen Configuration
     let config = SplashScreenConfiguration {
@@ -65,6 +79,7 @@ fn main() {
     /*
      * Debugging keyboard shortcuts:
      *
+     * F9  - Toggle Framepacing
      * F10 - StateInspector (GameState)
      * F11 - WorldInspector
      * F12 - PerformanceUI (Not yet implemented)
@@ -77,6 +92,10 @@ fn main() {
         .add_plugins(
             DefaultPlugins.set(window_plugin).set(ImagePlugin::default_nearest()).set(log_plugin)
         )
+        // Frame Pacing
+        .add_plugins(bevy_framepace::FramepacePlugin)
+        .add_plugins(bevy_framepace::debug::DiagnosticsPlugin)
+        .add_systems(Update, toggle_framepace)
         // GameState
         .init_state::<GameState>()
         .register_type::<GameState>()
