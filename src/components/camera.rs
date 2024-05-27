@@ -1,6 +1,6 @@
 use bevy::{
     asset::{ Assets, Handle },
-    ecs::{ component::Component, query::{ With, Without }, system::{ Query, Res } },
+    ecs::{ query::{ With, Without }, system::{ Query, Res } },
     math::Vec2,
     render::camera::OrthographicProjection,
     transform::components::Transform,
@@ -16,8 +16,8 @@ use super::player::Player;
 const ASPECT_RATIO: f32 = 16.0 / 9.0;
 
 // 🎥
-#[derive(Component)]
-pub struct MainCamera;
+// #[derive(Component)]
+// pub struct MainCamera;
 
 #[allow(clippy::type_complexity)]
 pub fn fit_inside_current_level(

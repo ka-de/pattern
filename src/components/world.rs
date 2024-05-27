@@ -1,3 +1,4 @@
+#![allow(dead_code)] // FIXME
 use bevy::math::bounding::Aabb2d;
 use bevy::math::bounding::IntersectsVolume;
 use bevy::prelude::*;
@@ -106,6 +107,7 @@ fn handle_collisions(
     tile_query: Query<(&Tile, &Transform), Without<Velocity>>,
     time: Res<Time>
 ) {
+    #[allow(unused)]
     for (
         mut animal_velocity,
         mut animal_transform,

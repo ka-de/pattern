@@ -1,3 +1,4 @@
+#![allow(dead_code)] // FIXME
 use bevy::ecs::component::Component;
 
 use super::armor::Armor;

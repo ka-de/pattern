@@ -1,3 +1,4 @@
+#![allow(dead_code, unused)] // FIXME
 use super::{
     names,
     AnimationIndices,
@@ -169,7 +170,7 @@ fn spawn_animal<T: Animal>(
         current_index: 0,
     }; // idle animation
     let facing_direction_clone = facing_direction;
-    let animal_entity = commands
+    commands
         .spawn((
             animal_factory(animal_name.clone()),
             Health {

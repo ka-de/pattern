@@ -12,15 +12,14 @@ pub(crate) mod colliderbundle;
 pub(crate) mod ground;
 pub(crate) mod items;
 pub(crate) mod sensorbundle;
-pub(crate) mod gamemode;
+//pub(crate) mod gamemode;
 pub(crate) mod camera;
 pub(crate) mod hunger;
 pub(crate) mod names;
 pub(crate) mod armor;
 
-pub use animals::{ spawn_cat, spawn_dog, Cat, Dog };
-pub use perfui::CustomPerfUiAppExt;
-pub use world::{ death_zone_bundle, tile_bundle };
+pub use animals::{ /*spawn_cat, spawn_dog, */ Cat, Dog };
+// pub use world::{ death_zone_bundle, tile_bundle };
 
 use crate::components::health::Health;
 
@@ -175,40 +174,24 @@ fn animate_sprite<T: Component>(
     }
 }
 
-// Define a trait named 'CustomSystemsAppExt' for adding custom systems to the app
-pub trait CustomSystemsAppExt {
-    // Method to add custom systems to the app
-    fn add_custom_systems(&mut self) -> &mut Self;
-}
-
-// Implement the 'CustomSystemsAppExt' trait for the 'App' struct
-impl CustomSystemsAppExt for App {
-    // Method to add custom systems to the app
-    fn add_custom_systems(&mut self) -> &mut Self {
-        // Initialize the hunger timer resource
-        self.init_resource::<hunger::HungerTimer>()
-            // Add the decrease_hunger system to the update stage
-            .add_systems(Update, hunger::decrease_hunger)
-            // Add the move_entities system to the update stage
-            .add_systems(Update, move_entities)
-            // Add the update_facing_direction system to the update stage
-            .add_systems(Update, update_facing_direction)
-            // Add the animate_sprite system for the Cat component to the update stage
-            .add_systems(Update, animate_sprite::<Cat>)
-            // Add the animate_sprite system for the Dog component to the update stage
-            .add_systems(Update, animate_sprite::<Dog>)
-            // Add the update_animation system to the update stage
-            .add_systems(Update, update_animation)
-            // Add the play_death_animation system to the update stage
-            .add_systems(Update, play_death_animation);
-
-        // Setup world systems
-        world::setup_world_systems(self);
-        // Setup UI
-        ui::setup_ui(self);
-
-        systems::setup_ldtk(self);
-
-        self
-    }
+// Method to add old custom systems to the app
+#[allow(dead_code)]
+pub fn old_systems_plugin(app: &mut App) {
+    // Initialize the hunger timer resource
+    app.init_resource::<hunger::HungerTimer>()
+        // Add the decrease_hunger system to the update stage
+        .add_systems(Update, hunger::decrease_hunger)
+        // Add the move_entities system to the update stage
+        .add_systems(Update, move_entities)
+        // Add the update_facing_direction system to the update stage
+        .add_systems(Update, update_facing_direction)
+        // Add the animate_sprite system for the Cat component to the update stage
+        .add_systems(Update, animate_sprite::<Cat>)
+        // Add the animate_sprite system for the Dog component to the update stage
+        .add_systems(Update, animate_sprite::<Dog>)
+        // Add the update_animation system to the update stage
+        .add_systems(Update, update_animation)
+        // Add the play_death_animation system to the update stage
+        .add_systems(Update, play_death_animation)
+        .add_plugins(world::setup_world_systems);
 }
