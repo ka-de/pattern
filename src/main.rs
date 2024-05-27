@@ -80,6 +80,10 @@ fn main() {
         // GameState
         .init_state::<GameState>()
         .register_type::<GameState>()
+        // Splash Screen
+        .add_plugins(SplashScreenPlugin(config))
+        .init_resource::<iyes_progress::ProgressCounter>()
+        //.init_resource::<bevy_splashscreen::resources::splash_screen_images::SplashScreenImages>()
         .add_systems(OnEnter(GameState::SplashScreen), set_state_splashscreen)
         .add_systems(OnEnter(GameState::Loading), set_state_loading)
         .add_systems(OnEnter(GameState::MainMenu), set_state_mainmenu)
