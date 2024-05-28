@@ -62,11 +62,12 @@ fn main() {
 
     let mut app = App::new();
 
-    // Disable Multi-Sample Anti-Aliasing
-    app.insert_resource(Msaa::Off)
+    app.insert_resource(Msaa::Off) // Disable Multi-Sample Anti-Aliasing
         // DefaultPlugins
         .add_plugins((
             DefaultPlugins.set(window_plugin).set(ImagePlugin::default_nearest()).set(log_plugin),
+            // Tweening
+            .add_plugins(TweeningPlugin)
             // Frame Pacing
             bevy_framepace::FramepacePlugin,
             components::gamestate::game_state_plugin,
