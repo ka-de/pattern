@@ -3,11 +3,6 @@ use bevy::render::camera::ScalingMode;
 use bevy::input::common_conditions::input_toggle_active;
 use bevy_splashscreen::prelude::*;
 
-/**
- * The GameState
- *
- * TODO: Write the doc lmao
- */
 #[derive(States, Default, Debug, Clone, Eq, PartialEq, Hash, Reflect)]
 pub enum GameState {
     #[default]
@@ -61,7 +56,6 @@ pub fn game_state_plugin(app: &mut App) {
         // Splash Screen
         .add_plugins(SplashScreenPlugin(config))
         .init_resource::<bevy_progress::ProgressCounter>();
-
 
     // StateInspectorPlugin
     #[cfg(debug_assertions)]

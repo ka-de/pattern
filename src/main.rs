@@ -6,26 +6,9 @@ mod components;
 use bevy::input::common_conditions::input_toggle_active;
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_tweening::*;
-use bevy_framepace::Limiter;
-
-fn set_framepace(mut settings: ResMut<bevy_framepace::FramepaceSettings>) {
-    settings.limiter = Limiter::Off;
-}
-
-fn toggle_framepace(
-    mut settings: ResMut<bevy_framepace::FramepaceSettings>,
-    input: Res<ButtonInput<KeyCode>>
-) {
-    if input.just_pressed(KeyCode::F9) {
-        settings.limiter = match settings.limiter {
-            Limiter::Auto => Limiter::Off,
-            Limiter::Off => Limiter::from_framerate(60.0),
-            Limiter::Manual(_) => Limiter::Auto,
-        };
-    }
-}
+#[cfg(debug_assertions)]
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 fn main() {
     // this code is compiled only if debug assertions are enabled (debug mode)
@@ -56,15 +39,6 @@ fn main() {
     #[cfg(not(target_arch = "wasm32"))]
     let window_plugin = WindowPlugin::default();
 
-    /*
-     * Debugging keyboard shortcuts:
-     *
-     * F9  - Toggle Framepacing
-     * F10 - StateInspector (GameState)
-     * F11 - WorldInspector
-     * F12 - PerformanceUI (Not yet implemented)
-     */
-
     let mut app = App::new();
 
     app.insert_resource(Msaa::Off) // Disable Multi-Sample Anti-Aliasing
@@ -73,25 +47,20 @@ fn main() {
             DefaultPlugins.set(window_plugin).set(ImagePlugin::default_nearest()).set(log_plugin),
             // Tweening
             TweeningPlugin,
-            // Frame Pacing
-            bevy_framepace::FramepacePlugin,
             components::gamestate::game_state_plugin,
-            // PerformanceUI
-            components::perfui::setup_perf_ui,
             components::ui::setup_ui,
             components::systems::setup_ldtk,
-        ))
-        .add_systems(Update, toggle_framepace)
-        .add_systems(Startup, set_framepace);
+        ));
 
     #[cfg(debug_assertions)]
-    app.add_plugins(bevy_framepace::debug::DiagnosticsPlugin)
+    app.add_plugins((
         // FrameTimeDiagnosticsPlugin
-        .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
+        bevy::diagnostic::FrameTimeDiagnosticsPlugin,
         // WorldInspectorPlugin
-        .add_plugins(
-            WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::F11))
-        );
+        WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::F11)),
+        // PerformanceUI
+        components::perfui::setup_perf_ui,
+    ));
 
     app.run();
 }

@@ -9,7 +9,8 @@ bevy_ecs_ldtk = { git = "https://github.com/ka-de/bevy_ecs_ldtk" }
 bevy-inspector-egui = { git = "https://github.com/ka-de/bevy-inspector-egui" }
 bevy_splashscreen = { git = "https://github.com/ka-de/bevy_splashscreen" }
 bevy_tweening = { git = "https://github.com/ka-de/bevy_tweening" }
-bevy_framepace = { git = "https://github.com/ka-de/bevy_framepace" }
+#bevy_framepace = { git = "https://github.com/ka-de/bevy_framepace" }
+#bevy_smooth_pixel_camera = { git = "https://github.com/ka-de/bevy_smooth_pixel_camera" }
 bevy_progress = { git = "https://github.com/ka-de/bevy_progress", features = [
   "assets",
   "debug",
@@ -32,7 +33,7 @@ features = [
   "bevy_ui",
   "bevy_text",
   "subpixel_glyph_atlas",
-  "bevy_render"
+  "bevy_render",
 ]
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.bevy]

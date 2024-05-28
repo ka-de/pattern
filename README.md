@@ -2,6 +2,14 @@
 
 ---
 
+## Debugging Keyboard Shortcuts
+
+| Action | KeyCode |
+| :----- | :-----: |
+| StateInspector (**GameState**)  |   F10   |
+| WorldInspector | F11 |
+| PerformanceUI | F12 | <!-- TODO -->
+
 ## `filesystem_watcher` and `asset_processor`
 
 ???
