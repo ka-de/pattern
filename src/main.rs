@@ -8,9 +8,9 @@ use bevy::log::LogPlugin;
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_tweening::*;
+use bevy_framepace::Limiter;
 
 fn set_framepace(mut settings: ResMut<bevy_framepace::FramepaceSettings>) {
-    use bevy_framepace::Limiter;
     settings.limiter = Limiter::Off;
 }
 
@@ -19,7 +19,6 @@ fn toggle_framepace(
     input: Res<ButtonInput<KeyCode>>
 ) {
     if input.just_pressed(KeyCode::F9) {
-        use bevy_framepace::Limiter;
         settings.limiter = match settings.limiter {
             Limiter::Auto => Limiter::Off,
             Limiter::Off => Limiter::from_framerate(60.0),
