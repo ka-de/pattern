@@ -67,7 +67,7 @@ fn main() {
         .add_plugins((
             DefaultPlugins.set(window_plugin).set(ImagePlugin::default_nearest()).set(log_plugin),
             // Tweening
-            .add_plugins(TweeningPlugin)
+            TweeningPlugin,
             // Frame Pacing
             bevy_framepace::FramepacePlugin,
             components::gamestate::game_state_plugin,
