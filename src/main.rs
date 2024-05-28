@@ -7,6 +7,12 @@ use bevy::input::common_conditions::input_toggle_active;
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_tweening::*;
+
+fn set_framepace(mut settings: ResMut<bevy_framepace::FramepaceSettings>) {
+    use bevy_framepace::Limiter;
+    settings.limiter = Limiter::Off;
+}
 
 fn toggle_framepace(
     mut settings: ResMut<bevy_framepace::FramepaceSettings>,
@@ -76,7 +82,8 @@ fn main() {
             components::ui::setup_ui,
             components::systems::setup_ldtk,
         ))
-        .add_systems(Update, toggle_framepace);
+        .add_systems(Update, toggle_framepace)
+        .add_systems(Startup, set_framepace);
 
     #[cfg(debug_assertions)]
     app.add_plugins(bevy_framepace::debug::DiagnosticsPlugin)
