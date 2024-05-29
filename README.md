@@ -4,11 +4,11 @@
 
 ## Debugging Keyboard Shortcuts
 
-| Action | KeyCode |
-| :----- | :-----: |
-| StateInspector (**GameState**)  |   F10   |
-| WorldInspector | F11 |
-| PerformanceUI | F12 | <!-- TODO -->
+| Action                         | KeyCode |
+| :----------------------------- | :-----: | ------------- |
+| StateInspector (**GameState**) |   F10   |
+| WorldInspector                 |   F11   |
+| PerformanceUI                  |   F12   | <!-- TODO --> |
 
 ## `filesystem_watcher` and `asset_processor`
 
@@ -18,12 +18,12 @@
 
 ### Current Progress
 
-⚠️ BAD ⚠️
+⚠️ STILL BAD ⚠️
+
+The asset loading error has been replaced by multiple different asset loading errors!
 
 ```r
-ERROR app: C:\Users\kade\.cargo\registry\src\index.crates.io-6f17d22bba15001f\bevy_asset-0.13.2\src\io\wasm.rs:124 Reading directories is not supported with the HttpWasmAssetReader
- INFO app: C:\Users\kade\.cargo\git\checkouts\bevy_asset_loader-3fb1a3d48c4110df\a1f2aa1\bevy_asset_loader\src\loading_state\systems.rs:142 Loading state 'bevy_splashscreen::state::splash_screen_state::SplashScreenState::Initialize' is done
- INFO app: src\components\gamestate.rs:33 Set GameState: Playing
+
 ```
 
 ### Set Custom HTML
