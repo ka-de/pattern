@@ -2,6 +2,7 @@
 #![warn(clippy::all, clippy::pedantic)]
 
 mod components;
+mod plugins;
 
 use bevy::input::common_conditions::input_toggle_active;
 use bevy::log::LogPlugin;

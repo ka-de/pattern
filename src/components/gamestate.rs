@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 use bevy::input::common_conditions::input_toggle_active;
-use bevy_splashscreen::prelude::*;
+use bevy_asset_loader::standard_dynamic_asset::StandardDynamicAsset;
+use crate::plugins::splashscreen::{ SplashScreenPlugin, SplashScreenConfiguration };
 
 #[derive(States, Default, Debug, Clone, Eq, PartialEq, Hash, Reflect)]
 pub enum GameState {
@@ -39,7 +40,7 @@ pub fn game_state_plugin(app: &mut App) {
         next_state: GameState::Playing,
         // TODO: Implement this motherfucker!
         //next_state: GameState::MainMenu,
-        path: String::from("splash_screens"),
+        images: StandardDynamicAsset::Files { paths: vec!["splash_screens/splash.png".to_owned()] },
         custom_size: Some(Vec2::ONE),
         splash_timer: 3.0,
         clear_color: Color::BLACK,

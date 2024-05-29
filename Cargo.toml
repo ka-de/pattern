@@ -7,7 +7,6 @@ edition = "2021"
 perf_ui = { git = "https://github.com/ka-de/perf_ui" }
 bevy_ecs_ldtk = { git = "https://github.com/ka-de/bevy_ecs_ldtk" }
 bevy-inspector-egui = { git = "https://github.com/ka-de/bevy-inspector-egui" }
-bevy_splashscreen = { git = "https://github.com/ka-de/bevy_splashscreen" }
 bevy_tweening = { git = "https://github.com/ka-de/bevy_tweening" }
 #bevy_framepace = { git = "https://github.com/ka-de/bevy_framepace" }
 #bevy_smooth_pixel_camera = { git = "https://github.com/ka-de/bevy_smooth_pixel_camera" }
@@ -35,6 +34,13 @@ features = [
   "subpixel_glyph_atlas",
   "bevy_render",
 ]
+
+[dependencies.bevy_asset_loader]
+# Bevy plugin for asset loading
+git = "https://github.com/ka-de/bevy_asset_loader"
+default-features = false
+features = ["2d", "standard_dynamic_assets", "progress_tracking"]
+
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.bevy]
 version = "0.13.2"
