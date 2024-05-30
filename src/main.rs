@@ -4,14 +4,19 @@
 mod components;
 mod plugins;
 
-use bevy::input::common_conditions::input_toggle_active;
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 use bevy_tweening::*;
+use bevy::asset::AssetMetaCheck;
+
+#[cfg(debug_assertions)]
+use bevy::input::common_conditions::input_toggle_active;
 #[cfg(debug_assertions)]
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 fn main() {
+    let mut app = App::new();
+
     // this code is compiled only if debug assertions are enabled (debug mode)
     #[cfg(debug_assertions)]
     let log_plugin = LogPlugin {
@@ -40,7 +45,8 @@ fn main() {
     #[cfg(not(target_arch = "wasm32"))]
     let window_plugin = WindowPlugin::default();
 
-    let mut app = App::new();
+    #[cfg(target_arch = "wasm32")]
+    app.insert_resource(AssetMetaCheck::Never);
 
     app.insert_resource(Msaa::Off) // Disable Multi-Sample Anti-Aliasing
         // DefaultPlugins

@@ -49,7 +49,13 @@ features = ["webgpu"]
 # Only enable dynamic linking when not building wasm32.
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies.bevy]
 version = "0.13.2"
-features = ["dynamic_linking", "multi-threaded", "file_watcher", "bevy_winit"]
+features = [
+  "dynamic_linking",
+  "multi-threaded",
+  "file_watcher",
+  "bevy_winit",
+  "embedded_watcher",
+]
 
 [workspace]
 resolver = "2"
