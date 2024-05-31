@@ -14,8 +14,18 @@ use bevy::input::common_conditions::input_toggle_active;
 #[cfg(debug_assertions)]
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
+fn play_background_audio(asset_server: Res<AssetServer>, mut commands: Commands) {
+    // Create an entity dedicated to playing our background music
+    commands.spawn(AudioBundle {
+        source: asset_server.load("music/garam_masala_wip.ogg"),
+        settings: PlaybackSettings::LOOP,
+    });
+}
+
 fn main() {
     let mut app = App::new();
+
+    app.add_systems(Startup, play_background_audio);
 
     // this code is compiled only if debug assertions are enabled (debug mode)
     #[cfg(debug_assertions)]
