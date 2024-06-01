@@ -14,6 +14,19 @@ use bevy::input::common_conditions::input_toggle_active;
 #[cfg(debug_assertions)]
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
+// ⚠️ TODO: Move audio stuff to its own thing
+use bevy::audio::{ SpatialScale, AudioPlugin };
+use bevy::audio::Volume;
+
+use components::player::Player;
+
+const AUDIO_SCALE: f32 = 1.0 / 100.0;
+
+fn change_global_volume(mut volume: ResMut<GlobalVolume>) {
+    volume.volume = Volume::new(0.5);
+}
+
+// ⚠️ TODO: Currently very dumb, just plays one music on repeat!
 fn play_background_audio(asset_server: Res<AssetServer>, mut commands: Commands) {
     // Create an entity dedicated to playing our background music
     commands.spawn(AudioBundle {
@@ -21,6 +34,29 @@ fn play_background_audio(asset_server: Res<AssetServer>, mut commands: Commands)
         settings: PlaybackSettings::LOOP,
     });
 }
+
+// ⚠️ TODO: This is at the moment just testing Spatial Audio
+//
+//
+fn play_2d_spatial_audio(mut commands: Commands, asset_server: Res<AssetServer>) {
+    // Spawn our emitter
+    commands.spawn((
+        Player,
+        AudioBundle {
+            source: asset_server.load("vo/dogspeak.ogg"),
+            settings: PlaybackSettings::LOOP, // ⚠️ TODO: Change it later to `ONCE` when done testing.
+            //settings: PlaybackSettings::ONCE,
+        },
+    ));
+
+    // Spawn our listener
+    commands.spawn((
+        SpatialListener::new(100.0), // Gap between the ears
+        SpatialBundle::default(),
+    ));
+}
+
+// End of TODO
 
 fn main() {
     let mut app = App::new();
@@ -61,13 +97,23 @@ fn main() {
     app.insert_resource(Msaa::Off) // Disable Multi-Sample Anti-Aliasing
         // DefaultPlugins
         .add_plugins((
-            DefaultPlugins.set(window_plugin).set(ImagePlugin::default_nearest()).set(log_plugin),
+            DefaultPlugins.set(window_plugin)
+                .set(ImagePlugin::default_nearest())
+                .set(log_plugin)
+                // ⚠️ TODO: Maybe move this to its own thing? I'm not sure!
+                .set(AudioPlugin {
+                    default_spatial_scale: SpatialScale::new_2d(AUDIO_SCALE),
+                    ..default()
+                }),
             // Tweening
             TweeningPlugin,
             components::gamestate::game_state_plugin,
             components::ui::setup_ui,
             components::systems::setup_ldtk,
-        ));
+        ))
+        .insert_resource(GlobalVolume::new(0.2))
+        .add_systems(Startup, change_global_volume)
+        .add_systems(Startup, play_2d_spatial_audio);
 
     #[cfg(debug_assertions)]
     app.add_plugins((
