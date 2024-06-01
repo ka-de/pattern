@@ -19,7 +19,6 @@ const ASPECT_RATIO: f32 = 16.0 / 9.0;
 // #[derive(Component)]
 // pub struct MainCamera;
 
-#[allow(clippy::type_complexity)]
 pub fn fit_inside_current_level(
     mut camera_query: Query<
         (&mut bevy::render::camera::OrthographicProjection, &mut Transform),

@@ -17,6 +17,7 @@ pub(crate) mod camera;
 pub(crate) mod hunger;
 pub(crate) mod names;
 pub(crate) mod armor;
+pub(crate) mod torch;
 
 pub use animals::{ /*spawn_cat, spawn_dog, */ Cat, Dog };
 // pub use world::{ death_zone_bundle, tile_bundle };

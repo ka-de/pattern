@@ -9,6 +9,10 @@ use bevy::prelude::*;
 use bevy_tweening::*;
 use bevy::asset::AssetMetaCheck;
 
+// ⚠️ TODO: This will need to get eventually removed from main.
+use components::player::Player;
+use components::torch::Torch;
+
 #[cfg(debug_assertions)]
 use bevy::input::common_conditions::input_toggle_active;
 #[cfg(debug_assertions)]
@@ -17,8 +21,6 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 // ⚠️ TODO: Move audio stuff to its own thing
 use bevy::audio::{ SpatialScale, AudioPlugin };
 use bevy::audio::Volume;
-
-use components::player::Player;
 
 const AUDIO_SCALE: f32 = 1.0 / 100.0;
 
@@ -41,7 +43,7 @@ fn play_background_audio(asset_server: Res<AssetServer>, mut commands: Commands)
 fn play_2d_spatial_audio(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Spawn our emitter
     commands.spawn((
-        Player,
+        Torch,
         AudioBundle {
             source: asset_server.load("vo/dogspeak.ogg"),
             settings: PlaybackSettings::LOOP, // ⚠️ TODO: Change it later to `ONCE` when done testing.
