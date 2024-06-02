@@ -1,9 +1,7 @@
 use bevy::prelude::*;
-use bevy_ecs_ldtk::{ prelude::*, utils::ldtk_pixel_coords_to_translation_pivoted };
+use bevy_ecs_ldtk::prelude::*;
 
 use super::collision::ColliderBundle;
-use super::enemy::Enemy;
-
 
 /*
  * LDTK
@@ -15,17 +13,6 @@ pub struct Wall;
 #[derive(Clone, Debug, Default, Bundle, LdtkIntCell)]
 pub struct WallBundle {
     wall: Wall,
-}
-
-#[derive(Clone, Default, Bundle, LdtkEntity)]
-pub struct MobBundle {
-    #[sprite_sheet_bundle]
-    pub sprite_sheet_bundle: SpriteSheetBundle,
-    #[from_entity_instance]
-    pub collider_bundle: ColliderBundle,
-    pub enemy: Enemy,
-    #[ldtk_entity]
-    pub patrol: Patrol,
 }
 
 #[derive(Clone, Default, Bundle, LdtkEntity)]

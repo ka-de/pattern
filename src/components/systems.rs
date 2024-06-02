@@ -3,6 +3,7 @@ use super::{
     items::Items,
     ladders::{ Climbable, Climber },
     misc::*,
+    patrol::patrol,
     player::Player,
 };
 
@@ -18,7 +19,7 @@ pub fn setup_ldtk(app: &mut App) {
         .register_ldtk_int_cell::<super::misc::WallBundle>(3)
         .register_ldtk_entity::<super::torch::TorchBundle>("Torch")
         .register_ldtk_entity::<super::player::PlayerBundle>("Player")
-        .register_ldtk_entity::<super::misc::MobBundle>("Mob")
+        .register_ldtk_entity::<super::enemy::MobBundle>("Mob")
         .register_ldtk_entity::<super::misc::ChestBundle>("Chest")
         .register_ldtk_entity::<super::misc::PumpkinsBundle>("Pumpkins")
         .add_systems(
@@ -346,39 +347,6 @@ pub fn ignore_gravity_if_climbing(
         } else {
             gravity_scale.0 = 1.0;
         }
-    }
-}
-
-pub fn patrol(mut query: Query<(&mut Transform, &mut Velocity, &mut Patrol)>) {
-    for (mut transform, mut velocity, mut patrol) in &mut query {
-        if patrol.points.len() <= 1 {
-            continue;
-        }
-
-        let mut new_velocity =
-            (patrol.points[patrol.index] - transform.translation.truncate()).normalize() * 75.0;
-
-        if new_velocity.dot(velocity.linvel) < 0.0 {
-            if patrol.index == 0 {
-                patrol.forward = true;
-            } else if patrol.index == patrol.points.len() - 1 {
-                patrol.forward = false;
-            }
-
-            transform.translation.x = patrol.points[patrol.index].x;
-            transform.translation.y = patrol.points[patrol.index].y;
-
-            if patrol.forward {
-                patrol.index += 1;
-            } else {
-                patrol.index -= 1;
-            }
-
-            new_velocity =
-                (patrol.points[patrol.index] - transform.translation.truncate()).normalize() * 75.0;
-        }
-
-        velocity.linvel = new_velocity;
     }
 }
 
