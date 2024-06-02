@@ -13,7 +13,6 @@ pub(crate) mod collision;
 pub(crate) mod ground;
 pub(crate) mod items;
 pub(crate) mod sensorbundle;
-//pub(crate) mod gamemode;
 pub(crate) mod camera;
 pub(crate) mod hunger;
 pub(crate) mod names;
