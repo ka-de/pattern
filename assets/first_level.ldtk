@@ -1,16 +1,7 @@
 {
-	"__header__": {
-		"fileType": "LDtk Project JSON",
-		"app": "LDtk",
-		"doc": "https://ldtk.io/json",
-		"schema": "https://ldtk.io/files/JSON_SCHEMA.json",
-		"appAuthor": "Sebastien 'deepnight' Benard",
-		"appVersion": "1.5.3",
-		"url": "https://ldtk.io"
-	},
 	"iid": "39227760-c640-11ed-bac6-0b5f56187457",
 	"jsonVersion": "1.5.3",
-	"appBuildId": 473703,
+	"appBuildId": 477037,
 	"nextUid": 109,
 	"identifierStyle": "Capitalize",
 	"toc": [],
