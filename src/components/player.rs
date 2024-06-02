@@ -6,12 +6,7 @@ use bevy_ecs_ldtk::{ EntityInstance, LdtkEntity, Worldly };
 use super::armor::Armor;
 use super::Health;
 
-use super::{
-    climber::Climber,
-    collision::ColliderBundle,
-    ground::GroundDetection,
-    items::Items,
-};
+use super::{ ladders::Climber, collision::ColliderBundle, ground::GroundDetection, items::Items };
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct Player;

@@ -17,16 +17,6 @@ pub struct WallBundle {
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
-pub struct Climbable;
-
-#[derive(Clone, Default, Bundle, LdtkIntCell)]
-pub struct LadderBundle {
-    #[from_int_grid_cell]
-    pub sensor_bundle: SensorBundle,
-    pub climbable: Climbable,
-}
-
-#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct Enemy;
 
 #[derive(Clone, PartialEq, Debug, Default, Component)]

@@ -1,4 +1,10 @@
-use super::{ climber::Climber, ground::GroundDetection, items::Items, misc::*, player::Player };
+use super::{
+    ground::GroundDetection,
+    items::Items,
+    ladders::{ Climbable, Climber },
+    misc::*,
+    player::Player,
+};
 
 use std::collections::{ HashMap, HashSet };
 
@@ -8,7 +14,7 @@ use bevy_rapier2d::prelude::*;
 
 pub fn setup_ldtk(app: &mut App) {
     app.register_ldtk_int_cell::<super::misc::WallBundle>(1)
-        .register_ldtk_int_cell::<super::misc::LadderBundle>(2)
+        .register_ldtk_int_cell::<super::ladders::LadderBundle>(2)
         .register_ldtk_int_cell::<super::misc::WallBundle>(3)
         .register_ldtk_entity::<super::torch::TorchBundle>("Torch")
         .register_ldtk_entity::<super::player::PlayerBundle>("Player")
