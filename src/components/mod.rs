@@ -21,6 +21,7 @@ pub(crate) mod armor;
 pub(crate) mod torch;
 pub(crate) mod enemy;
 pub(crate) mod patrol;
+pub(crate) mod input;
 
 pub use animals::{ /*spawn_cat, spawn_dog, */ Cat, Dog };
 // pub use world::{ death_zone_bundle, tile_bundle };
@@ -28,13 +29,6 @@ pub use animals::{ /*spawn_cat, spawn_dog, */ Cat, Dog };
 use crate::components::health::Health;
 
 use bevy::prelude::*;
-
-// ↗️
-#[derive(Component, Debug)]
-struct Velocity {
-    x: f32, // The x-component of the velocity
-    y: f32, // The y-component of the velocity
-}
 
 // ⬇️
 #[derive(Component, Default)]
@@ -54,60 +48,6 @@ struct AnimationTimer(Timer); // The timer for the animation
 #[derive(Component)]
 struct DeathAnimationPlayed(bool); // A boolean to track if the death animation has been played
 
-// Function to update the animation based on the velocity and health of the entities
-fn update_animation(mut query: Query<(&mut AnimationIndices, &Velocity, &Health)>) {
-    // Iterate over the entities
-    for (mut animation_indices, velocity, health) in &mut query {
-        // If the health of the entity is greater than 0
-        if health.current > 0 {
-            // Get the absolute value of the x-component of the velocity
-            let abs_velocity = velocity.x.abs();
-            // If the absolute velocity is less than 0.01
-            if abs_velocity < 0.01 {
-                // Set the indices for the idle animation
-                if animation_indices.first != 0 {
-                    animation_indices.first = 0;
-                    animation_indices.last = 3;
-                    animation_indices.current_index = 0;
-                }
-                // If the absolute velocity is less than 2.1
-            } else if abs_velocity < 2.1 {
-                // Set the indices for the walking animation
-                if animation_indices.first != 8 {
-                    animation_indices.first = 8;
-                    animation_indices.last = 11;
-                    animation_indices.current_index = 8;
-                }
-                // If the absolute velocity is greater than or equal to 2.1
-            } else {
-                // Set the indices for the running animation
-                if animation_indices.first != 12 {
-                    animation_indices.first = 12;
-                    animation_indices.last = 15;
-                    animation_indices.current_index = 12;
-                }
-            }
-            // If the health of the entity is less than or equal to 0
-        } else {
-            // Set the indices for the death animation
-            if animation_indices.first != 4 {
-                animation_indices.first = 4;
-                animation_indices.last = 4;
-                animation_indices.current_index = 4;
-            }
-        }
-    }
-}
-
-// Function to update the facing direction of the entities based on their velocity
-fn update_facing_direction(mut query: Query<(&mut Sprite, &Velocity)>) {
-    // Iterate over the entities
-    for (mut sprite, velocity) in &mut query {
-        // Flip the sprite if the x-component of the velocity is less than 0
-        sprite.flip_x = velocity.x < 0.0;
-    }
-}
-
 // Function to play the death animation for entities with 0 health
 fn play_death_animation(
     mut query: Query<(&mut AnimationIndices, &Health, &mut DeathAnimationPlayed, &mut TextureAtlas)>
@@ -124,26 +64,6 @@ fn play_death_animation(
             atlas.index = animation_indices.current_index;
             // Mark the death animation as played
             death_animation_played.0 = true;
-        }
-    }
-}
-
-// Function to move entities based on their velocity and health
-fn move_entities(time: Res<Time>, mut query: Query<(&mut Transform, &mut Velocity, &Health)>) {
-    // Iterate over the entities
-    for (mut transform, mut velocity, health) in &mut query {
-        // If the health of the entity is greater than 0
-        if health.current > 0 {
-            // Calculate the change in time
-            let delta_seconds = time.delta_seconds();
-            // Update the position of the entity based on its velocity and the change in time
-            transform.translation.x += velocity.x * delta_seconds;
-            transform.translation.y += velocity.y * delta_seconds;
-            // If the health of the entity is 0
-        } else {
-            // Set the velocity of the entity to 0
-            velocity.x = 0.0;
-            velocity.y = 0.0;
         }
     }
 }
@@ -176,26 +96,4 @@ fn animate_sprite<T: Component>(
             atlas.index = indices.current_index;
         }
     }
-}
-
-// Method to add old custom systems to the app
-#[allow(dead_code)]
-pub fn old_systems_plugin(app: &mut App) {
-    // Initialize the hunger timer resource
-    app.init_resource::<hunger::HungerTimer>()
-        // Add the decrease_hunger system to the update stage
-        .add_systems(Update, hunger::decrease_hunger)
-        // Add the move_entities system to the update stage
-        .add_systems(Update, move_entities)
-        // Add the update_facing_direction system to the update stage
-        .add_systems(Update, update_facing_direction)
-        // Add the animate_sprite system for the Cat component to the update stage
-        .add_systems(Update, animate_sprite::<Cat>)
-        // Add the animate_sprite system for the Dog component to the update stage
-        .add_systems(Update, animate_sprite::<Dog>)
-        // Add the update_animation system to the update stage
-        .add_systems(Update, update_animation)
-        // Add the play_death_animation system to the update stage
-        .add_systems(Update, play_death_animation)
-        .add_plugins(world::setup_world_systems);
 }
