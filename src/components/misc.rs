@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::{ prelude::*, utils::ldtk_pixel_coords_to_translation_pivoted };
 
-use super::colliderbundle::ColliderBundle;
+use super::collision::ColliderBundle;
 use super::sensorbundle::SensorBundle;
 
 /*

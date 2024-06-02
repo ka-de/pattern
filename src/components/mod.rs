@@ -9,7 +9,7 @@ pub(crate) mod health;
 pub(crate) mod gamestate;
 pub(crate) mod climber;
 pub(crate) mod player;
-pub(crate) mod colliderbundle;
+pub(crate) mod collision;
 pub(crate) mod ground;
 pub(crate) mod items;
 pub(crate) mod sensorbundle;

@@ -8,7 +8,7 @@ use super::Health;
 
 use super::{
     climber::Climber,
-    colliderbundle::ColliderBundle,
+    collision::ColliderBundle,
     ground::GroundDetection,
     items::Items,
 };
