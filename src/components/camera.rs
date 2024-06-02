@@ -1,6 +1,6 @@
 use bevy::{
     asset::{ Assets, Handle },
-    ecs::{ query::{ With, Without }, system::{ Query, Res } },
+    ecs::{ bundle::Bundle, query::{ With, Without }, system::{ Query, Res } },
     math::Vec2,
     render::camera::OrthographicProjection,
     transform::components::Transform,
@@ -10,18 +10,23 @@ use bevy_ecs_ldtk::{
     LevelIid,
     LevelSelection,
 };
+use bevy_smooth_pixel_camera::prelude::*;
 
 use super::player::Player;
 
 const ASPECT_RATIO: f32 = 16.0 / 9.0;
 
 // 🎥
-// #[derive(Component)]
-// pub struct MainCamera;
+pub fn camera_bundle() -> impl Bundle {
+    (
+        bevy::core_pipeline::core_2d::Camera2dBundle::default(),
+        PixelCamera::from_size(ViewportSize::PixelFixed(1)),
+    )
+}
 
 pub fn fit_inside_current_level(
     mut camera_query: Query<
-        (&mut bevy::render::camera::OrthographicProjection, &mut Transform),
+        (&mut OrthographicProjection, &mut bevy_smooth_pixel_camera::components::PixelCamera),
         Without<Player>
     >,
     player_query: Query<&Transform, With<Player>>,
@@ -32,8 +37,7 @@ pub fn fit_inside_current_level(
 ) {
     if let Ok(Transform { translation: player_translation, .. }) = player_query.get_single() {
         let player_translation = *player_translation;
-
-        let (mut orthographic_projection, mut camera_transform) = camera_query.single_mut();
+        let (mut orthographic_projection, mut pixel_camera) = camera_query.single_mut();
 
         for (level_transform, level_iid) in &level_query {
             let ldtk_project = ldtk_project_assets
@@ -54,28 +58,28 @@ pub fn fit_inside_current_level(
                     let width = height * ASPECT_RATIO;
                     orthographic_projection.scaling_mode =
                         bevy::render::camera::ScalingMode::Fixed { width, height };
-                    camera_transform.translation.x = (
+                    pixel_camera.subpixel_pos.x = (
                         player_translation.x -
                         level_transform.translation.x -
                         width / 2.0
                     ).clamp(0.0, (level.px_wid as f32) - width);
-                    camera_transform.translation.y = 0.0;
+                    pixel_camera.subpixel_pos.y = 0.0;
                 } else {
                     // level is taller than the screen
                     let width = ((level.px_wid as f32) / 16.0).round() * 16.0;
                     let height = width / ASPECT_RATIO;
                     orthographic_projection.scaling_mode =
                         bevy::render::camera::ScalingMode::Fixed { width, height };
-                    camera_transform.translation.y = (
+                    pixel_camera.subpixel_pos.y = (
                         player_translation.y -
                         level_transform.translation.y -
                         height / 2.0
                     ).clamp(0.0, (level.px_hei as f32) - height);
-                    camera_transform.translation.x = 0.0;
+                    pixel_camera.subpixel_pos.x = 0.0;
                 }
 
-                camera_transform.translation.x += level_transform.translation.x;
-                camera_transform.translation.y += level_transform.translation.y;
+                pixel_camera.subpixel_pos.x += level_transform.translation.x;
+                pixel_camera.subpixel_pos.y += level_transform.translation.y;
             }
         }
     }
