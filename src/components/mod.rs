@@ -23,16 +23,9 @@ pub(crate) mod enemy;
 pub(crate) mod patrol;
 pub(crate) mod input;
 
-pub use animals::{ /*spawn_cat, spawn_dog, */ Cat, Dog };
-// pub use world::{ death_zone_bundle, tile_bundle };
-
 use crate::components::health::Health;
 
 use bevy::prelude::*;
-
-// ⬇️
-#[derive(Component, Default)]
-struct GravityScale(f32); // The scale of the gravity
 
 // 🎞️
 #[derive(Component, Clone)]
