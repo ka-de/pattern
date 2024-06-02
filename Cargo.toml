@@ -9,7 +9,7 @@ bevy_ecs_ldtk = { git = "https://github.com/ka-de/bevy_ecs_ldtk" }
 bevy-inspector-egui = { git = "https://github.com/ka-de/bevy-inspector-egui" }
 bevy_tweening = { git = "https://github.com/ka-de/bevy_tweening" }
 #bevy_framepace = { git = "https://github.com/ka-de/bevy_framepace" }
-#bevy_smooth_pixel_camera = { git = "https://github.com/ka-de/bevy_smooth_pixel_camera" }
+bevy_smooth_pixel_camera = { git = "https://github.com/ka-de/bevy_smooth_pixel_camera" }
 bevy_progress = { git = "https://github.com/ka-de/bevy_progress", features = [
   "assets",
   "debug",
