@@ -1,5 +1,12 @@
-use bevy::ecs::component::Component;
+use bevy::{ ecs::{ bundle::Bundle, component::Component }, sprite::SpriteSheetBundle };
+use bevy_ecs_ldtk::LdtkEntity;
 
-pub struct Torch {
-    pub value: u32, // The armor value of the entity
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
+pub struct Torch;
+
+#[derive(Clone, Default, Bundle, LdtkEntity)]
+pub struct TorchBundle {
+    #[sprite_sheet_bundle]
+    pub sprite_sheet_bundle: SpriteSheetBundle,
+    pub torch: Torch,
 }

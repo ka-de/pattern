@@ -10,6 +10,7 @@ pub fn setup_ldtk(app: &mut App) {
     app.register_ldtk_int_cell::<super::misc::WallBundle>(1)
         .register_ldtk_int_cell::<super::misc::LadderBundle>(2)
         .register_ldtk_int_cell::<super::misc::WallBundle>(3)
+        .register_ldtk_entity::<super::torch::TorchBundle>("Torch")
         .register_ldtk_entity::<super::player::PlayerBundle>("Player")
         .register_ldtk_entity::<super::misc::MobBundle>("Mob")
         .register_ldtk_entity::<super::misc::ChestBundle>("Chest")
@@ -75,6 +76,7 @@ pub fn dbg_player_items(
     }
 }
 
+// ⚠️ TODO: Move this to input.rs
 pub fn movement(
     input: Res<ButtonInput<KeyCode>>,
     mut query: Query<(&mut Velocity, &mut Climber, &GroundDetection), With<Player>>
