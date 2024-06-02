@@ -9,7 +9,7 @@ use bevy::prelude::*;
 use bevy_tweening::*;
 
 // ⚠️ TODO: This will need to get eventually removed from main.
-use components::player::Player;
+// use components::player::Player;
 use components::torch::Torch;
 //
 

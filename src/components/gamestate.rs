@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
-use bevy::input::common_conditions::input_toggle_active;
 use bevy_asset_loader::standard_dynamic_asset::StandardDynamicAsset;
 use crate::plugins::splashscreen::{ SplashScreenPlugin, SplashScreenConfiguration };
 
@@ -63,6 +62,6 @@ pub fn game_state_plugin(app: &mut App) {
     app.add_plugins(
         bevy_inspector_egui::quick::StateInspectorPlugin::<GameState>
             ::default()
-            .run_if(input_toggle_active(false, KeyCode::F10))
+            .run_if(bevy::input::common_conditions::input_toggle_active(false, KeyCode::F10))
     );
 }
