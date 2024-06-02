@@ -63,7 +63,7 @@ fn play_2d_spatial_audio(mut commands: Commands, asset_server: Res<AssetServer>)
 fn main() {
     let mut app = App::new();
 
-    app.add_systems(Startup, play_background_audio);
+    //app.add_systems(Startup, play_background_audio);
 
     // this code is compiled only if debug assertions are enabled (debug mode)
     #[cfg(debug_assertions)]
@@ -114,8 +114,8 @@ fn main() {
             components::systems::setup_ldtk,
         ))
         .insert_resource(GlobalVolume::new(0.2))
-        .add_systems(Startup, change_global_volume)
-        .add_systems(Startup, play_2d_spatial_audio);
+        .add_systems(Startup, change_global_volume);
+    //.add_systems(Startup, play_2d_spatial_audio);
 
     #[cfg(debug_assertions)]
     app.add_plugins((
