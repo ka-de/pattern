@@ -26,9 +26,9 @@ pub fn set_state_mainmenu() {
 
 pub fn set_state_playing(mut commands: Commands, asset_server: Res<AssetServer>) {
     info!("Set GameState: Playing");
-    // We have to move the camera to the menu once added
     // 🎥
-    commands.spawn(super::camera::camera_bundle());
+    let camera = Camera2dBundle::default();
+    commands.spawn(camera);
     super::systems::spawn_ldtk_world(commands, asset_server);
 }
 

@@ -7,7 +7,6 @@ mod plugins;
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 use bevy_tweening::*;
-use bevy_smooth_pixel_camera::prelude::*;
 
 // ⚠️ TODO: This will need to get eventually removed from main.
 // use components::player::Player;
@@ -97,24 +96,23 @@ fn main() {
     #[cfg(target_arch = "wasm32")]
     app.insert_resource(AssetMetaCheck::Never);
 
-    // DefaultPlugins
-    app.add_plugins((
-        DefaultPlugins.set(window_plugin)
-            .set(ImagePlugin::default_nearest())
-            .set(log_plugin)
-            // ⚠️ TODO: Maybe move this to its own thing? I'm not sure!
-            .set(AudioPlugin {
-                default_spatial_scale: SpatialScale::new_2d(AUDIO_SCALE),
-                ..default()
-            }),
-        // Tweening
-        TweeningPlugin,
-        // Smooth pixel camera plugins, also disables Multi-Sample Anti-Aliasing
-        PixelCameraPlugin,
-        components::gamestate::game_state_plugin,
-        components::ui::setup_ui,
-        components::systems::setup_ldtk,
-    ))
+    app.insert_resource(Msaa::Off) // Disable Multi-Sample Anti-Aliasing
+        // DefaultPlugins
+        .add_plugins((
+            DefaultPlugins.set(window_plugin)
+                .set(ImagePlugin::default_nearest())
+                .set(log_plugin)
+                // ⚠️ TODO: Maybe move this to its own thing? I'm not sure!
+                .set(AudioPlugin {
+                    default_spatial_scale: SpatialScale::new_2d(AUDIO_SCALE),
+                    ..default()
+                }),
+            // Tweening
+            TweeningPlugin,
+            components::gamestate::game_state_plugin,
+            components::ui::setup_ui,
+            components::systems::setup_ldtk,
+        ))
         .insert_resource(GlobalVolume::new(0.2))
         .add_systems(Startup, change_global_volume);
     //.add_systems(Startup, play_2d_spatial_audio);
