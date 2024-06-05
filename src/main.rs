@@ -7,6 +7,7 @@ mod plugins;
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 use bevy_tweening::*;
+use bevy_steamworks::*;
 
 // ⚠️ TODO: This will need to get eventually removed from main.
 // use components::player::Player;
@@ -61,6 +62,15 @@ fn play_2d_spatial_audio(mut commands: Commands, asset_server: Res<AssetServer>)
 // End of TODO
 
 fn main() {
+	#[cfg(not(debug_assertions))] // ⚠️ TODO: At some point we will need to dev with Steam.
+	match SteamworksPlugin::init_app(981370) {
+        Ok(_) => (),
+        Err(err) => {
+            eprintln!("{}", err);
+            return;
+        }
+    }
+
     let mut app = App::new();
 
     //app.add_systems(Startup, play_background_audio);
