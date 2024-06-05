@@ -22,6 +22,14 @@ bevy_rapier2d = { version = "0.26.0", features = ["simd-stable"] }
 sickle_ui = { git = "https://github.com/ka-de/sickle_ui" }
 bevy_yarnspinner = { git = "https://github.com/ka-de/YarnSpinner-Rust" }
 bevy_yarnspinner_example_dialogue_view = { git = "https://github.com/ka-de/YarnSpinner-Rust" }
+wgpu = { version = "0.19.3", default-features = false, features = [
+  "wgsl",
+  "dx12",
+  "metal",
+  "naga",
+  "naga-ir",
+  "fragile-send-sync-non-atomic-wasm",
+] }
 
 # Only enable dynamic linking in `sickle_ui` when not building wasm32.
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies.sickle_ui]

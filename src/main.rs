@@ -1,6 +1,12 @@
 // Turn clippy into a real bitch
 #![warn(clippy::all, clippy::pedantic)]
 
+use std::env;
+
+use bevy::render::settings::WgpuSettings;
+use bevy::render::RenderPlugin;
+use wgpu::Backends;
+
 mod components;
 mod plugins;
 
@@ -58,12 +64,41 @@ fn play_2d_spatial_audio(mut commands: Commands, asset_server: Res<AssetServer>)
         SpatialBundle::default(),
     ));
 }
-
 // End of TODO
 
+fn get_backend() -> Option<Backends> {
+    // Check if the WGPU_BACKEND environment variable is set
+    if let Ok(backend_str) = env::var("WGPU_BACKEND") {
+        // Convert the environment variable value to a Backend
+        match backend_str.to_lowercase().as_str() {
+            "vulkan" => {
+                return Some(Backends::VULKAN);
+            }
+            "dx12" | "direct3d12" => {
+                return Some(Backends::DX12);
+            }
+            "metal" => {
+                return Some(Backends::METAL);
+            }
+            _ => eprintln!("Unsupported backend: {}", backend_str),
+        }
+    }
+
+    // If the environment variable is not set, use the default logic
+    if cfg!(target_os = "linux") {
+        Some(Backends::VULKAN)
+    } else if cfg!(target_os = "windows") {
+        Some(Backends::DX12)
+    } else if cfg!(target_os = "macos") {
+        Some(Backends::METAL)
+    } else {
+        panic!("Unsupported Operating System!");
+    }
+}
+
 fn main() {
-	#[cfg(not(debug_assertions))] // ⚠️ TODO: At some point we will need to dev with Steam.
-	match SteamworksPlugin::init_app(981370) {
+    #[cfg(not(debug_assertions))] // ⚠️ TODO: At some point we will need to dev with Steam.
+    match SteamworksPlugin::init_app(981370) {
         Ok(_) => (),
         Err(err) => {
             eprintln!("{}", err);
@@ -71,6 +106,7 @@ fn main() {
         }
     }
 
+    let backend = get_backend();
     let mut app = App::new();
 
     //app.add_systems(Startup, play_background_audio);
@@ -109,7 +145,14 @@ fn main() {
     app.insert_resource(Msaa::Off) // Disable Multi-Sample Anti-Aliasing
         // DefaultPlugins
         .add_plugins((
-            DefaultPlugins.set(window_plugin)
+            DefaultPlugins.set(RenderPlugin {
+                render_creation: (WgpuSettings {
+                    backends: backend,
+                    ..default()
+                }).into(),
+                ..default()
+            })
+                .set(window_plugin)
                 .set(ImagePlugin::default_nearest())
                 .set(log_plugin)
                 // ⚠️ TODO: Maybe move this to its own thing? I'm not sure!
