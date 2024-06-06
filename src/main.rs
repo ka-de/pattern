@@ -54,18 +54,21 @@ fn spawn_simple_widget(mut commands: Commands) {
             // By default, a column will be 100% of the parent's height which would be the entire length of the screen.,
             .height(Val::Auto)
             // Lets give it a visible background color.
-            .background_color(Color::rgb(0.5, 0.5, 0.5));
-        // Let's add some content to our column.
+            .background_color(Color::rgb(0.1, 0.1, 0.1));
+        // Print out "DEVELOPMENT BUILD" when not in release mode.
+        #[cfg(debug_assertions)]
         column
             .label(LabelConfig::default())
             .entity_commands()
             // We can use the set_text method to set the text of a label.
-            .set_text("This is label 1.", None);
-
+            .set_text("DEVELOPMENT BUILD", None);
+        // ⚠️ TODO: This will have to go away from the actual release build
+        // Print out "ALPHA RELEASE BUILD" when in release mode.
+        #[cfg(not(debug_assertions))]
         column
             .label(LabelConfig::default())
             .entity_commands()
-            .set_text("This is another label.", None);
+            .set_text("ALPHA RELEASE BUILD", None);
     });
 }
 /// END OF UI TEST ⚠️
