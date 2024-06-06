@@ -193,7 +193,7 @@ fn main() {
     #[cfg(target_arch = "wasm32")]
     let window_plugin = WindowPlugin {
         primary_window: Some(Window {
-            canvas: Some("#pattern-canvas".into()),
+            canvas: Some("#separated-canvas".into()),
             ..default()
         }),
         ..default()
