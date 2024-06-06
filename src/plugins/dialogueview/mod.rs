@@ -1,27 +1,5 @@
 //! A simple example dialogue view for Yarn Spinner.
 //! A dialogue view is a plugin that handles presenting lines and options to the user and advances the dialogue on user input.
-//! This one shows text in a dialogue box inspired by Legend of Zelda: Breath of the Wild.
-//!
-//! ## Demo
-//!
-//! The [Yarn Spinner for Rust Demo](https://janhohenheim.itch.io/yarnspinner-rust-demo) uses this dialogue view, so you can play that in the browser if you
-//! want to see it in action. Additionally, all [Bevy Yarn Spinner examples](https://github.com/YarnSpinnerTool/YarnSpinner-Rust/tree/main/examples/bevy_yarnspinner/src/bin) use
-//! this dialogue view as well.
-//!
-//! ## Usage
-//!
-//! It's enough to simply register [`ExampleYarnSpinnerDialogueViewPlugin`] alongside [`YarnSpinnerPlugin`]:
-//! ```no_run
-//! use bevy::prelude::*;
-//! use bevy_yarnspinner::*;
-//! use bevy_yarnspinner::prelude::YarnSpinnerPlugin;
-//! use bevy_yarnspinner_example_dialogue_view::prelude::*;
-//!
-//! App::new()
-//!    .add_plugins(DefaultPlugins)
-//!    .add_plugins(YarnSpinnerPlugin::new())
-//!    .add_plugins(ExampleYarnSpinnerDialogueViewPlugin::new());
-//! ```
 //!
 //! This crate also exposes the [`SpeakerChangeEvent`] which you can use to animate characters while they are speaking,
 //! as the text is written out over a few seconds.
@@ -45,10 +23,10 @@ use bevy_yarnspinner::prelude::{ YarnFileSource, YarnSpinnerPlugin };
 pub use updating::SpeakerChangeEvent;
 
 pub mod prelude {
-    //! Everything you need to get starting using this example Yarn Spinner dialogue view.
+    //! Everything you need to get starting using this  Yarn Spinner dialogue view.
     pub use crate::{
-        plugins::dialogueview::ExampleYarnSpinnerDialogueViewPlugin,
-        plugins::dialogueview::ExampleYarnSpinnerDialogueViewSystemSet,
+        plugins::dialogueview::YarnSpinnerDialogueViewPlugin,
+        plugins::dialogueview::YarnSpinnerDialogueViewSystemSet,
         plugins::dialogueview::SpeakerChangeEvent,
     };
 }
@@ -56,12 +34,12 @@ pub mod prelude {
 /// The plugin registering all systems of the dialogue view.
 #[derive(Debug, Default)]
 #[non_exhaustive]
-pub struct ExampleYarnSpinnerDialogueViewPlugin;
+pub struct YarnSpinnerDialogueViewPlugin;
 
-/// The [`SystemSet`] containing all systems added by the [`ExampleYarnSpinnerDialogueViewPlugin`].
+/// The [`SystemSet`] containing all systems added by the [`YarnSpinnerDialogueViewPlugin`].
 /// Is run after the [`YarnSpinnerSystemSet`](bevy_yarnspinner::prelude::YarnSpinnerSystemSet).
 #[derive(Debug, Default, Clone, Copy, SystemSet, Eq, PartialEq, Hash)]
-pub struct ExampleYarnSpinnerDialogueViewSystemSet;
+pub struct YarnSpinnerDialogueViewSystemSet;
 
 mod assets;
 mod option_selection;
@@ -69,7 +47,7 @@ mod setup;
 mod typewriter;
 mod updating;
 
-impl Plugin for ExampleYarnSpinnerDialogueViewPlugin {
+impl Plugin for YarnSpinnerDialogueViewPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(
             YarnSpinnerPlugin::with_yarn_source(YarnFileSource::file("dialogues/test_dialog.yarn"))

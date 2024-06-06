@@ -1,7 +1,7 @@
 use super::option_selection::OptionSelection;
 use super::setup::{ DialogueContinueNode, DialogueNameNode, UiRootNode };
 use super::typewriter::{ self, Typewriter };
-use super::ExampleYarnSpinnerDialogueViewSystemSet;
+use super::YarnSpinnerDialogueViewSystemSet;
 use bevy::prelude::*;
 use bevy_yarnspinner::{ events::*, prelude::* };
 
@@ -20,7 +20,7 @@ pub(crate) fn ui_updating_plugin(app: &mut App) {
             .chain()
             .after(YarnSpinnerSystemSet)
             .after(typewriter::spawn)
-            .in_set(ExampleYarnSpinnerDialogueViewSystemSet)
+            .in_set(YarnSpinnerDialogueViewSystemSet)
     )
         .add_event::<SpeakerChangeEvent>()
         .register_type::<SpeakerChangeEvent>();

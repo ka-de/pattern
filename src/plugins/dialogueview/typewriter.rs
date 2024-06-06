@@ -7,7 +7,7 @@ use super::setup::{
     INITIAL_DIALOGUE_CONTINUE_BOTTOM,
 };
 use super::updating::SpeakerChangeEvent;
-use super::ExampleYarnSpinnerDialogueViewSystemSet;
+use super::YarnSpinnerDialogueViewSystemSet;
 use bevy::prelude::*;
 use bevy::utils::Instant;
 use bevy_yarnspinner::{ events::*, prelude::* };
@@ -26,7 +26,7 @@ pub(crate) fn typewriter_plugin(app: &mut App) {
         )
             .chain()
             .after(YarnSpinnerSystemSet)
-            .in_set(ExampleYarnSpinnerDialogueViewSystemSet)
+            .in_set(YarnSpinnerDialogueViewSystemSet)
     ).add_event::<TypewriterFinishedEvent>();
 }
 

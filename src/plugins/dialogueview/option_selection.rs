@@ -1,6 +1,6 @@
 use super::setup::{ spawn_options, DialogueNode, OptionButton, OptionsNode, UiRootNode };
 use super::typewriter::{ self, Typewriter, TypewriterFinishedEvent };
-use super::ExampleYarnSpinnerDialogueViewSystemSet;
+use super::YarnSpinnerDialogueViewSystemSet;
 use bevy::prelude::*;
 use bevy::utils::HashMap;
 use bevy::window::PrimaryWindow;
@@ -21,7 +21,7 @@ pub(crate) fn option_selection_plugin(app: &mut App) {
         )
             .chain()
             .after(YarnSpinnerSystemSet)
-            .in_set(ExampleYarnSpinnerDialogueViewSystemSet)
+            .in_set(YarnSpinnerDialogueViewSystemSet)
     ).add_event::<HasSelectedOptionEvent>();
 }
 
