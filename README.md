@@ -1,4 +1,4 @@
-# PATTERN OF DEATH
+# SEPARATED
 
 ---
 
@@ -41,10 +41,10 @@ The asset loading error has been replaced by multiple different asset loading er
 
 ### Set Custom HTML
 
-Needed so the thing can find `#pattern-canvas`.
+Needed so the thing can find `#separated-canvas`.
 
 ```bash
-set WASM_SERVER_RUNNER_CUSTOM_INDEX_HTML=C:\Users\kade\Desktop\rust\pattern\pattern.html
+set WASM_SERVER_RUNNER_CUSTOM_INDEX_HTML=C:\Users\kade\Desktop\rust\separated\separated.html
 ```
 
 ## Default RapierConfiguration

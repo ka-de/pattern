@@ -1,25 +1,25 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "type": "lldb",
-      "request": "launch",
-      "sourceLanguages": ["rust"],
-      "name": "Debug Pattern",
-      "cargo": {
-        "args": ["build", "--bin=pattern", "--package=pattern"],
-        "filter": {
-          "name": "pattern",
-          "kind": "bin"
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "sourceLanguages": ["rust"],
+            "name": "Debug SEPARATED",
+            "cargo": {
+                "args": ["build", "--bin=separated", "--package=separated"],
+                "filter": {
+                    "name": "separated",
+                    "kind": "bin"
+                }
+            },
+            "env": {
+                "CARGO_MANIFEST_DIR": "${workspaceFolder}",
+                "RUSTFLAGS": "-Clinker=rust-lld.exe -Zshare-generics=n -Zthreads=0",
+                "PATH": "${env:HOME}/.rustup/toolchains/nightly-x86_64-pc-windows-msvc/bin;${workspaceFolder}/target/debug/deps;${env:PATH}"
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
         }
-      },
-      "env": {
-        "CARGO_MANIFEST_DIR": "${workspaceFolder}",
-        "RUSTFLAGS": "-Clinker=rust-lld.exe -Zshare-generics=n -Zthreads=0",
-        "PATH": "${env:HOME}/.rustup/toolchains/nightly-x86_64-pc-windows-msvc/bin;${workspaceFolder}/target/debug/deps;${env:PATH}"
-      },
-      "args": [],
-      "cwd": "${workspaceFolder}"
-    }
-  ]
+    ]
 }
