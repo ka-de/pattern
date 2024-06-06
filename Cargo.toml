@@ -35,6 +35,7 @@ wgpu = { version = "0.19.3", default-features = false, features = [
   "naga-ir",
   "fragile-send-sync-non-atomic-wasm",
 ] }
+unicode-segmentation = "1.11.0"
 
 # Only enable dynamic linking in `sickle_ui` when not building wasm32.
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies.sickle_ui]

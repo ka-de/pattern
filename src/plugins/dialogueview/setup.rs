@@ -1,4 +1,4 @@
-use crate::assets::{font_handle, image_handle};
+use super::assets::{ font_handle, image_handle };
 use bevy::ecs::system::EntityCommands;
 use bevy::prelude::*;
 use bevy_yarnspinner::prelude::*;
@@ -117,8 +117,9 @@ fn setup(mut commands: Commands) {
                     // Dialog itself
                     parent.spawn((
                         fmt_name("text"),
-                        TextBundle::from_section(String::new(), text_style::standard())
-                            .with_style(style::standard()),
+                        TextBundle::from_section(String::new(), text_style::standard()).with_style(
+                            style::standard()
+                        ),
                         DialogueNode,
                         Label,
                     ));
@@ -221,9 +222,7 @@ pub(crate) fn create_dialog_text(text: impl Into<String>, invisible: impl Into<S
 }
 
 pub(crate) fn spawn_options<'a, T>(entity_commands: &mut EntityCommands, options: T)
-where
-    T: IntoIterator<Item = &'a DialogueOption>,
-    <T as IntoIterator>::IntoIter: 'a,
+    where T: IntoIterator<Item = &'a DialogueOption>, <T as IntoIterator>::IntoIter: 'a
 {
     entity_commands.with_children(|parent| {
         for (i, option) in options.into_iter().enumerate() {

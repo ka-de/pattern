@@ -1,12 +1,6 @@
-use plugins::dialogueview::setup::{
-    spawn_options,
-    DialogueNode,
-    OptionButton,
-    OptionsNode,
-    UiRootNode,
-};
-use crate::typewriter::{ self, Typewriter, TypewriterFinishedEvent };
-use crate::ExampleYarnSpinnerDialogueViewSystemSet;
+use super::setup::{ spawn_options, DialogueNode, OptionButton, OptionsNode, UiRootNode };
+use super::typewriter::{ self, Typewriter, TypewriterFinishedEvent };
+use super::ExampleYarnSpinnerDialogueViewSystemSet;
 use bevy::prelude::*;
 use bevy::utils::HashMap;
 use bevy::window::PrimaryWindow;

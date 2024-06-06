@@ -1,9 +1,9 @@
-use crate::option_selection::OptionSelection;
-use crate::setup::{DialogueContinueNode, DialogueNameNode, UiRootNode};
-use crate::typewriter::{self, Typewriter};
-use crate::ExampleYarnSpinnerDialogueViewSystemSet;
+use super::option_selection::OptionSelection;
+use super::setup::{ DialogueContinueNode, DialogueNameNode, UiRootNode };
+use super::typewriter::{ self, Typewriter };
+use super::ExampleYarnSpinnerDialogueViewSystemSet;
 use bevy::prelude::*;
-use bevy_yarnspinner::{events::*, prelude::*};
+use bevy_yarnspinner::{ events::*, prelude::* };
 
 pub(crate) fn ui_updating_plugin(app: &mut App) {
     app.add_systems(
@@ -11,18 +11,19 @@ pub(crate) fn ui_updating_plugin(app: &mut App) {
         (
             hide_dialog,
             show_dialog.run_if(on_event::<DialogueStartEvent>()),
-            present_line
-                .run_if(resource_exists::<Typewriter>.and_then(on_event::<PresentLineEvent>())),
+            present_line.run_if(
+                resource_exists::<Typewriter>.and_then(on_event::<PresentLineEvent>())
+            ),
             present_options.run_if(on_event::<PresentOptionsEvent>()),
             continue_dialogue.run_if(resource_exists::<Typewriter>),
         )
             .chain()
             .after(YarnSpinnerSystemSet)
             .after(typewriter::spawn)
-            .in_set(ExampleYarnSpinnerDialogueViewSystemSet),
+            .in_set(ExampleYarnSpinnerDialogueViewSystemSet)
     )
-    .add_event::<SpeakerChangeEvent>()
-    .register_type::<SpeakerChangeEvent>();
+        .add_event::<SpeakerChangeEvent>()
+        .register_type::<SpeakerChangeEvent>();
 }
 
 /// Signals that a speaker has changed.
@@ -44,7 +45,7 @@ fn show_dialog(mut visibility: Query<&mut Visibility, With<UiRootNode>>) {
 
 fn hide_dialog(
     mut root_visibility: Query<&mut Visibility, With<UiRootNode>>,
-    mut dialogue_complete_events: EventReader<DialogueCompleteEvent>,
+    mut dialogue_complete_events: EventReader<DialogueCompleteEvent>
 ) {
     if !dialogue_complete_events.is_empty() {
         *root_visibility.single_mut() = Visibility::Hidden;
@@ -56,7 +57,7 @@ fn present_line(
     mut line_events: EventReader<PresentLineEvent>,
     mut speaker_change_events: EventWriter<SpeakerChangeEvent>,
     mut typewriter: ResMut<Typewriter>,
-    mut name_node: Query<&mut Text, With<DialogueNameNode>>,
+    mut name_node: Query<&mut Text, With<DialogueNameNode>>
 ) {
     for event in line_events.read() {
         let name = if let Some(name) = event.line.character_name() {
@@ -90,13 +91,14 @@ fn continue_dialogue(
     mut root_visibility: Query<&mut Visibility, With<UiRootNode>>,
     mut continue_visibility: Query<
         &mut Visibility,
-        (With<DialogueContinueNode>, Without<UiRootNode>),
-    >,
+        (With<DialogueContinueNode>, Without<UiRootNode>)
+    >
 ) {
-    let explicit_continue = keys.just_pressed(KeyCode::Space)
-        || keys.just_pressed(KeyCode::Enter)
-        || mouse_buttons.just_pressed(MouseButton::Left)
-        || touches.any_just_pressed();
+    let explicit_continue =
+        keys.just_pressed(KeyCode::Space) ||
+        keys.just_pressed(KeyCode::Enter) ||
+        mouse_buttons.just_pressed(MouseButton::Left) ||
+        touches.any_just_pressed();
     if explicit_continue && !typewriter.is_finished() {
         typewriter.fast_forward();
         return;
