@@ -66,17 +66,30 @@ impl EntityCommand for SetFont {
 
 /// BannerWidget
 #[derive(Component)]
-struct BannerWidget;
+pub struct BannerWidget;
+
+/// BannerLabel
+/// A marker component used internally to initialize the label font.
+#[derive(Component)]
+struct BannerLabel;
 
 /// BannerWidgetConfig
 pub struct BannerWidgetConfig {
     pub label: String,
+    pub font: String,
+    pub font_size: f32,
 }
 
 impl BannerWidgetConfig {
-    pub fn from(label: impl Into<String>) -> Self {
+    pub fn from(
+        label: impl Into<String>,
+        font: impl Into<String>,
+        font_size: impl Into<f32>
+    ) -> Self {
         Self {
             label: label.into(),
+            font: font.into(),
+            font_size: font_size.into(),
         }
     }
 }
@@ -112,7 +125,11 @@ impl<'w, 's> UiBannerWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
                 .top(Val::Px(20.0));
 
             // We would like to set a default text style without having to pass in the AssetServer.
-            label.entity_commands().set_text(config.label, None);
+            label
+                .entity_commands()
+                .insert(BannerLabel)
+                .set_text(config.label, None)
+                .font(config.font, config.font_size, Color::rgb(0.471, 0.278, 0.153));
         })
     }
 }
