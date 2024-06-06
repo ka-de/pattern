@@ -6,7 +6,6 @@ use bevy_rapier2d::dynamics::Velocity;
 
 use super::{ ground::GroundDetection, ladders::Climber, player::Player };
 
-// ⚠️ TODO: Move this to input.rs
 pub fn movement(
     input: Res<ButtonInput<KeyCode>>,
     mut query: Query<(&mut Velocity, &mut Climber, &GroundDetection), With<Player>>
