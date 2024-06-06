@@ -41,8 +41,7 @@
 #![warn(missing_docs, missing_debug_implementations)]
 
 use bevy::prelude::*;
-use bevy_yarnspinner::prelude::YarnSpinnerPlugin;
-pub use setup::UiRootNode;
+use bevy_yarnspinner::prelude::{ YarnFileSource, YarnSpinnerPlugin };
 pub use updating::SpeakerChangeEvent;
 
 pub mod prelude {
@@ -64,13 +63,6 @@ pub struct ExampleYarnSpinnerDialogueViewPlugin;
 #[derive(Debug, Default, Clone, Copy, SystemSet, Eq, PartialEq, Hash)]
 pub struct ExampleYarnSpinnerDialogueViewSystemSet;
 
-impl ExampleYarnSpinnerDialogueViewPlugin {
-    /// Creates a new example dialogue view
-    pub fn new() -> Self {
-        Self::default()
-    }
-}
-
 mod assets;
 mod option_selection;
 mod setup;
@@ -79,11 +71,10 @@ mod updating;
 
 impl Plugin for ExampleYarnSpinnerDialogueViewPlugin {
     fn build(&self, app: &mut App) {
-        assert!(
-            app.is_plugin_added::<YarnSpinnerPlugin>(),
-            "YarnSpinnerPlugin must be added before ExampleYarnSpinnerDialogueViewPlugin"
-        );
-        app.add_plugins(assets::ui_assets_plugin)
+        app.add_plugins(
+            YarnSpinnerPlugin::with_yarn_source(YarnFileSource::file("dialogues/test_dialog.yarn"))
+        )
+            .add_plugins(assets::ui_assets_plugin)
             .add_plugins(setup::ui_setup_plugin)
             .add_plugins(updating::ui_updating_plugin)
             .add_plugins(typewriter::typewriter_plugin)

@@ -1,13 +1,16 @@
-use crate::option_selection::OptionSelection;
-use crate::setup::{
-    create_dialog_text, DialogueContinueNode, DialogueNode, UiRootNode,
+use super::option_selection::OptionSelection;
+use super::setup::{
+    create_dialog_text,
+    DialogueContinueNode,
+    DialogueNode,
+    UiRootNode,
     INITIAL_DIALOGUE_CONTINUE_BOTTOM,
 };
-use crate::updating::SpeakerChangeEvent;
-use crate::ExampleYarnSpinnerDialogueViewSystemSet;
+use super::updating::SpeakerChangeEvent;
+use super::ExampleYarnSpinnerDialogueViewSystemSet;
 use bevy::prelude::*;
 use bevy::utils::Instant;
-use bevy_yarnspinner::{events::*, prelude::*};
+use bevy_yarnspinner::{ events::*, prelude::* };
 use unicode_segmentation::UnicodeSegmentation;
 
 pub(crate) fn typewriter_plugin(app: &mut App) {
@@ -23,9 +26,8 @@ pub(crate) fn typewriter_plugin(app: &mut App) {
         )
             .chain()
             .after(YarnSpinnerSystemSet)
-            .in_set(ExampleYarnSpinnerDialogueViewSystemSet),
-    )
-    .add_event::<TypewriterFinishedEvent>();
+            .in_set(ExampleYarnSpinnerDialogueViewSystemSet)
+    ).add_event::<TypewriterFinishedEvent>();
 }
 
 #[derive(Debug, Eq, PartialEq, Hash, Reflect, Event)]
@@ -87,18 +89,14 @@ impl Typewriter {
         self.start = Instant::now();
         let calculated_graphemes = (self.graphemes_per_second() * self.elapsed).floor() as usize;
         let graphemes_left = self.graphemes_left.len();
-        let grapheme_length_to_take = (calculated_graphemes).min(graphemes_left);
-        self.elapsed -= grapheme_length_to_take as f32 / self.graphemes_per_second();
+        let grapheme_length_to_take = calculated_graphemes.min(graphemes_left);
+        self.elapsed -= (grapheme_length_to_take as f32) / self.graphemes_per_second();
         let graphemes_to_take = self.graphemes_left.drain(..grapheme_length_to_take);
         self.current_text.extend(graphemes_to_take);
     }
 
     fn graphemes_per_second(&self) -> f32 {
-        if self.fast_typing {
-            120.0
-        } else {
-            40.0
-        }
+        if self.fast_typing { 120.0 } else { 40.0 }
     }
 }
 
@@ -107,7 +105,7 @@ fn write_text(
     mut typewriter: ResMut<Typewriter>,
     option_selection: Option<Res<OptionSelection>>,
     mut speaker_change_events: EventWriter<SpeakerChangeEvent>,
-    mut root_visibility: Query<&mut Visibility, With<UiRootNode>>,
+    mut root_visibility: Query<&mut Visibility, With<UiRootNode>>
 ) {
     let mut text = text.single_mut();
     if typewriter.last_before_options && option_selection.is_none() {
@@ -139,7 +137,7 @@ fn write_text(
 fn show_continue(
     typewriter: Res<Typewriter>,
     mut visibility: Query<&mut Visibility, With<DialogueContinueNode>>,
-    mut typewriter_finished_event: EventReader<TypewriterFinishedEvent>,
+    mut typewriter_finished_event: EventReader<TypewriterFinishedEvent>
 ) {
     for _event in typewriter_finished_event.read() {
         if !typewriter.last_before_options {
@@ -160,7 +158,7 @@ pub(crate) fn spawn(mut commands: Commands) {
 fn bob_continue(
     time: Res<Time>,
     visibility: Query<&Visibility, With<DialogueContinueNode>>,
-    mut style: Query<&mut Style, With<DialogueContinueNode>>,
+    mut style: Query<&mut Style, With<DialogueContinueNode>>
 ) {
     let visibility = visibility.single();
     if *visibility == Visibility::Hidden {
@@ -175,7 +173,7 @@ fn bob_continue(
 fn send_finished_event(
     mut events: EventWriter<TypewriterFinishedEvent>,
     typewriter: Res<Typewriter>,
-    mut last_finished: Local<bool>,
+    mut last_finished: Local<bool>
 ) {
     if !typewriter.is_finished() {
         *last_finished = false;

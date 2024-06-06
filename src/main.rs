@@ -228,6 +228,7 @@ fn main() {
             components::gamestate::game_state_plugin,
             components::ui::setup_ui,
             components::systems::setup_ldtk,
+            plugins::dialogueview::prelude::ExampleYarnSpinnerDialogueViewPlugin,
             plugins::debug::plugin,
         ))
         .add_systems(Startup, set_window_icon) // Set the Window icon.
