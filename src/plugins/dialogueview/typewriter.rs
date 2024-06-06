@@ -17,17 +17,25 @@ pub(crate) fn typewriter_plugin(app: &mut App) {
     app.add_systems(
         Update,
         (
-            send_finished_event.run_if(resource_exists::<Typewriter>),
+            send_finished_event.run_if(in_dialogue),
             despawn.run_if(on_event::<DialogueCompleteEvent>()),
             spawn.run_if(on_event::<DialogueStartEvent>()),
-            write_text.run_if(resource_exists::<Typewriter>),
-            show_continue.run_if(resource_exists::<Typewriter>),
+            write_text.run_if(in_dialogue),
+            show_continue.run_if(in_dialogue),
             bob_continue,
         )
             .chain()
             .after(YarnSpinnerSystemSet)
             .in_set(YarnSpinnerDialogueViewSystemSet)
     ).add_event::<TypewriterFinishedEvent>();
+}
+
+pub(crate) fn in_dialogue(res: Option<Res<Typewriter>>) -> bool {
+    res.is_some()
+}
+
+pub(crate) fn not_in_dialogue(res: Option<Res<Typewriter>>) -> bool {
+    res.is_none()
 }
 
 #[derive(Debug, Eq, PartialEq, Hash, Reflect, Event)]
@@ -148,6 +156,7 @@ fn show_continue(
 }
 
 pub(crate) fn despawn(mut commands: Commands) {
+    info!("despanw dialogue");
     commands.remove_resource::<Typewriter>();
 }
 

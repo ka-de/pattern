@@ -3,22 +3,14 @@ use bevy::{
     input::{ keyboard::KeyCode, ButtonInput },
 };
 use bevy_rapier2d::dynamics::Velocity;
-use bevy_yarnspinner::prelude::DialogueRunner;
 
 use super::{ ground::GroundDetection, ladders::Climber, player::Player };
 
+// ⚠️ TODO: Move this to input.rs
 pub fn movement(
     input: Res<ButtonInput<KeyCode>>,
-    mut query: Query<(&mut Velocity, &mut Climber, &GroundDetection), With<Player>>,
-    mut dialogue_runners: Query<&mut DialogueRunner>
+    mut query: Query<(&mut Velocity, &mut Climber, &GroundDetection), With<Player>>
 ) {
-    // Disable player movement if a dialogue is running.
-    for dialogue_runner in dialogue_runners.iter_mut() {
-        if dialogue_runner.is_running() {
-            return;
-        }
-    }
-
     for (mut velocity, mut climber, ground_detection) in &mut query {
         let right = if input.pressed(KeyCode::KeyD) { 1.0 } else { 0.0 };
         let left = if input.pressed(KeyCode::KeyA) { 1.0 } else { 0.0 };

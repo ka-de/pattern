@@ -6,6 +6,10 @@ use super::{
     patrol::patrol,
     player::Player,
 };
+use crate::plugins::{
+    dialogueview::not_in_dialogue,
+    gamestate::GameState
+};
 
 use std::collections::{ HashMap, HashSet };
 
@@ -26,7 +30,7 @@ pub fn setup_ldtk(app: &mut App) {
             Update,
             (
                 spawn_wall_collision,
-                movement,
+                movement.run_if(not_in_dialogue),
                 detect_climb_range,
                 ignore_gravity_if_climbing,
                 patrol,
@@ -37,7 +41,7 @@ pub fn setup_ldtk(app: &mut App) {
                 super::ground::ground_detection,
                 super::ground::update_on_ground,
                 restart_level,
-            ).run_if(in_state(crate::plugins::gamestate::GameState::Playing))
+            ).run_if(in_state(GameState::Playing))
         )
         .add_plugins((LdtkPlugin, RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0)));
 }

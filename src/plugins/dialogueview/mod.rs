@@ -20,17 +20,19 @@
 #![warn(missing_docs, missing_debug_implementations)]
 
 use bevy::prelude::*;
-use bevy_yarnspinner::prelude::{ YarnFileSource, YarnSpinnerPlugin, YarnProject };
-pub use updating::SpeakerChangeEvent;
+use bevy_yarnspinner::{
+    prelude::{
+        YarnFileSource,
+        YarnSpinnerPlugin,
+        YarnProject,
+        FileExtensionAssetProvider,
+        AudioAssetProvider,
+    },
+    file_extensions,
+};
 
-pub mod prelude {
-    //! Everything you need to get starting using this  Yarn Spinner dialogue view.
-    pub use crate::{
-        plugins::dialogueview::YarnSpinnerDialogueViewPlugin,
-        plugins::dialogueview::YarnSpinnerDialogueViewSystemSet,
-        plugins::dialogueview::SpeakerChangeEvent,
-    };
-}
+pub use updating::SpeakerChangeEvent;
+pub(crate) use typewriter::{ in_dialogue, not_in_dialogue };
 
 /// The plugin registering all systems of the dialogue view.
 #[derive(Debug, Default)]
@@ -71,7 +73,7 @@ impl Plugin for YarnSpinnerDialogueViewPlugin {
 }
 
 fn spawn_dialogue_runner(mut commands: Commands, project: Res<YarnProject>) {
-    warn!("Starting dialogue");
+    info!("Starting dialogue");
     // Create a dialogue runner from the project.
     let mut dialogue_runner = project.create_dialogue_runner();
     // Immediately start showing the dialogue to the player

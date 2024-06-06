@@ -1,6 +1,6 @@
 use super::option_selection::OptionSelection;
 use super::setup::{ DialogueContinueNode, DialogueNameNode, UiRootNode };
-use super::typewriter::{ self, Typewriter };
+use super::typewriter::{ self, Typewriter, in_dialogue };
 use super::YarnSpinnerDialogueViewSystemSet;
 use bevy::prelude::*;
 use bevy_yarnspinner::{ events::*, prelude::* };
@@ -11,11 +11,9 @@ pub(crate) fn ui_updating_plugin(app: &mut App) {
         (
             hide_dialog,
             show_dialog.run_if(on_event::<DialogueStartEvent>()),
-            present_line.run_if(
-                resource_exists::<Typewriter>.and_then(on_event::<PresentLineEvent>())
-            ),
+            present_line.run_if(in_dialogue.and_then(on_event::<PresentLineEvent>())),
             present_options.run_if(on_event::<PresentOptionsEvent>()),
-            continue_dialogue.run_if(resource_exists::<Typewriter>),
+            continue_dialogue.run_if(in_dialogue),
         )
             .chain()
             .after(YarnSpinnerSystemSet)
