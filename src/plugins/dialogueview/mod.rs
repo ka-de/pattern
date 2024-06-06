@@ -1,4 +1,5 @@
-//! A simple example dialogue view for Yarn Spinner.
+//! A dialogue view for Yarn Spinner.
+//!
 //! A dialogue view is a plugin that handles presenting lines and options to the user and advances the dialogue on user input.
 //!
 //! This crate also exposes the [`SpeakerChangeEvent`] which you can use to animate characters while they are speaking,
