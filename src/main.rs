@@ -1,6 +1,11 @@
 // Turn clippy into a real bitch
 #![warn(clippy::all, clippy::pedantic)]
 
+// This changes the executable to a graphical application instead of a CLI one
+// only for Release builds.
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+// Provides functions to read and manipulate environment variables.
 use std::env;
 
 use bevy::render::settings::WgpuSettings;
@@ -9,6 +14,9 @@ use wgpu::Backends;
 
 mod components;
 mod plugins;
+
+#[cfg(debug_assertions)]
+use bevy::diagnostic::{ FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin };
 
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
@@ -66,6 +74,7 @@ fn play_2d_spatial_audio(mut commands: Commands, asset_server: Res<AssetServer>)
 }
 // End of TODO
 
+// Allow the user to set the WGPU_BACKEND but have sane defaults for each platform.
 fn get_backend() -> Option<Backends> {
     // Check if the WGPU_BACKEND environment variable is set
     if let Ok(backend_str) = env::var("WGPU_BACKEND") {
@@ -174,6 +183,12 @@ fn main() {
     app.add_plugins((
         // FrameTimeDiagnosticsPlugin
         bevy::diagnostic::FrameTimeDiagnosticsPlugin,
+        // LogDiagnosticsPlugin
+        LogDiagnosticsPlugin::default(),
+        // EntityCountDiagnosticsPlugin
+        bevy::diagnostic::EntityCountDiagnosticsPlugin::default(),
+        // SystemInformationDiagnosticsPlugin
+        bevy::diagnostic::SystemInformationDiagnosticsPlugin::default(),
         // WorldInspectorPlugin
         WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::F11)),
         // PerformanceUI

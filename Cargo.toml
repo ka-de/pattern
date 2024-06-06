@@ -3,6 +3,9 @@ name = "pattern"
 version = "1.0.0"
 edition = "2021"
 
+[build-dependencies]
+embed-resource = "2.4.2"
+
 [dependencies]
 perf_ui = { git = "https://github.com/ka-de/perf_ui" }
 bevy_ecs_ldtk = { git = "https://github.com/ka-de/bevy_ecs_ldtk" }
