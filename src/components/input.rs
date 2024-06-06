@@ -12,6 +12,7 @@ pub fn movement(
     mut query: Query<(&mut Velocity, &mut Climber, &GroundDetection), With<Player>>,
     mut dialogue_runners: Query<&mut DialogueRunner>
 ) {
+    // Disable player movement if a dialogue is running.
     for dialogue_runner in dialogue_runners.iter_mut() {
         if dialogue_runner.is_running() {
             return;
