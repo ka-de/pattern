@@ -29,7 +29,7 @@ pub fn set_state_playing(mut commands: Commands, asset_server: Res<AssetServer>)
     // 🎥
     let camera = Camera2dBundle::default();
     commands.spawn(camera);
-    super::systems::spawn_ldtk_world(commands, asset_server);
+    crate::components::systems::spawn_ldtk_world(commands, asset_server);
 }
 
 pub fn game_state_plugin(app: &mut App) {

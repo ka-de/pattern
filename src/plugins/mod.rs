@@ -1,5 +1,6 @@
 pub(crate) mod splashscreen;
 pub(crate) mod dialogueview;
+pub(crate) mod gamestate;
 
 #[cfg(debug_assertions)]
 pub(crate) mod debug;

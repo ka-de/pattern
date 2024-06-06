@@ -334,7 +334,7 @@ fn main() {
                 }),
             // Tweening
             TweeningPlugin,
-            components::gamestate::game_state_plugin,
+            plugins::gamestate::game_state_plugin,
             components::ui::setup_ui,
             components::systems::setup_ldtk,
             plugins::dialogueview::prelude::YarnSpinnerDialogueViewPlugin,

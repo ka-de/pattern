@@ -37,7 +37,7 @@ pub fn setup_ldtk(app: &mut App) {
                 super::ground::ground_detection,
                 super::ground::update_on_ground,
                 restart_level,
-            ).run_if(in_state(super::gamestate::GameState::Playing))
+            ).run_if(in_state(crate::plugins::gamestate::GameState::Playing))
         )
         .add_plugins((LdtkPlugin, RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0)));
 }

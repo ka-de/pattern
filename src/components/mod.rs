@@ -6,7 +6,6 @@ pub(crate) mod world;
 pub(crate) mod misc;
 pub(crate) mod systems;
 pub(crate) mod health;
-pub(crate) mod gamestate;
 pub(crate) mod ladders;
 pub(crate) mod player;
 pub(crate) mod collision;
