@@ -8,7 +8,7 @@
 // Provides functions to read and manipulate environment variables.
 use std::env;
 
-use bevy::render::settings::WgpuSettings;
+use bevy::{ ecs::system::EntityCommand, render::settings::WgpuSettings };
 use bevy::render::RenderPlugin;
 use sickle_ui::{
     dev_panels::{
@@ -19,7 +19,10 @@ use sickle_ui::{
     ui_commands::{ SetCursorExt, SetTextExt as _ },
     ui_style::{
         SetBackgroundColorExt,
+        SetImageExt as _,
+        SetNodeAlignSelfExt as _,
         SetNodeHeightExt,
+        SetNodeJustifyContentsExt as _,
         SetNodePositionTypeExt as _,
         SetNodeRightExt as _,
         SetNodeTopExt as _,
@@ -38,19 +41,77 @@ use bevy_tweening::*;
 // Steamworks
 use bevy_steamworks::*;
 
-// ⚠️ UI TEST ⚠️
-//
-// BannerWidget
+/// ⚠️ UI TEST ⚠️
+///////////////////////////////////////////////////
+
+/// SetFont
+struct SetFont(String, f32, Color);
+
+impl EntityCommand for SetFont {
+    fn apply(self, entity: Entity, world: &mut World) {
+        let asset_server = world.resource::<AssetServer>();
+        let font = asset_server.load(&self.0);
+
+        if let Some(mut text) = world.entity_mut(entity).get_mut::<Text>() {
+            for text_section in &mut text.sections {
+                text_section.style.font = font.clone();
+                text_section.style.font_size = self.1;
+                text_section.style.color = self.2;
+            }
+        }
+    }
+}
+
+/// BannerWidget
 #[derive(Component)]
 struct BannerWidget;
 
+/// BannerWidgetConfig
+pub struct BannerWidgetConfig {
+    pub label: String,
+}
+
+impl BannerWidgetConfig {
+    pub fn from(label: impl Into<String>) -> Self {
+        Self {
+            label: label.into(),
+        }
+    }
+}
+
 pub trait UiBannerWidgetExt<'w, 's> {
-    fn banner_widget<'a>(&'a mut self) -> UiBuilder<'w, 's, 'a, Entity>;
+    fn banner_widget<'a>(&'a mut self, config: BannerWidgetConfig) -> UiBuilder<'w, 's, 'a, Entity>;
 }
 
 impl<'w, 's> UiBannerWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
-    fn banner_widget<'a>(&'a mut self) -> UiBuilder<'w, 's, 'a, Entity> {
-        self.spawn((NodeBundle::default(), BannerWidget))
+    fn banner_widget<'a>(
+        &'a mut self,
+        config: BannerWidgetConfig
+    ) -> UiBuilder<'w, 's, 'a, Entity> {
+        self.container((ImageBundle::default(), BannerWidget), |banner| {
+            banner
+                .style()
+                .position_type(PositionType::Absolute)
+                // Center the children (the label) horizontally.
+                .justify_content(JustifyContent::Center)
+                .width(Val::Px(401.0))
+                .height(Val::Px(79.0))
+                // Add a nice looking background image to our widget.
+                .image("banner_title.png");
+
+            // And we'll want a customizable label on the banner.
+            let mut label = banner.label(LabelConfig::default());
+
+            label
+                .style()
+                // Align the label relative to the top of the banner.
+                .align_self(AlignSelf::Start)
+                // Move us a few pixels down so we look nice relative to our font.
+                .top(Val::Px(20.0));
+
+            // We would like to set a default text style without having to pass in the AssetServer.
+            label.entity_commands().set_text(config.label, None);
+        })
     }
 }
 
