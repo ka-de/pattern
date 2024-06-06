@@ -19,13 +19,11 @@ use sickle_ui::{
     ui_builder::{ UiBuilder, UiBuilderExt, UiRoot },
     ui_commands::SetTextExt as _,
     ui_style::{
-        SetBackgroundColorExt,
         SetImageExt as _,
         SetNodeAlignSelfExt as _,
         SetNodeHeightExt,
         SetNodeJustifyContentsExt as _,
         SetNodePositionTypeExt as _,
-        SetNodeRightExt as _,
         SetNodeTopExt as _,
         SetNodeWidthExt,
     },
