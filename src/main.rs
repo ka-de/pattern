@@ -109,7 +109,7 @@ impl<'w, 's> UiBannerWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
                 .width(Val::Px(100.0))
                 .height(Val::Px(12.0))
                 // Add a nice looking background image to our widget.
-                .image("ui/label_gradient.png");
+                .image("ui/label_gradient_transparent.png");
 
             // And we'll want a customizable label on the banner.
             let mut label = banner.label(LabelConfig::default());
