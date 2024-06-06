@@ -22,10 +22,36 @@ pub(crate) fn plugin(app: &mut bevy::app::App) {
     ));
 }
 
+mod log_mod {
+    use bevy::log::tracing_subscriber::Layer;
+    use bevy::log::tracing_subscriber::prelude::*;
+    use bevy::log::BoxedSubscriber;
+    use bevy::utils::tracing::Subscriber;
+
+    pub struct MyLayer {
+        // ...
+    }
+
+    impl<S: Subscriber> Layer<S> for MyLayer {
+        fn register_callsite(
+            &self,
+            metadata: &'static bevy::utils::tracing::Metadata<'static>
+        ) -> bevy::utils::tracing::subscriber::Interest {
+            println!("register_callsite: {:#?}", metadata);
+            bevy::utils::tracing::subscriber::Interest::always()
+        }
+        // ...
+    }
+
+    pub fn update_subscriber(subscriber: BoxedSubscriber) -> BoxedSubscriber {
+        Box::new(subscriber.with(MyLayer {}))
+    }
+}
+
 pub(crate) fn make_log_plugin() -> impl Plugin {
     bevy::log::LogPlugin {
         level: bevy::log::Level::DEBUG,
         filter: "info,pattern=debug,wgpu_core=warn,wgpu_hal=warn,pattern=debug".into(),
-        update_subscriber: None,
+        update_subscriber: Some(log_mod::update_subscriber),
     }
 }
