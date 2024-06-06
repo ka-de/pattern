@@ -11,9 +11,9 @@ pub(crate) fn plugin(app: &mut bevy::app::App) {
         // LogDiagnosticsPlugin
         //bevy::diagnostic::LogDiagnosticsPlugin::default(),
         // EntityCountDiagnosticsPlugin
-        bevy::diagnostic::EntityCountDiagnosticsPlugin::default(),
+        //bevy::diagnostic::EntityCountDiagnosticsPlugin::default(),
         // SystemInformationDiagnosticsPlugin
-        bevy::diagnostic::SystemInformationDiagnosticsPlugin::default(),
+        //bevy::diagnostic::SystemInformationDiagnosticsPlugin::default(),
         // WorldInspectorPlugin
         WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::F11)),
         // PerformanceUI

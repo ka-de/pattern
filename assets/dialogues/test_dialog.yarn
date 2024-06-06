@@ -21,7 +21,7 @@ position: -43,-216
 <<jump Hub1>>
 ===
 title: Hub1
-position: -41,-19
+position: -41,-17
 ---
 <<declare $great = false as bool>>
 -> You: This is great! <<if $great == false>>
