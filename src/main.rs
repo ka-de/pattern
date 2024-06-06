@@ -11,14 +11,13 @@ use std::env;
 use bevy::ecs::system::EntityCommands;
 use bevy::{ ecs::system::EntityCommand, render::settings::WgpuSettings };
 use bevy::render::RenderPlugin;
+use wgpu::Backends;
+
+/// ⚠️ UI STUFF
 use sickle_ui::ui_style::{ SetNodeBottomExt as _, SetNodeLeftExt as _ };
 use sickle_ui::{
-    dev_panels::{
-        hierarchy::{ HierarchyTreeViewPlugin, UiHierarchyExt },
-        scene_view::{ SceneView, SceneViewPlugin, SpawnSceneViewPreUpdate, UiSceneViewExt },
-    },
-    ui_builder::{ UiBuilder, UiBuilderExt, UiContextRoot, UiRoot },
-    ui_commands::{ SetCursorExt, SetTextExt as _ },
+    ui_builder::{ UiBuilder, UiBuilderExt, UiRoot },
+    ui_commands::SetTextExt as _,
     ui_style::{
         SetBackgroundColorExt,
         SetImageExt as _,
@@ -30,10 +29,9 @@ use sickle_ui::{
         SetNodeTopExt as _,
         SetNodeWidthExt,
     },
-    widgets::{ prelude::*, tab_container::UiTabContainerSubExt, WidgetLibraryUpdate },
-    SickleUiPlugin,
+    widgets::prelude::*,
 };
-use wgpu::Backends;
+/// ⚠️ END OF UI STUFF
 
 mod components;
 mod plugins;
@@ -111,7 +109,7 @@ impl<'w, 's> UiBannerWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
                 // Center the children (the label) horizontally.
                 .justify_content(JustifyContent::Center)
                 .width(Val::Px(100.0))
-                .height(Val::Px(16.0))
+                .height(Val::Px(12.0))
                 // Add a nice looking background image to our widget.
                 .image("ui\\label_gradient.png");
 
@@ -121,7 +119,9 @@ impl<'w, 's> UiBannerWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
             label
                 .style()
                 // Align the label relative to the top of the banner.
-                .align_self(AlignSelf::Start);
+                .align_self(AlignSelf::Start)
+                // Move us a few pixels down so we look nice relative to our font.
+                .top(Val::Px(3.0));
 
             // We would like to set a default text style without having to pass in the AssetServer.
             label
@@ -156,49 +156,29 @@ impl<'a> BannerWidgetCommands<'a> for EntityCommands<'a> {
     }
 }
 
-fn spawn_banner_widgets(mut commands: Commands) {
-    commands
-        .ui_builder(UiRoot)
-        .banner_widget(BannerWidgetConfig::from("DEVELOPMENT BUILD", "fonts/bahnschrift.ttf", 12.0))
-        .style()
-        .left(Val::Px(100.0))
-        .bottom(Val::Px(100.0));
-}
-
 /// release_label
 ///
 /// Prints out release or debug build on the UI.
 fn release_label(mut commands: Commands) {
-    // Let's create a simple column widget on the screen.
-    commands.ui_builder(UiRoot).column(|column| {
-        // We can style our widget directly in code using the style method.
-        column
-            .style()
-            // The column will be located 100 pixels from the right and 100 pixels from the top of the screen.
-            // The absolute position means we are not set relative to any parent.
-            .position_type(PositionType::Absolute)
-            .right(Val::Px(100.0))
-            .top(Val::Px(100.0))
-            // We'll bound the height of our column to the total height of our contents.
-            // By default, a column will be 100% of the parent's height which would be the entire length of the screen.,
-            .height(Val::Auto)
-            // Lets give it a visible background color.
-            .background_color(Color::rgb(0.1, 0.1, 0.1));
-        // Print out "DEVELOPMENT BUILD" when not in release mode.
-        #[cfg(debug_assertions)]
-        column
-            .label(LabelConfig::default())
-            .entity_commands()
-            // We can use the set_text method to set the text of a label.
-            .set_text("DEVELOPMENT BUILD", None);
-        // ⚠️ TODO: This will have to go away from the actual release build
-        // Print out "ALPHA RELEASE BUILD" when in release mode.
-        #[cfg(not(debug_assertions))]
-        column
-            .label(LabelConfig::default())
-            .entity_commands()
-            .set_text("ALPHA RELEASE BUILD", None);
-    });
+    // Print out "DEVELOPMENT BUILD" when not in release mode.
+    #[cfg(debug_assertions)]
+    commands
+        .ui_builder(UiRoot)
+        .banner_widget(BannerWidgetConfig::from("DEVELOPMENT BUILD", "fonts\\bahnschrift.ttf", 8.0))
+        .style()
+        .left(Val::Px(100.0))
+        .bottom(Val::Px(100.0));
+    // ⚠️ TODO: This will have to go away from the actual release build
+    // Print out "ALPHA RELEASE BUILD" when in release mode.
+    #[cfg(not(debug_assertions))]
+    commands
+        .ui_builder(UiRoot)
+        .banner_widget(
+            BannerWidgetConfig::from("ALPHA RELEASE BUILD", "fonts\\bahnschrift.ttf", 8.0)
+        )
+        .style()
+        .left(Val::Px(100.0))
+        .bottom(Val::Px(100.0));
 }
 /// END OF UI TEST ⚠️
 /////////////////////////////////////////////////////////////////////////////
@@ -363,7 +343,6 @@ fn main() {
         .add_systems(Startup, set_window_icon) // Set the Window icon.
         // UI TESTING ⚠️
         .add_systems(Startup, release_label)
-        .add_systems(Startup, spawn_banner_widgets) // Prints out release or debug mode in the UI.
         // AUDIO TESTING ⚠️
         .insert_resource(GlobalVolume::new(0.2)) // Set the GlobalVolume ⚠️ WIP
         .add_systems(Startup, change_global_volume); // Change the GlobalVolume ⚠️ WIP
