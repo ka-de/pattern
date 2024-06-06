@@ -20,16 +20,7 @@
 #![warn(missing_docs, missing_debug_implementations)]
 
 use bevy::prelude::*;
-use bevy_yarnspinner::{
-    prelude::{
-        YarnFileSource,
-        YarnSpinnerPlugin,
-        YarnProject,
-        FileExtensionAssetProvider,
-        AudioAssetProvider,
-    },
-    file_extensions,
-};
+use bevy_yarnspinner::prelude::{ YarnFileSource, YarnSpinnerPlugin, YarnProject };
 
 pub use updating::SpeakerChangeEvent;
 pub(crate) use typewriter::{ in_dialogue, not_in_dialogue };

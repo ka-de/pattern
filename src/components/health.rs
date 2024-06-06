@@ -5,17 +5,17 @@ use super::armor::Armor;
 // 🩸
 #[derive(Component, Clone)]
 pub struct Health {
-    pub current: u32, // The current health of the entity
-    pub max: u32, // The maximum health of the entity
-    pub hunger: u32, // The hunger of the entity
+    pub current: u32,
+    pub max: u32,
+    pub hunger: u32,
 }
 
 impl Default for Health {
     fn default() -> Self {
         Self {
-            current: 100, // default value for current health
-            max: 100, // default value for max health
-            hunger: 0, // default value for hunger
+            current: 100,
+            max: 100,
+            hunger: 0,
         }
     }
 }

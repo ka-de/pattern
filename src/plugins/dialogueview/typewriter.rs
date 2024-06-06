@@ -156,7 +156,7 @@ fn show_continue(
 }
 
 pub(crate) fn despawn(mut commands: Commands) {
-    info!("despanw dialogue");
+    info!("Despawning dialogue!");
     commands.remove_resource::<Typewriter>();
 }
 
