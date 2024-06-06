@@ -11,6 +11,7 @@ use std::env;
 use bevy::ecs::system::EntityCommands;
 use bevy::{ ecs::system::EntityCommand, render::settings::WgpuSettings };
 use bevy::render::RenderPlugin;
+use sickle_ui::ui_style::{ SetNodeBottomExt as _, SetNodeLeftExt as _ };
 use sickle_ui::{
     dev_panels::{
         hierarchy::{ HierarchyTreeViewPlugin, UiHierarchyExt },
@@ -109,10 +110,10 @@ impl<'w, 's> UiBannerWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
                 .position_type(PositionType::Absolute)
                 // Center the children (the label) horizontally.
                 .justify_content(JustifyContent::Center)
-                .width(Val::Px(401.0))
-                .height(Val::Px(79.0))
+                .width(Val::Px(100.0))
+                .height(Val::Px(16.0))
                 // Add a nice looking background image to our widget.
-                .image("banner_title.png");
+                .image("ui\\label_gradient.png");
 
             // And we'll want a customizable label on the banner.
             let mut label = banner.label(LabelConfig::default());
@@ -120,16 +121,14 @@ impl<'w, 's> UiBannerWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
             label
                 .style()
                 // Align the label relative to the top of the banner.
-                .align_self(AlignSelf::Start)
-                // Move us a few pixels down so we look nice relative to our font.
-                .top(Val::Px(20.0));
+                .align_self(AlignSelf::Start);
 
             // We would like to set a default text style without having to pass in the AssetServer.
             label
                 .entity_commands()
                 .insert(BannerLabel)
                 .set_text(config.label, None)
-                .font(config.font, config.font_size, Color::rgb(0.471, 0.278, 0.153));
+                .font(config.font, config.font_size, Color::rgb(1.0, 1.0, 1.0));
         })
     }
 }
@@ -155,6 +154,15 @@ impl<'a> BannerWidgetCommands<'a> for EntityCommands<'a> {
     ) -> &mut EntityCommands<'a> {
         self.add(SetFont(font.into(), size, color))
     }
+}
+
+fn spawn_banner_widgets(mut commands: Commands) {
+    commands
+        .ui_builder(UiRoot)
+        .banner_widget(BannerWidgetConfig::from("DEVELOPMENT BUILD", "fonts/bahnschrift.ttf", 12.0))
+        .style()
+        .left(Val::Px(100.0))
+        .bottom(Val::Px(100.0));
 }
 
 /// release_label
@@ -354,7 +362,8 @@ fn main() {
         ))
         .add_systems(Startup, set_window_icon) // Set the Window icon.
         // UI TESTING ⚠️
-        .add_systems(Startup, release_label) // Prints out release or debug mode in the UI.
+        .add_systems(Startup, release_label)
+        .add_systems(Startup, spawn_banner_widgets) // Prints out release or debug mode in the UI.
         // AUDIO TESTING ⚠️
         .insert_resource(GlobalVolume::new(0.2)) // Set the GlobalVolume ⚠️ WIP
         .add_systems(Startup, change_global_volume); // Change the GlobalVolume ⚠️ WIP
