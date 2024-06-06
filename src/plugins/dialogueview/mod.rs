@@ -48,8 +48,9 @@ pub use updating::SpeakerChangeEvent;
 pub mod prelude {
     //! Everything you need to get starting using this example Yarn Spinner dialogue view.
     pub use crate::{
-        ExampleYarnSpinnerDialogueViewPlugin, ExampleYarnSpinnerDialogueViewSystemSet,
-        SpeakerChangeEvent,
+        plugins::dialogueview::ExampleYarnSpinnerDialogueViewPlugin,
+        plugins::dialogueview::ExampleYarnSpinnerDialogueViewSystemSet,
+        plugins::dialogueview::SpeakerChangeEvent,
     };
 }
 

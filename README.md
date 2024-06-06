@@ -2,10 +2,10 @@
 
 ---
 
-## Filter out DX12 spam
+## Filter out DX12 spam with PowerShell
 
 ```pwsh
-cargo run 2>&1 | Out-String -Stream | Where-Object { $_ -notmatch "ID3D12Device::CreateCommittedResource:" }
+cargo run 2>&1 | Out-String -Stream | Where-Object { $_ -notmatch "ID3D12Device::CreateCommittedResource:" -and $_ -notmatch "Live Object at" }
 ```
 
 ## TODO
@@ -13,7 +13,7 @@ cargo run 2>&1 | Out-String -Stream | Where-Object { $_ -notmatch "ID3D12Device:
 - Use something to copy `dxil.dll` and `dxcompiler.dll` to Windows builds.
 - begin YarnSpinner integration
 - YarnSpinner+LDTK integration
-- sickle_ui 
+- sickle_ui
 
 ## Debugging Keyboard Shortcuts
 

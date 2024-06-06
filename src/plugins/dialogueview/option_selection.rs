@@ -1,10 +1,16 @@
-use crate::setup::{spawn_options, DialogueNode, OptionButton, OptionsNode, UiRootNode};
-use crate::typewriter::{self, Typewriter, TypewriterFinishedEvent};
+use plugins::dialogueview::setup::{
+    spawn_options,
+    DialogueNode,
+    OptionButton,
+    OptionsNode,
+    UiRootNode,
+};
+use crate::typewriter::{ self, Typewriter, TypewriterFinishedEvent };
 use crate::ExampleYarnSpinnerDialogueViewSystemSet;
 use bevy::prelude::*;
 use bevy::utils::HashMap;
 use bevy::window::PrimaryWindow;
-use bevy_yarnspinner::{events::*, prelude::*};
+use bevy_yarnspinner::{ events::*, prelude::* };
 
 pub(crate) fn option_selection_plugin(app: &mut App) {
     app.add_systems(
@@ -14,17 +20,15 @@ pub(crate) fn option_selection_plugin(app: &mut App) {
             show_options,
             select_option
                 .run_if(
-                    resource_exists::<OptionSelection>
-                        .and_then(any_with_component::<PrimaryWindow>),
+                    resource_exists::<OptionSelection>.and_then(any_with_component::<PrimaryWindow>)
                 )
                 .before(typewriter::despawn),
             despawn_options,
         )
             .chain()
             .after(YarnSpinnerSystemSet)
-            .in_set(ExampleYarnSpinnerDialogueViewSystemSet),
-    )
-    .add_event::<HasSelectedOptionEvent>();
+            .in_set(ExampleYarnSpinnerDialogueViewSystemSet)
+    ).add_event::<HasSelectedOptionEvent>();
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect, Event)]
@@ -51,7 +55,7 @@ fn create_options(
     mut commands: Commands,
     children: Query<&Children>,
     mut options_node: Query<(Entity, &mut Style, &mut Visibility), With<OptionsNode>>,
-    mut root_visibility: Query<&mut Visibility, (With<UiRootNode>, Without<OptionsNode>)>,
+    mut root_visibility: Query<&mut Visibility, (With<UiRootNode>, Without<OptionsNode>)>
 ) {
     let (entity, mut style, mut visibility) = options_node.single_mut();
     style.display = Display::Flex;
@@ -65,7 +69,7 @@ fn create_options(
 
 fn show_options(
     mut typewriter_finished_event: EventReader<TypewriterFinishedEvent>,
-    mut options_node: Query<&mut Visibility, With<OptionsNode>>,
+    mut options_node: Query<&mut Visibility, With<OptionsNode>>
 ) {
     for _event in typewriter_finished_event.read() {
         let mut visibility = options_node.single_mut();
@@ -78,21 +82,20 @@ fn select_option(
     typewriter: Res<Typewriter>,
     mut buttons: Query<
         (&Interaction, &OptionButton, &Children),
-        (With<Button>, Changed<Interaction>),
+        (With<Button>, Changed<Interaction>)
     >,
     mut dialogue_runners: Query<&mut DialogueRunner>,
     mut text: Query<&mut Text, Without<DialogueNode>>,
     option_selection: Res<OptionSelection>,
     mut windows: Query<&mut Window, With<PrimaryWindow>>,
-    mut selected_option_event: EventWriter<HasSelectedOptionEvent>,
+    mut selected_option_event: EventWriter<HasSelectedOptionEvent>
 ) {
     if !typewriter.is_finished() {
         return;
     }
 
     let mut selection = None;
-    let key_to_option: HashMap<_, _> = NUMBER_KEYS
-        .into_iter()
+    let key_to_option: HashMap<_, _> = NUMBER_KEYS.into_iter()
         .zip(NUMPAD_KEYS)
         .zip(option_selection.options.iter().map(|option| option.id))
         .collect();
@@ -113,7 +116,10 @@ fn select_option(
             _ => (Color::TOMATO, CursorIcon::Default),
         };
         window.cursor.icon = icon;
-        let text_entity = children.iter().find(|&e| text.contains(*e)).unwrap();
+        let text_entity = children
+            .iter()
+            .find(|&e| text.contains(*e))
+            .unwrap();
         let mut text = text.get_mut(*text_entity).unwrap();
         text.sections[1].style.color = color;
     }
@@ -134,7 +140,7 @@ fn despawn_options(
     mut commands: Commands,
     mut options_node: Query<(Entity, &mut Style, &mut Visibility), With<OptionsNode>>,
     mut dialogue_node_text: Query<&mut Text, With<DialogueNode>>,
-    mut root_visibility: Query<&mut Visibility, (With<UiRootNode>, Without<OptionsNode>)>,
+    mut root_visibility: Query<&mut Visibility, (With<UiRootNode>, Without<OptionsNode>)>
 ) {
     let should_despawn =
         !has_selected_option_event.is_empty() || !dialogue_complete_event.is_empty();
