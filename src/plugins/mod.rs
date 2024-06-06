@@ -1,5 +1,6 @@
 pub(crate) mod splashscreen;
-pub(crate) mod dialogueview;
+// Argh
+//pub(crate) mod dialogueview;
 
 #[cfg(debug_assertions)]
 pub(crate) mod debug;

@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 
-const GRAVITY: f32 = 19.61;
 const TILE_SIZE: f32 = 32.0;
 
 // 💀 Zone

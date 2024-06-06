@@ -10,6 +10,24 @@ use std::env;
 
 use bevy::render::settings::WgpuSettings;
 use bevy::render::RenderPlugin;
+use sickle_ui::{
+    dev_panels::{
+        hierarchy::{ HierarchyTreeViewPlugin, UiHierarchyExt },
+        scene_view::{ SceneView, SceneViewPlugin, SpawnSceneViewPreUpdate, UiSceneViewExt },
+    },
+    ui_builder::{ UiBuilderExt, UiContextRoot, UiRoot },
+    ui_commands::{ SetCursorExt, SetTextExt as _ },
+    ui_style::{
+        SetBackgroundColorExt,
+        SetNodeHeightExt,
+        SetNodePositionTypeExt as _,
+        SetNodeRightExt as _,
+        SetNodeTopExt as _,
+        SetNodeWidthExt,
+    },
+    widgets::{ prelude::*, tab_container::UiTabContainerSubExt, WidgetLibraryUpdate },
+    SickleUiPlugin,
+};
 use wgpu::Backends;
 
 mod components;
@@ -20,7 +38,40 @@ use bevy_tweening::*;
 // Steamworks
 use bevy_steamworks::*;
 
+/// ⚠️ UI TEST ⚠️
+fn spawn_simple_widget(mut commands: Commands) {
+    // Let's create a simple column widget on the screen.
+    commands.ui_builder(UiRoot).column(|column| {
+        // We can style our widget directly in code using the style method.
+        column
+            .style()
+            // The column will be located 100 pixels from the right and 100 pixels from the top of the screen.
+            // The absolute position means we are not set relative to any parent.
+            .position_type(PositionType::Absolute)
+            .right(Val::Px(100.0))
+            .top(Val::Px(100.0))
+            // We'll bound the height of our column to the total height of our contents.
+            // By default, a column will be 100% of the parent's height which would be the entire length of the screen.,
+            .height(Val::Auto)
+            // Lets give it a visible background color.
+            .background_color(Color::rgb(0.5, 0.5, 0.5));
+        // Let's add some content to our column.
+        column
+            .label(LabelConfig::default())
+            .entity_commands()
+            // We can use the set_text method to set the text of a label.
+            .set_text("This is label 1.", None);
+
+        column
+            .label(LabelConfig::default())
+            .entity_commands()
+            .set_text("This is another label.", None);
+    });
+}
+/// END OF UI TEST ⚠️
+
 // Used for setting the Window icon
+
 use bevy::winit::WinitWindows;
 use winit::window::Icon;
 
@@ -177,6 +228,8 @@ fn main() {
             plugins::debug::plugin,
         ))
         .add_systems(Startup, set_window_icon) // Set the Window icon.
+        // UI TESTING ⚠️
+        .add_systems(Startup, spawn_simple_widget)
         .insert_resource(GlobalVolume::new(0.2)) // Set the GlobalVolume ⚠️ WIP
         .add_systems(Startup, change_global_volume); // Change the GlobalVolume ⚠️ WIP
     //.add_systems(Startup, play_2d_spatial_audio);
