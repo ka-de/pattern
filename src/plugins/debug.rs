@@ -5,12 +5,11 @@ use bevy::input::common_conditions::input_toggle_active;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 pub(crate) fn plugin(app: &mut bevy::app::App) {
-    
     app.add_plugins((
         // FrameTimeDiagnosticsPlugin
         bevy::diagnostic::FrameTimeDiagnosticsPlugin,
         // LogDiagnosticsPlugin
-        bevy::diagnostic::LogDiagnosticsPlugin::default(),
+        //bevy::diagnostic::LogDiagnosticsPlugin::default(),
         // EntityCountDiagnosticsPlugin
         bevy::diagnostic::EntityCountDiagnosticsPlugin::default(),
         // SystemInformationDiagnosticsPlugin
