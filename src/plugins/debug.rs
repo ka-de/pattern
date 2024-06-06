@@ -16,8 +16,6 @@ pub(crate) fn plugin(app: &mut bevy::app::App) {
         //bevy::diagnostic::SystemInformationDiagnosticsPlugin::default(),
         // WorldInspectorPlugin
         WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::F11)),
-        // PerformanceUI
-        crate::components::perfui::setup_perf_ui,
     ));
 }
 
