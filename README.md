@@ -2,6 +2,10 @@
 
 ---
 
+## TODO
+
+- Use something to copy `dxil.dll` and `dxcompiler.dll` to Windows builds.
+
 ## Debugging Keyboard Shortcuts
 
 | Action                         | KeyCode |
