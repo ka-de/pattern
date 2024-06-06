@@ -14,13 +14,13 @@ use crate::components::ladders::Climber;
 
 #[derive(Resource, Default)]
 pub(crate) struct KeyPressState {
-    counts: HashMap<KeyCode, u32>,
-    last_pressed: HashMap<KeyCode, bool>,
+    pub(crate) counts: HashMap<KeyCode, u32>,
+    pub(crate) last_pressed: HashMap<KeyCode, bool>,
 }
 
 #[derive(Resource, Default)]
 pub(crate) struct KeyPressTimers {
-    timers: HashMap<KeyCode, Stopwatch>,
+    pub(crate) timers: HashMap<KeyCode, Stopwatch>,
 }
 
 pub(crate) fn movement(

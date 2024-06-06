@@ -1,7 +1,6 @@
 pub(crate) mod animals;
 #[cfg(debug_assertions)]
 pub(crate) mod perfui;
-pub(crate) mod ui;
 pub(crate) mod deathzone;
 pub(crate) mod misc;
 pub(crate) mod systems;

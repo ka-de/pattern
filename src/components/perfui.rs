@@ -1,12 +1,12 @@
-use super::ui::{ SpaceKeyPressCount, TimeSinceLastKeypress };
-
+use crate::plugins::input::{ KeyPressState, KeyPressTimers };
 use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
 use bevy::prelude::*;
 use perf_ui::prelude::*;
+use std::collections::HashMap;
 
 #[derive(Component)]
-struct PerfUiTimeSinceLastKeypress {
+struct PerfUiKeyPressTimers {
     label: String,
     display_units: bool,
     threshold_highlight: Option<f32>,
@@ -16,9 +16,9 @@ struct PerfUiTimeSinceLastKeypress {
     sort_key: i32,
 }
 
-impl Default for PerfUiTimeSinceLastKeypress {
+impl Default for PerfUiKeyPressTimers {
     fn default() -> Self {
-        PerfUiTimeSinceLastKeypress {
+        PerfUiKeyPressTimers {
             label: String::new(),
             display_units: true,
             threshold_highlight: Some(10.0),
@@ -30,9 +30,9 @@ impl Default for PerfUiTimeSinceLastKeypress {
     }
 }
 
-impl PerfUiEntry for PerfUiTimeSinceLastKeypress {
-    type Value = f64;
-    type SystemParam = (SRes<Time>, SRes<TimeSinceLastKeypress>);
+impl PerfUiEntry for PerfUiKeyPressTimers {
+    type Value = HashMap<KeyCode, f64>;
+    type SystemParam = SRes<KeyPressTimers>;
 
     fn label(&self) -> &str {
         if self.label.is_empty() { "Time since last key press" } else { &self.label }
@@ -44,18 +44,29 @@ impl PerfUiEntry for PerfUiTimeSinceLastKeypress {
 
     fn update_value(
         &self,
-        (time, lastkeypress): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>
+        key_press_timers: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>
     ) -> Option<Self::Value> {
-        let d = time.elapsed() - lastkeypress.last_keypress;
-        Some(d.as_secs_f64())
+        let mut times = HashMap::new();
+        for (key_code, timer) in &key_press_timers.timers {
+            times.insert(*key_code, timer.elapsed_secs().into());
+        }
+        Some(times)
     }
 
     fn format_value(&self, value: &Self::Value) -> String {
-        let mut s = perf_ui::utils::format_pretty_float(self.digits, self.precision, *value);
-        if self.display_units {
-            s.push_str(" s");
+        let mut output = String::new();
+        for (key_code, time) in value {
+            let mut time_str = perf_ui::utils::format_pretty_float(
+                self.digits,
+                self.precision,
+                *time
+            );
+            if self.display_units {
+                time_str.push_str(" s");
+            }
+            output.push_str(&format!("{:?}: {time_str}\n", key_code));
         }
-        s
+        output
     }
 
     fn width_hint(&self) -> usize {
@@ -67,36 +78,36 @@ impl PerfUiEntry for PerfUiTimeSinceLastKeypress {
         }
     }
 
-    fn value_color(&self, value: &Self::Value) -> Option<Color> {
-        self.color_gradient.get_color_for_value(*value as f32)
+    fn value_color(&self, _value: &Self::Value) -> Option<Color> {
+        None
     }
 
-    fn value_highlight(&self, value: &Self::Value) -> bool {
-        self.threshold_highlight.is_some_and(|t| (*value as f32) > t)
+    fn value_highlight(&self, _value: &Self::Value) -> bool {
+        false
     }
 }
 
 #[derive(Component)]
-struct PerfUiSpaceKeyPressCount {
+struct PerfUiKeyPressCounts {
     label: String,
     sort_key: i32,
 }
 
-impl Default for PerfUiSpaceKeyPressCount {
+impl Default for PerfUiKeyPressCounts {
     fn default() -> Self {
-        PerfUiSpaceKeyPressCount {
+        PerfUiKeyPressCounts {
             label: String::new(),
             sort_key: perf_ui::utils::next_sort_key(),
         }
     }
 }
 
-impl PerfUiEntry for PerfUiSpaceKeyPressCount {
-    type Value = u32;
-    type SystemParam = SRes<SpaceKeyPressCount>;
+impl PerfUiEntry for PerfUiKeyPressCounts {
+    type Value = HashMap<KeyCode, u32>;
+    type SystemParam = SRes<KeyPressState>;
 
     fn label(&self) -> &str {
-        if self.label.is_empty() { "Space key press count" } else { &self.label }
+        if self.label.is_empty() { "Key press counts" } else { &self.label }
     }
 
     fn sort_key(&self) -> i32 {
@@ -105,17 +116,29 @@ impl PerfUiEntry for PerfUiSpaceKeyPressCount {
 
     fn update_value(
         &self,
-        space_key_press_count: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>
+        key_press_state: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>
     ) -> Option<Self::Value> {
-        Some(space_key_press_count.count)
+        Some(key_press_state.counts.clone())
     }
 
     fn format_value(&self, value: &Self::Value) -> String {
-        format!("{value}")
+        let mut output = String::new();
+        for (key_code, count) in value {
+            output.push_str(&format!("{:?}: {count}\n", key_code));
+        }
+        output
     }
 
     fn width_hint(&self) -> usize {
         10
+    }
+
+    fn value_color(&self, _value: &Self::Value) -> Option<Color> {
+        None
+    }
+
+    fn value_highlight(&self, _value: &Self::Value) -> bool {
+        false
     }
 }
 
@@ -129,14 +152,14 @@ fn setup_perfui(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         },
         PerfUiEntryFPS::default(),
-        PerfUiTimeSinceLastKeypress::default(),
-        PerfUiSpaceKeyPressCount::default(),
+        PerfUiKeyPressTimers::default(),
+        PerfUiKeyPressCounts::default(),
     ));
 }
 
 pub fn setup_perf_ui(app: &mut App) {
     app.add_plugins(PerfUiPlugin)
-    .add_perf_ui_entry_type::<PerfUiTimeSinceLastKeypress>()
-    .add_perf_ui_entry_type::<PerfUiSpaceKeyPressCount>()
-    .add_systems(PreStartup, setup_perfui);
+        .add_perf_ui_entry_type::<PerfUiKeyPressTimers>()
+        .add_perf_ui_entry_type::<PerfUiKeyPressCounts>()
+        .add_systems(PreStartup, setup_perfui);
 }
