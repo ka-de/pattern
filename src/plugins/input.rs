@@ -1,7 +1,8 @@
-use bevy::{ input::keyboard::KeyboardInput, time::Stopwatch };
+use bevy::input::keyboard::KeyboardInput;
 use bevy::input::ButtonState;
 use bevy::prelude::*;
 use std::collections::HashMap;
+use std::time::Instant;
 use bevy::{
     ecs::{ query::With, system::Query, system::Res },
     input::{ keyboard::KeyCode, ButtonInput },
@@ -12,16 +13,16 @@ use crate::components::ground::GroundDetection;
 use crate::components::player::Player;
 use crate::components::ladders::Climber;
 
-#[derive(Resource, Default)]
+use super::{ gamestate::GameState, dialogueview::not_in_dialogue };
+
+#[derive(Debug)]
 pub(crate) struct KeyPressState {
-    pub(crate) counts: HashMap<KeyCode, u32>,
-    pub(crate) last_pressed: HashMap<KeyCode, bool>,
+    pub count: u32,
+    pub last_pressed: Instant,
 }
 
 #[derive(Resource, Default)]
-pub(crate) struct KeyPressTimers {
-    pub(crate) timers: HashMap<KeyCode, Stopwatch>,
-}
+pub(crate) struct KeyPressStates(pub HashMap<KeyCode, KeyPressState>);
 
 pub(crate) fn movement(
     input: Res<ButtonInput<KeyCode>>,
@@ -54,23 +55,29 @@ pub(crate) fn movement(
 }
 
 pub(crate) fn handle_keypress(
+    time: Res<Time<Real>>,
     mut keyboard_input: EventReader<KeyboardInput>,
-    mut key_press_state: ResMut<KeyPressState>,
-    mut key_press_timers: ResMut<KeyPressTimers>
+    mut key_press_states: ResMut<KeyPressStates>
 ) {
+    if keyboard_input.is_empty() {
+        return;
+    }
+    let now = time.last_update().unwrap_or(Instant::now());
     for event in keyboard_input.read() {
         let is_pressed = event.state == ButtonState::Pressed;
         let key_code = event.key_code;
-
-        if is_pressed && !key_press_state.last_pressed.contains_key(&key_code) {
-            *key_press_state.counts.entry(key_code).or_insert(0) += 1;
-            key_press_timers.timers
+        if is_pressed {
+            key_press_states.0
                 .entry(key_code)
-                .or_insert_with(|| Stopwatch::new())
-                .reset();
+                .and_modify(|state| {
+                    state.count += 1;
+                    state.last_pressed = now;
+                })
+                .or_insert_with(|| KeyPressState {
+                    count: 0,
+                    last_pressed: now,
+                });
         }
-
-        key_press_state.last_pressed.insert(key_code, is_pressed);
     }
 }
 
@@ -78,8 +85,12 @@ pub struct InputPlugin;
 
 impl Plugin for InputPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<KeyPressState>()
-            .init_resource::<KeyPressTimers>()
-            .add_systems(Update, (handle_keypress, movement).chain());
+        app.init_resource::<KeyPressStates>().add_systems(
+            Update,
+            (
+                handle_keypress,
+                movement.run_if(not_in_dialogue.and_then(in_state(GameState::Playing))),
+            ).chain()
+        );
     }
 }

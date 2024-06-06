@@ -5,7 +5,7 @@ use super::{
     patrol::patrol,
     player::Player,
 };
-use crate::plugins::{ dialogueview::not_in_dialogue, gamestate::GameState, input::movement };
+use crate::plugins::gamestate::GameState;
 
 use std::collections::{ HashMap, HashSet };
 
@@ -26,7 +26,6 @@ pub fn setup_ldtk(app: &mut App) {
             Update,
             (
                 spawn_wall_collision,
-                movement.run_if(not_in_dialogue),
                 detect_climb_range,
                 ignore_gravity_if_climbing,
                 patrol,
