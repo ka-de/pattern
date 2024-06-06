@@ -20,7 +20,7 @@
 #![warn(missing_docs, missing_debug_implementations)]
 
 use bevy::prelude::*;
-use bevy_yarnspinner::prelude::{ YarnFileSource, YarnSpinnerPlugin };
+use bevy_yarnspinner::prelude::{ YarnFileSource, YarnSpinnerPlugin, YarnProject };
 pub use updating::SpeakerChangeEvent;
 
 pub mod prelude {
@@ -57,6 +57,24 @@ impl Plugin for YarnSpinnerDialogueViewPlugin {
             .add_plugins(setup::ui_setup_plugin)
             .add_plugins(updating::ui_updating_plugin)
             .add_plugins(typewriter::typewriter_plugin)
-            .add_plugins(option_selection::option_selection_plugin);
+            .add_plugins(option_selection::option_selection_plugin)
+            .add_systems(
+                Update,
+                // Spawn the dialogue runner once the Yarn project has finished compiling
+                spawn_dialogue_runner.run_if(
+                    in_state(crate::plugins::gamestate::GameState::Playing).and_then(
+                        resource_added::<YarnProject>
+                    )
+                )
+            );
     }
+}
+
+fn spawn_dialogue_runner(mut commands: Commands, project: Res<YarnProject>) {
+    warn!("Starting dialogue");
+    // Create a dialogue runner from the project.
+    let mut dialogue_runner = project.create_dialogue_runner();
+    // Immediately start showing the dialogue to the player
+    dialogue_runner.start_node("Start");
+    commands.spawn(dialogue_runner);
 }
