@@ -15,7 +15,7 @@ use sickle_ui::{
         hierarchy::{ HierarchyTreeViewPlugin, UiHierarchyExt },
         scene_view::{ SceneView, SceneViewPlugin, SpawnSceneViewPreUpdate, UiSceneViewExt },
     },
-    ui_builder::{ UiBuilderExt, UiContextRoot, UiRoot },
+    ui_builder::{ UiBuilder, UiBuilderExt, UiContextRoot, UiRoot },
     ui_commands::{ SetCursorExt, SetTextExt as _ },
     ui_style::{
         SetBackgroundColorExt,
@@ -38,8 +38,24 @@ use bevy_tweening::*;
 // Steamworks
 use bevy_steamworks::*;
 
-/// ⚠️ UI TEST ⚠️
-fn spawn_simple_widget(mut commands: Commands) {
+// ⚠️ UI TEST ⚠️
+//
+// BannerWidget
+#[derive(Component)]
+struct BannerWidget;
+
+pub trait UiBannerWidgetExt<'w, 's> {
+    fn banner_widget<'a>(&'a mut self) -> UiBuilder<'w, 's, 'a, Entity>;
+}
+
+impl<'w, 's> UiBannerWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
+    fn banner_widget<'a>(&'a mut self) -> UiBuilder<'w, 's, 'a, Entity> {
+        self.spawn((NodeBundle::default(), BannerWidget))
+    }
+}
+
+// Prints out release or debug build on the UI.
+fn release_label(mut commands: Commands) {
     // Let's create a simple column widget on the screen.
     commands.ui_builder(UiRoot).column(|column| {
         // We can style our widget directly in code using the style method.
@@ -233,7 +249,8 @@ fn main() {
         ))
         .add_systems(Startup, set_window_icon) // Set the Window icon.
         // UI TESTING ⚠️
-        .add_systems(Startup, spawn_simple_widget)
+        .add_systems(Startup, release_label) // Prints out release or debug mode in the UI.
+        // AUDIO TESTING ⚠️
         .insert_resource(GlobalVolume::new(0.2)) // Set the GlobalVolume ⚠️ WIP
         .add_systems(Startup, change_global_volume); // Change the GlobalVolume ⚠️ WIP
     //.add_systems(Startup, play_2d_spatial_audio);
