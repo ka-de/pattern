@@ -17,11 +17,37 @@ mod plugins;
 
 use bevy::prelude::*;
 use bevy_tweening::*;
+// Steamworks
 use bevy_steamworks::*;
 
+// Used for setting the Window icon
+use bevy::winit::WinitWindows;
+use winit::window::Icon;
+
 // ⚠️ TODO: This will need to get eventually removed from main.
+// RANDOM GAMEPLAY COMPONENTS
 // use components::player::Player;
 use components::torch::Torch;
+
+fn set_window_icon(
+    // we have to use `NonSend` here
+    windows: NonSend<WinitWindows>
+) {
+    // here we use the `image` crate to load our icon data from a png file
+    // this is not a very bevy-native solution, but it will do
+    let (icon_rgba, icon_width, icon_height) = {
+        let image = image::open("assets/icon.png").expect("Failed to open icon path").into_rgba8();
+        let (width, height) = image.dimensions();
+        let rgba = image.into_raw();
+        (rgba, width, height)
+    };
+    let icon = Icon::from_rgba(icon_rgba, icon_width, icon_height).unwrap();
+
+    // do it for all windows
+    for window in windows.windows.values() {
+        window.set_window_icon(Some(icon.clone()));
+    }
+}
 
 // ⚠️ TODO: Move audio stuff to its own thing
 use bevy::audio::{ SpatialScale, AudioPlugin };
@@ -150,8 +176,9 @@ fn main() {
             components::systems::setup_ldtk,
             plugins::debug::plugin,
         ))
-        .insert_resource(GlobalVolume::new(0.2))
-        .add_systems(Startup, change_global_volume);
+        .add_systems(Startup, set_window_icon) // Set the Window icon.
+        .insert_resource(GlobalVolume::new(0.2)) // Set the GlobalVolume ⚠️ WIP
+        .add_systems(Startup, change_global_volume); // Change the GlobalVolume ⚠️ WIP
     //.add_systems(Startup, play_2d_spatial_audio);
 
     app.run();
