@@ -5,6 +5,21 @@ use bevy::prelude::*;
 use bevy::utils::Duration;
 
 #[derive(Resource, Default)]
+struct EKeyPressState {
+    last_pressed: bool,
+}
+
+#[derive(Resource, Default)]
+pub struct EKeyPressCount {
+    pub count: u32,
+}
+
+#[derive(Resource, Default)]
+struct SpaceKeyPressState {
+    last_pressed: bool,
+}
+
+#[derive(Resource, Default)]
 pub struct SpaceKeyPressCount {
     pub count: u32,
 }
@@ -20,7 +35,9 @@ fn handle_keypress(
     mut lastkeypress: ResMut<TimeSinceLastKeypress>,
     mut evr_keyboard: EventReader<KeyboardInput>,
     mut space_key_press_count: ResMut<SpaceKeyPressCount>,
-    mut space_key_press_state: ResMut<SpaceKeyPressState>
+    mut space_key_press_state: ResMut<SpaceKeyPressState>,
+    mut e_key_press_count: ResMut<EKeyPressCount>,
+    mut e_key_press_state: ResMut<EKeyPressState>
 ) {
     // Iterate through all keyboard input events.
     for ev in evr_keyboard.read() {
@@ -32,28 +49,27 @@ fn handle_keypress(
             // If the space bar is pressed and it was not already pressed,
             // update the last key press time, increment the count, and set the state to pressed.
             if ev.state == ButtonState::Pressed && !space_key_press_state.last_pressed {
-                lastkeypress.last_keypress = time.elapsed();
                 space_key_press_count.count += 1;
                 space_key_press_state.last_pressed = true;
-            } else if
-                // If the space bar is released, set the state to not pressed.
-                ev.state == ButtonState::Released
-            {
+            } else if ev.state == ButtonState::Released {
                 space_key_press_state.last_pressed = false;
+            }
+        } else if ev.key_code == KeyCode::KeyE {
+            if ev.state == ButtonState::Pressed && !space_key_press_state.last_pressed {
+                e_key_press_count.count += 1;
+                e_key_press_state.last_pressed = true;
+            } else if ev.state == ButtonState::Released {
+                e_key_press_state.last_pressed = false;
             }
         }
     }
-}
-
-// Struct for tracking if the Space key is being held.
-#[derive(Resource, Default)]
-struct SpaceKeyPressState {
-    last_pressed: bool,
 }
 
 pub fn setup_ui(app: &mut App) {
     app.init_resource::<TimeSinceLastKeypress>()
         .init_resource::<SpaceKeyPressCount>()
         .init_resource::<SpaceKeyPressState>()
+        .init_resource::<EKeyPressCount>()
+        .init_resource::<EKeyPressState>()
         .add_systems(Update, handle_keypress);
 }

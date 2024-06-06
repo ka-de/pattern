@@ -19,7 +19,6 @@ pub(crate) mod armor;
 pub(crate) mod torch;
 pub(crate) mod enemy;
 pub(crate) mod patrol;
-pub(crate) mod input;
 pub(crate) mod animation;
 
 use crate::components::health::Health;

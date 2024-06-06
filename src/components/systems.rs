@@ -1,15 +1,11 @@
 use super::{
-    input::movement,
     items::Items,
     ladders::{ Climbable, Climber },
     misc::*,
     patrol::patrol,
     player::Player,
 };
-use crate::plugins::{
-    dialogueview::not_in_dialogue,
-    gamestate::GameState
-};
+use crate::plugins::{ dialogueview::not_in_dialogue, gamestate::GameState, input::movement };
 
 use std::collections::{ HashMap, HashSet };
 
