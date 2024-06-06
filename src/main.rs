@@ -8,6 +8,7 @@
 // Provides functions to read and manipulate environment variables.
 use std::env;
 
+use bevy::ecs::system::EntityCommands;
 use bevy::{ ecs::system::EntityCommand, render::settings::WgpuSettings };
 use bevy::render::RenderPlugin;
 use sickle_ui::{
@@ -41,8 +42,9 @@ use bevy_tweening::*;
 // Steamworks
 use bevy_steamworks::*;
 
+/////////////////////////////////////////////////////////////////////////////
 /// ⚠️ UI TEST ⚠️
-///////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
 /// SetFont
 struct SetFont(String, f32, Color);
@@ -115,7 +117,32 @@ impl<'w, 's> UiBannerWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
     }
 }
 
-// Prints out release or debug build on the UI.
+/// BannerWidgetCommands
+///
+/// An extension trait that exposes the SetFont command.
+pub trait BannerWidgetCommands<'a> {
+    fn font(
+        &'a mut self,
+        font: impl Into<String>,
+        size: f32,
+        color: Color
+    ) -> &mut EntityCommands<'a>;
+}
+
+impl<'a> BannerWidgetCommands<'a> for EntityCommands<'a> {
+    fn font(
+        &'a mut self,
+        font: impl Into<String>,
+        size: f32,
+        color: Color
+    ) -> &mut EntityCommands<'a> {
+        self.add(SetFont(font.into(), size, color))
+    }
+}
+
+/// release_label
+///
+/// Prints out release or debug build on the UI.
 fn release_label(mut commands: Commands) {
     // Let's create a simple column widget on the screen.
     commands.ui_builder(UiRoot).column(|column| {
@@ -149,9 +176,9 @@ fn release_label(mut commands: Commands) {
     });
 }
 /// END OF UI TEST ⚠️
+/////////////////////////////////////////////////////////////////////////////
 
 // Used for setting the Window icon
-
 use bevy::winit::WinitWindows;
 use winit::window::Icon;
 
