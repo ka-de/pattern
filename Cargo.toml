@@ -26,7 +26,6 @@ rand = "0.8.5"
 bevy_rapier2d = { version = "0.26.0", features = ["simd-stable"] }
 sickle_ui = { git = "https://github.com/ka-de/sickle_ui" }
 bevy_yarnspinner = { git = "https://github.com/ka-de/YarnSpinner-Rust" }
-bevy_yarnspinner_example_dialogue_view = { git = "https://github.com/ka-de/YarnSpinner-Rust" }
 wgpu = { version = "0.19.3", default-features = false, features = [
   "wgsl",
   "dx12",
