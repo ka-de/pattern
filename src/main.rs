@@ -172,7 +172,7 @@ fn release_label(mut commands: Commands) {
     commands
         .ui_builder(UiRoot)
         .banner_widget(
-            BannerWidgetConfig::from("ALPHA RELEASE BUILD", "fonts\\bahnschrift.ttf", 8.0)
+            BannerWidgetConfig::from("ALPHA RELEASE BUILD", "fonts/bahnschrift.ttf", 8.0)
         )
         .style()
         .left(Val::Px(100.0))
