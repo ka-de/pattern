@@ -3,11 +3,12 @@ use sickle_ui::{
     ui_builder::{ UiBuilder, UiBuilderExt, UiRoot },
     ui_commands::SetTextExt,
     ui_style::{
-        SetBackgroundColorExt,
-        SetNodeBottomExt,
+        //SetBackgroundColorExt,
+        //SetNodeBottomExt,
         SetNodeJustifyContentsExt,
         SetNodePositionTypeExt,
         SetNodeRightExt,
+        SetNodeTopExt,
     },
     widgets::{ container::UiContainerExt, label::{ LabelConfig, UiLabelExt } },
 };
@@ -32,14 +33,13 @@ impl<'w, 's> UiFPSWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
             fps.style()
                 .position_type(PositionType::Absolute)
                 .right(Val::Px(10.0))
-                .bottom(Val::Px(10.0))
-                .justify_content(JustifyContent::Center)
-                .background_color(Color::BLACK);
+                .top(Val::Px(10.0))
+                .justify_content(JustifyContent::Center);
 
             let mut label = fps.label(LabelConfig::default());
 
             // No fancy styling in this example.
-            label.entity_commands().insert(FpsText).set_text("FPS: 0".to_string(), None);
+            label.entity_commands().insert(FpsText).set_text("0".to_string(), None);
         })
     }
 }
@@ -75,10 +75,10 @@ fn update_fps(
 
         let text_style = TextStyle {
             font: asset_server.load("fonts/bahnschrift.ttf"),
-            font_size: 60.0,
+            font_size: 12.0,
             color: text_color,
         };
 
-        commands.entity(label).set_text(format!("FPS: {:3.0}", smoothed_fps), text_style.into());
+        commands.entity(label).set_text(format!("{:3.0}", smoothed_fps), text_style.into());
     }
 }
