@@ -19,5 +19,7 @@ pub(crate) mod patrol;
 pub(crate) mod animation;
 pub(crate) mod npc;
 pub(crate) mod pumpkins;
+pub(crate) mod wall;
+pub(crate) mod chest;
 
 use crate::components::health::Health;
