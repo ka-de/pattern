@@ -3,7 +3,7 @@ use sickle_ui::{
     ui_builder::{ UiBuilder, UiBuilderExt, UiRoot },
     ui_commands::SetTextExt,
     ui_style::{
-        //SetBackgroundColorExt,
+        SetBackgroundColorExt,
         //SetNodeBottomExt,
         SetNodeJustifyContentsExt,
         SetNodePositionTypeExt,
@@ -34,7 +34,8 @@ impl<'w, 's> UiFPSWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
                 .position_type(PositionType::Absolute)
                 .right(Val::Px(10.0))
                 .top(Val::Px(10.0))
-                .justify_content(JustifyContent::Center);
+                .justify_content(JustifyContent::Center)
+                .background_color(Color::NONE);
 
             let mut label = fps.label(LabelConfig::default());
 
