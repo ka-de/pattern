@@ -22,7 +22,6 @@ pub fn setup_ldtk(app: &mut App) {
         .register_ldtk_entity::<super::enemy::MobBundle>("Mob")
         .register_ldtk_entity::<super::chest::ChestBundle>("Chest")
         .register_ldtk_entity::<super::pumpkins::PumpkinsBundle>("Pumpkins")
-        .register_ldtk_entity::<super::deathzone::DeathZoneBundle>("DeathZone")
         .add_systems(
             Update,
             (
@@ -38,7 +37,6 @@ pub fn setup_ldtk(app: &mut App) {
                 super::ground::update_on_ground,
                 restart_level,
                 respawn_world,
-                super::deathzone::detect_death_zone_collision,
             ).run_if(in_state(GameState::Playing))
         )
         .add_plugins((LdtkPlugin, RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0)));

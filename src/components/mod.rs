@@ -1,5 +1,4 @@
 pub(crate) mod animals;
-pub(crate) mod deathzone;
 pub(crate) mod systems;
 pub(crate) mod health;
 pub(crate) mod ladders;
