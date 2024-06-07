@@ -12,12 +12,13 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 pub fn setup_ldtk(app: &mut App) {
-    app.register_ldtk_int_cell::<super::misc::WallBundle>(1)
+    app.register_ldtk_int_cell::<super::wall::WallBundle>(1)
         .register_ldtk_int_cell::<super::ladders::LadderBundle>(2)
-        .register_ldtk_int_cell::<super::misc::WallBundle>(3)
+        .register_ldtk_int_cell::<super::wall::WallBundle>(3)
         .register_ldtk_entity::<super::torch::TorchBundle>("Torch")
         .register_ldtk_entity::<super::player::PlayerBundle>("Player")
         .register_ldtk_entity::<super::npc::NpcBundle>("Npc")
+        .register_ldtk_entity::<super::npc::NpcPatrolBundle>("Npc")
         .register_ldtk_entity::<super::enemy::MobBundle>("Mob")
         .register_ldtk_entity::<super::chest::ChestBundle>("Chest")
         .register_ldtk_entity::<super::pumpkins::PumpkinsBundle>("Pumpkins")
