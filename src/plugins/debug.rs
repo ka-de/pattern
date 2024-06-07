@@ -6,14 +6,7 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 pub(crate) fn plugin(app: &mut bevy::app::App) {
     app.add_plugins((
-        // FrameTimeDiagnosticsPlugin
-        bevy::diagnostic::FrameTimeDiagnosticsPlugin,
-        // LogDiagnosticsPlugin
-        //bevy::diagnostic::LogDiagnosticsPlugin::default(),
-        // EntityCountDiagnosticsPlugin
-        //bevy::diagnostic::EntityCountDiagnosticsPlugin::default(),
-        // SystemInformationDiagnosticsPlugin
-        //bevy::diagnostic::SystemInformationDiagnosticsPlugin::default(),
+        // FPSWidget
         // WorldInspectorPlugin
         WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::F11)),
     ));

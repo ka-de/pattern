@@ -8,28 +8,9 @@
 // Provides functions to read and manipulate environment variables.
 use std::env;
 
-use bevy::ecs::system::EntityCommands;
-use bevy::{ ecs::system::EntityCommand, render::settings::WgpuSettings };
+use bevy::render::settings::WgpuSettings;
 use bevy::render::RenderPlugin;
 use wgpu::Backends;
-
-/// ⚠️ UI STUFF
-use sickle_ui::ui_style::{ SetNodeBottomExt as _, SetNodeLeftExt as _ };
-use sickle_ui::{
-    ui_builder::{ UiBuilder, UiBuilderExt, UiRoot },
-    ui_commands::SetTextExt as _,
-    ui_style::{
-        SetImageExt as _,
-        SetNodeAlignSelfExt as _,
-        SetNodeHeightExt,
-        SetNodeJustifyContentsExt as _,
-        SetNodePositionTypeExt as _,
-        SetNodeTopExt as _,
-        SetNodeWidthExt,
-    },
-    widgets::prelude::*,
-};
-/// ⚠️ END OF UI STUFF
 
 mod components;
 mod plugins;
@@ -38,148 +19,6 @@ use bevy::prelude::*;
 use bevy_tweening::*;
 // Steamworks
 use bevy_steamworks::*;
-
-/////////////////////////////////////////////////////////////////////////////
-/// ⚠️ UI TEST ⚠️
-/////////////////////////////////////////////////////////////////////////////
-
-/// SetFont
-struct SetFont(String, f32, Color);
-
-impl EntityCommand for SetFont {
-    fn apply(self, entity: Entity, world: &mut World) {
-        let asset_server = world.resource::<AssetServer>();
-        let font = asset_server.load(&self.0);
-
-        if let Some(mut text) = world.entity_mut(entity).get_mut::<Text>() {
-            for text_section in &mut text.sections {
-                text_section.style.font = font.clone();
-                text_section.style.font_size = self.1;
-                text_section.style.color = self.2;
-            }
-        }
-    }
-}
-
-/// BannerWidget
-#[derive(Component)]
-pub struct BannerWidget;
-
-/// BannerLabel
-/// A marker component used internally to initialize the label font.
-#[derive(Component)]
-struct BannerLabel;
-
-/// BannerWidgetConfig
-pub struct BannerWidgetConfig {
-    pub label: String,
-    pub font: String,
-    pub font_size: f32,
-}
-
-impl BannerWidgetConfig {
-    pub fn from(
-        label: impl Into<String>,
-        font: impl Into<String>,
-        font_size: impl Into<f32>
-    ) -> Self {
-        Self {
-            label: label.into(),
-            font: font.into(),
-            font_size: font_size.into(),
-        }
-    }
-}
-
-pub trait UiBannerWidgetExt<'w, 's> {
-    fn banner_widget<'a>(&'a mut self, config: BannerWidgetConfig) -> UiBuilder<'w, 's, 'a, Entity>;
-}
-
-impl<'w, 's> UiBannerWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
-    fn banner_widget<'a>(
-        &'a mut self,
-        config: BannerWidgetConfig
-    ) -> UiBuilder<'w, 's, 'a, Entity> {
-        self.container((ImageBundle::default(), BannerWidget), |banner| {
-            banner
-                .style()
-                .position_type(PositionType::Absolute)
-                // Center the children (the label) horizontally.
-                .justify_content(JustifyContent::Center)
-                .width(Val::Px(100.0))
-                .height(Val::Px(12.0))
-                // Add a nice looking background image to our widget.
-                .image("ui/label_gradient_transparent.png");
-
-            // And we'll want a customizable label on the banner.
-            let mut label = banner.label(LabelConfig::default());
-
-            label
-                .style()
-                // Align the label relative to the top of the banner.
-                .align_self(AlignSelf::Start)
-                // Move us a few pixels down so we look nice relative to our font.
-                .top(Val::Px(3.0));
-
-            // We would like to set a default text style without having to pass in the AssetServer.
-            label
-                .entity_commands()
-                .insert(BannerLabel)
-                .set_text(config.label, None)
-                .font(config.font, config.font_size, Color::rgb(1.0, 1.0, 1.0));
-        })
-    }
-}
-
-/// BannerWidgetCommands
-///
-/// An extension trait that exposes the SetFont command.
-pub trait BannerWidgetCommands<'a> {
-    fn font(
-        &'a mut self,
-        font: impl Into<String>,
-        size: f32,
-        color: Color
-    ) -> &mut EntityCommands<'a>;
-}
-
-impl<'a> BannerWidgetCommands<'a> for EntityCommands<'a> {
-    fn font(
-        &'a mut self,
-        font: impl Into<String>,
-        size: f32,
-        color: Color
-    ) -> &mut EntityCommands<'a> {
-        self.add(SetFont(font.into(), size, color))
-    }
-}
-
-/// release_label
-///
-/// Prints out release or debug build on the UI.
-fn release_label(mut commands: Commands) {
-    // Print out "DEVELOPMENT BUILD" when not in release mode.
-    #[cfg(debug_assertions)]
-    commands
-        .ui_builder(UiRoot)
-        .banner_widget(BannerWidgetConfig::from("DEVELOPMENT BUILD", "fonts/bahnschrift.ttf", 8.0))
-        .style()
-        .left(Val::Px(100.0))
-        .bottom(Val::Px(100.0));
-    // ⚠️ TODO: This will have to go away from the actual release build
-    // Print out "ALPHA RELEASE BUILD" when in release mode.
-    #[cfg(not(debug_assertions))]
-    commands
-        .ui_builder(UiRoot)
-        .banner_widget(
-            BannerWidgetConfig::from("ALPHA RELEASE BUILD", "fonts/bahnschrift.ttf", 8.0)
-        )
-        .style()
-        .left(Val::Px(100.0))
-        .bottom(Val::Px(100.0));
-}
-/// END OF UI TEST ⚠️
-/////////////////////////////////////////////////////////////////////////////
 
 // Used for setting the Window icon
 use bevy::winit::WinitWindows;
@@ -339,8 +178,6 @@ fn main() {
             plugins::input::InputPlugin,
         ))
         .add_systems(Startup, set_window_icon) // Set the Window icon.
-        // UI TESTING ⚠️
-        .add_systems(Startup, release_label)
         // AUDIO TESTING ⚠️
         .insert_resource(GlobalVolume::new(0.2)) // Set the GlobalVolume ⚠️ WIP
         .add_systems(Startup, change_global_volume); // Change the GlobalVolume ⚠️ WIP
