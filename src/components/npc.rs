@@ -35,19 +35,3 @@ pub struct NpcPatrolBundle {
     #[ldtk_entity]
     pub patrol: Patrol,
 }
-
-pub fn print_npc_names(query: Query<(&Npc, &LdtkEntity)>) {
-    for (npc, ldtk_entity) in query.iter() {
-        if let Some(name) = ldtk_entity.custom_fields.get("name") {
-            println!("Npc name: {}", name);
-        }
-    }
-}
-
-pub fn print_npc_patrol_names(query: Query<(&NpcPatrol, &LdtkEntity)>) {
-    for (npc_patrol, ldtk_entity) in query.iter() {
-        if let Some(name) = ldtk_entity.custom_fields.get("name") {
-            println!("NpcPatrol name: {}", name);
-        }
-    }
-}

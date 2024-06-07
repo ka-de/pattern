@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
-use bevy_rapier2d::prelude::*;
+use bevy_rapier2d::{ prelude::*, rapier::geometry::InteractionGroups };
 
 #[derive(Clone, Default, Bundle, LdtkIntCell)]
 pub struct ColliderBundle {
@@ -11,6 +11,7 @@ pub struct ColliderBundle {
     pub gravity_scale: GravityScale,
     pub friction: Friction,
     pub density: ColliderMassProperties,
+    pub interaction_groups: InteractionGroupsComponent,
 }
 
 impl From<&EntityInstance> for ColliderBundle {
@@ -35,11 +36,27 @@ impl From<&EntityInstance> for ColliderBundle {
                     rotation_constraints,
                     ..Default::default()
                 },
+            "Npc" =>
+                ColliderBundle {
+                    collider: Collider::cuboid(5.0, 5.0),
+                    rigid_body: RigidBody::KinematicVelocityBased,
+                    rotation_constraints,
+                    density: ColliderMassProperties::Density(50.0),
+                    ..Default::default()
+                },
+            "NpcPatrol" =>
+                ColliderBundle {
+                    collider: Collider::cuboid(5.0, 5.0),
+                    rigid_body: RigidBody::KinematicVelocityBased,
+                    rotation_constraints,
+                    density: ColliderMassProperties::Density(50.0),
+                    ..Default::default()
+                },
             "Chest" =>
                 ColliderBundle {
                     collider: Collider::cuboid(8.0, 8.0),
                     rotation_constraints,
-                    density: ColliderMassProperties::Density(15.0),
+                    density: ColliderMassProperties::Density(50.0),
                     ..default()
                 },
             _ => {

@@ -22,7 +22,7 @@ pub fn patrol(mut query: Query<(&mut Transform, &mut Velocity, &mut Patrol)>) {
         }
 
         let mut new_velocity =
-            (patrol.points[patrol.index] - transform.translation.truncate()).normalize() * 75.0;
+            (patrol.points[patrol.index] - transform.translation.truncate()).normalize() * 20.0;
 
         if new_velocity.dot(velocity.linvel) < 0.0 {
             if patrol.index == 0 {
@@ -41,7 +41,7 @@ pub fn patrol(mut query: Query<(&mut Transform, &mut Velocity, &mut Patrol)>) {
             }
 
             new_velocity =
-                (patrol.points[patrol.index] - transform.translation.truncate()).normalize() * 75.0;
+                (patrol.points[patrol.index] - transform.translation.truncate()).normalize() * 20.0;
         }
 
         velocity.linvel = new_velocity;

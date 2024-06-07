@@ -182,6 +182,7 @@ fn main() {
         // AUDIO TESTING ⚠️
         .insert_resource(GlobalVolume::new(0.2)) // Set the GlobalVolume ⚠️ WIP
         .add_systems(Startup, change_global_volume); // Change the GlobalVolume ⚠️ WIP
+
     //.add_systems(Startup, play_2d_spatial_audio);
 
     app.run();
