@@ -4,7 +4,7 @@ use bevy::sprite::SpriteBundle;
 use bevy_ecs_ldtk::{ EntityInstance, LdtkEntity, Worldly };
 
 use super::armor::Armor;
-use super::Health;
+use super::health::Health;
 
 use super::{ ladders::Climber, collision::ColliderBundle, ground::GroundDetection, items::Items };
 
