@@ -21,7 +21,6 @@ impl From<&EntityInstance> for ColliderBundle {
             "Player" =>
                 ColliderBundle {
                     collider: Collider::cuboid(6.0, 14.0),
-                    rigid_body: RigidBody::Dynamic,
                     friction: Friction {
                         coefficient: 0.0,
                         combine_rule: CoefficientCombineRule::Min,
@@ -39,14 +38,21 @@ impl From<&EntityInstance> for ColliderBundle {
             "Chest" =>
                 ColliderBundle {
                     collider: Collider::cuboid(8.0, 8.0),
-                    rigid_body: RigidBody::Dynamic,
                     rotation_constraints,
-                    gravity_scale: GravityScale(1.0),
-                    friction: Friction::new(0.5),
                     density: ColliderMassProperties::Density(15.0),
-                    ..Default::default()
+                    ..default()
                 },
-            _ => ColliderBundle::default(),
+            _ => {
+                debug!("default ColliderBundle used for: {}", entity_instance.identifier);
+                ColliderBundle {
+                    collider: Collider::cuboid(
+                        (entity_instance.width as f32) / 2.0,
+                        (entity_instance.height as f32) / 2.0
+                    ),
+                    rotation_constraints,
+                    ..default()
+                }
+            }
         }
     }
 }
