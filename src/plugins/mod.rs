@@ -3,6 +3,7 @@ pub(crate) mod dialogueview;
 pub(crate) mod gamestate;
 pub(crate) mod input;
 pub(crate) mod ui;
+pub(crate) mod easing;
 
 #[cfg(debug_assertions)]
 pub(crate) mod debug;
