@@ -3,6 +3,7 @@ use bevy_ecs_ldtk::prelude::LdtkEntity;
 
 use super::collision::ColliderBundle;
 
+// Npc
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct Npc;
 
@@ -13,4 +14,17 @@ pub struct NpcBundle {
     #[from_entity_instance]
     pub collider_bundle: ColliderBundle,
     pub npc: Npc,
+}
+
+// NpcPatrol
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
+pub struct NpcPatrol;
+
+#[derive(Clone, Default, Bundle, LdtkEntity)]
+pub struct NpcPatrolBundle {
+    #[sprite_bundle("npc.png")]
+    pub sprite_bundle: SpriteBundle,
+    #[from_entity_instance]
+    pub collider_bundle: ColliderBundle,
+    pub npc: NpcPatrol,
 }

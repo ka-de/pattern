@@ -2,7 +2,7 @@
 	"iid": "39227760-c640-11ed-bac6-0b5f56187457",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 477038,
-	"nextUid": 119,
+	"nextUid": 120,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -2286,6 +2286,41 @@
 					"tilesetUid": null
 				}
 			]
+		},
+		{
+			"identifier": "DeathZone",
+			"uid": 119,
+			"tags": [],
+			"exportToToc": false,
+			"allowOutOfBounds": false,
+			"doc": null,
+			"width": 500,
+			"height": 500,
+			"resizableX": true,
+			"resizableY": true,
+			"minWidth": 24,
+			"maxWidth": null,
+			"minHeight": 24,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0,
+			"lineOpacity": 1,
+			"hollow": false,
+			"color": "#DB2B1A",
+			"renderMode": "Rectangle",
+			"showName": true,
+			"tilesetId": null,
+			"tileRenderMode": "FitInside",
+			"tileRect": null,
+			"uiTileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0.5,
+			"pivotY": 1,
+			"fieldDefs": []
 		}
 	], "tilesets": [
 		{
@@ -2777,6 +2812,22 @@
 							],
 							"__worldX": -712,
 							"__worldY": 320
+						},
+						{
+							"__identifier": "DeathZone",
+							"__grid": [49,35],
+							"__pivot": [0.5,1],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#DB2B1A",
+							"iid": "8b147200-fec0-11ee-906c-c55afab207be",
+							"width": 2416,
+							"height": 912,
+							"defUid": 119,
+							"px": [792,576],
+							"fieldInstances": [],
+							"__worldX": -200,
+							"__worldY": 576
 						}
 					]
 				},
