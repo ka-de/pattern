@@ -29,10 +29,6 @@ pub struct PlayerBundle {
     #[from_entity_instance]
     items: Items,
 
-    // I don't think this is how you do it!
-    #[from_entity_instance]
-    pub respawn: Respawn,
-
     // The whole EntityInstance can be stored directly as an EntityInstance component
     #[from_entity_instance]
     entity_instance: EntityInstance,

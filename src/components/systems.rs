@@ -22,7 +22,8 @@ pub fn setup_ldtk(app: &mut App) {
         .register_ldtk_entity::<super::npc::NpcBundle>("Npc")
         .register_ldtk_entity::<super::enemy::MobBundle>("Mob")
         .register_ldtk_entity::<super::misc::ChestBundle>("Chest")
-        .register_ldtk_entity::<super::misc::PumpkinsBundle>("Pumpkins")
+        .register_ldtk_entity::<super::pumpkins::PumpkinsBundle>("Pumpkins")
+        .register_ldtk_entity::<super::deathzone::DeathZoneBundle>("DeathZone")
         .add_systems(
             Update,
             (
@@ -37,6 +38,8 @@ pub fn setup_ldtk(app: &mut App) {
                 super::ground::ground_detection,
                 super::ground::update_on_ground,
                 restart_level,
+                respawn_world,
+                super::deathzone::detect_death_zone_collision,
             ).run_if(in_state(GameState::Playing))
         )
         .add_plugins((LdtkPlugin, RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0)));
@@ -355,6 +358,16 @@ pub fn update_level_selection(
                 *level_selection = LevelSelection::iid(level.iid.clone());
             }
         }
+    }
+}
+
+fn respawn_world(
+    mut commands: Commands,
+    ldtk_projects: Query<Entity, With<Handle<LdtkProject>>>,
+    input: Res<ButtonInput<KeyCode>>
+) {
+    if input.just_pressed(KeyCode::KeyT) {
+        commands.entity(ldtk_projects.single()).insert(Respawn);
     }
 }
 
