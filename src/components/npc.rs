@@ -41,18 +41,26 @@ pub struct NpcPatrolBundle {
     pub entity: EntityInstance,
 }
 
-pub fn print_npc_names(query: Query<&EntityInstance, Added<Npc>>) {
+pub fn print_npc_info(query: Query<&EntityInstance, Added<Npc>>) {
     for ldtk_entity in query.iter() {
         if let Ok(name) = ldtk_entity.get_string_field("name") {
             info!("Spawned NPC name={:?}", name);
         }
+
+        if let Ok(has_dialogue) = ldtk_entity.get_bool_field("hasDialogue") {
+            println!("NPC has dialogue: {}", has_dialogue);
+        }
     }
 }
 
-pub fn print_npc_patrol_names(query: Query<(&NpcPatrol, &EntityInstance)>) {
-    for (npc_patrol, ldtk_entity) in query.iter() {
+pub fn print_npcpatrol_info(query: Query<&EntityInstance, Added<NpcPatrol>>) {
+    for ldtk_entity in query.iter() {
         if let Ok(name) = ldtk_entity.get_string_field("name") {
             println!("NpcPatrol name: {}", name);
+        }
+
+        if let Ok(has_dialogue) = ldtk_entity.get_bool_field("hasDialogue") {
+            println!("NpcPatrol has dialogue: {}", has_dialogue);
         }
     }
 }
