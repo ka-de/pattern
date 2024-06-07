@@ -11,7 +11,6 @@ pub struct ColliderBundle {
     pub gravity_scale: GravityScale,
     pub friction: Friction,
     pub density: ColliderMassProperties,
-    pub interaction_groups: InteractionGroupsComponent,
 }
 
 impl From<&EntityInstance> for ColliderBundle {
