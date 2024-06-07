@@ -176,6 +176,7 @@ fn main() {
             plugins::dialogueview::YarnSpinnerDialogueViewPlugin,
             plugins::debug::plugin,
             plugins::input::InputPlugin,
+            plugins::ui::plugin,
         ))
         .add_systems(Startup, set_window_icon) // Set the Window icon.
         // AUDIO TESTING ⚠️
