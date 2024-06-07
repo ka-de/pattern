@@ -17,5 +17,6 @@ pub(crate) mod torch;
 pub(crate) mod enemy;
 pub(crate) mod patrol;
 pub(crate) mod animation;
+pub(crate) mod npc;
 
 use crate::components::health::Health;

@@ -2025,7 +2025,7 @@
 			"fieldDefs": []
 		},
 		{
-			"identifier": "NPC",
+			"identifier": "Npc",
 			"uid": 112,
 			"tags": [],
 			"exportToToc": false,
@@ -2556,8 +2556,8 @@
 							"__worldY": 320
 						},
 						{
-							"__identifier": "NPC",
-							"__grid": [10,9],
+							"__identifier": "Npc",
+							"__grid": [3,11],
 							"__pivot": [0.5,1],
 							"__tags": [],
 							"__tile": { "tilesetUid": 105, "x": 192, "y": 192, "w": 32, "h": 32 },
@@ -2566,7 +2566,7 @@
 							"width": 24,
 							"height": 24,
 							"defUid": 112,
-							"px": [168,160],
+							"px": [56,192],
 							"fieldInstances": [
 								{ "__identifier": "hasDialogue", "__type": "Bool", "__value": true, "__tile": null, "defUid": 113, "realEditorValues": [{
 									"id": "V_Bool",
@@ -2577,12 +2577,12 @@
 									"params": ["Just an NPC"]
 								}] }
 							],
-							"__worldX": -824,
-							"__worldY": 160
+							"__worldX": -936,
+							"__worldY": 192
 						},
 						{
-							"__identifier": "NPC",
-							"__grid": [17,19],
+							"__identifier": "Npc",
+							"__grid": [17,17],
 							"__pivot": [0.5,1],
 							"__tags": [],
 							"__tile": { "tilesetUid": 105, "x": 192, "y": 192, "w": 32, "h": 32 },
@@ -2591,7 +2591,7 @@
 							"width": 24,
 							"height": 24,
 							"defUid": 112,
-							"px": [280,320],
+							"px": [280,288],
 							"fieldInstances": [
 								{ "__identifier": "hasDialogue", "__type": "Bool", "__value": true, "__tile": null, "defUid": 113, "realEditorValues": [] },
 								{ "__identifier": "name", "__type": "String", "__value": "AnotherNPC", "__tile": null, "defUid": 114, "realEditorValues": [{
@@ -2600,7 +2600,26 @@
 								}] }
 							],
 							"__worldX": -712,
-							"__worldY": 320
+							"__worldY": 288
+						},
+						{
+							"__identifier": "Npc",
+							"__grid": [12,17],
+							"__pivot": [0.5,1],
+							"__tags": [],
+							"__tile": { "tilesetUid": 105, "x": 192, "y": 192, "w": 32, "h": 32 },
+							"__smartColor": "#EAD4AA",
+							"iid": "7de25d10-fec0-11ee-906c-8936f93780da",
+							"width": 24,
+							"height": 24,
+							"defUid": 112,
+							"px": [200,288],
+							"fieldInstances": [
+								{ "__identifier": "hasDialogue", "__type": "Bool", "__value": true, "__tile": null, "defUid": 113, "realEditorValues": [] },
+								{ "__identifier": "name", "__type": "String", "__value": null, "__tile": null, "defUid": 114, "realEditorValues": [] }
+							],
+							"__worldX": -792,
+							"__worldY": 288
 						}
 					]
 				},
