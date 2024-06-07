@@ -1,7 +1,7 @@
 use bevy::app::{ Startup, Update };
 use release_label::release_label;
 
-pub(crate) mod fpswidget;
+pub(crate) mod fps_widget;
 pub(crate) mod flying_labels;
 pub(crate) mod release_label;
 pub(crate) mod flying;

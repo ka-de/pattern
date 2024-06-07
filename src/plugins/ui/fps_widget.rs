@@ -1,6 +1,6 @@
 use bevy::{ diagnostic::{ DiagnosticsStore, FrameTimeDiagnosticsPlugin }, prelude::* };
 use sickle_ui::{
-    ui_builder::{ UiBuilder, UiRoot },
+    ui_builder::{ UiBuilder, UiBuilderExt, UiRoot },
     ui_commands::SetTextExt,
     ui_style::{
         SetBackgroundColorExt,
@@ -12,7 +12,7 @@ use sickle_ui::{
     widgets::{ container::UiContainerExt, label::{ LabelConfig, UiLabelExt } },
 };
 
-pub(super) fn plugin(app: &mut App) {
+pub fn plugin(app: &mut App) {
     app.add_plugins(FrameTimeDiagnosticsPlugin).add_systems(Update, update_fps);
 }
 
@@ -44,6 +44,10 @@ impl<'w, 's> UiFPSWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
     }
 }
 
+pub fn spawn_fps_widget(mut commands: Commands) {
+    commands.ui_builder(UiRoot).fps();
+}
+
 fn update_fps(
     mut commands: Commands,
     diagnostics: Res<DiagnosticsStore>,
@@ -70,7 +74,7 @@ fn update_fps(
         };
 
         let text_style = TextStyle {
-            font: asset_server.load("FiraSans-Bold.ttf"),
+            font: asset_server.load("fonts/bahnschrift.ttf"),
             font_size: 60.0,
             color: text_color,
         };
