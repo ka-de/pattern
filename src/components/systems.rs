@@ -37,6 +37,7 @@ pub fn setup_ldtk(app: &mut App) {
                 super::ground::update_on_ground,
                 restart_level,
                 respawn_world,
+                super::npc::print_npc_names,
             ).run_if(in_state(GameState::Playing))
         )
         .add_plugins((LdtkPlugin, RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0)));
