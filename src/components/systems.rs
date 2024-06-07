@@ -228,6 +228,7 @@ pub fn spawn_wall_collision(
                     for wall_rect in wall_rects {
                         level
                             .spawn_empty()
+                            .insert(Name::new("wall_collision"))
                             .insert(
                                 Collider::cuboid(
                                     (((wall_rect.right as f32) - (wall_rect.left as f32) + 1.0) *

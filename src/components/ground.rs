@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
 use bevy::{
+    core::Name,
     ecs::{
         component::Component,
         entity::Entity,
@@ -40,6 +41,7 @@ pub fn spawn_ground_sensor(
             commands.entity(entity).with_children(|builder| {
                 builder
                     .spawn_empty()
+                    .insert(Name::new("ground_sensor"))
                     .insert(ActiveEvents::COLLISION_EVENTS)
                     .insert(detector_shape)
                     .insert(Sensor)
