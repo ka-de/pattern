@@ -1,7 +1,7 @@
 use bevy::{ ecs::{ bundle::Bundle, component::Component }, sprite::SpriteBundle };
 use bevy_ecs_ldtk::prelude::LdtkEntity;
 
-use super::collision::ColliderBundle;
+use super::{ collision::ColliderBundle, patrol::Patrol };
 
 // Npc
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
@@ -27,4 +27,6 @@ pub struct NpcPatrolBundle {
     #[from_entity_instance]
     pub collider_bundle: ColliderBundle,
     pub npc: NpcPatrol,
+    #[ldtk_entity]
+    pub patrol: Patrol,
 }

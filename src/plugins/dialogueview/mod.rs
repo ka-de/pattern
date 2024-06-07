@@ -50,16 +50,7 @@ impl Plugin for YarnSpinnerDialogueViewPlugin {
             .add_plugins(setup::ui_setup_plugin)
             .add_plugins(updating::ui_updating_plugin)
             .add_plugins(typewriter::typewriter_plugin)
-            .add_plugins(option_selection::option_selection_plugin)
-            .add_systems(
-                Update,
-                // Spawn the dialogue runner once the Yarn project has finished compiling
-                spawn_dialogue_runner.run_if(
-                    in_state(crate::plugins::gamestate::GameState::Playing).and_then(
-                        resource_added::<YarnProject>
-                    )
-                )
-            );
+            .add_plugins(option_selection::option_selection_plugin);
     }
 }
 
