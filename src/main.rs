@@ -139,21 +139,6 @@ fn main() {
 
     //app.add_systems(Startup, play_background_audio);
 
-    #[cfg(target_arch = "wasm32")]
-    let window_plugin = WindowPlugin {
-        primary_window: Some(Window {
-            canvas: Some("#separated-canvas".into()),
-            ..default()
-        }),
-        ..default()
-    };
-
-    #[cfg(not(target_arch = "wasm32"))]
-    let window_plugin = WindowPlugin::default();
-
-    #[cfg(target_arch = "wasm32")]
-    app.insert_resource(AssetMetaCheck::Never);
-
     app.insert_resource(Msaa::Off) // Disable Multi-Sample Anti-Aliasing
         // DefaultPlugins
         .add_plugins((

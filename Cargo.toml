@@ -34,23 +34,16 @@ bevy-steamworks = { git = "https://github.com/ka-de/bevy_steamworks", features =
 ] }
 rand = "0.8.5"
 bevy_rapier2d = { version = "0.26.0", features = ["simd-stable"] }
-sickle_ui = { git = "https://github.com/ka-de/sickle_ui" }
+sickle_ui = { git = "https://github.com/ka-de/sickle_ui", features = ["dev"] }
 bevy_yarnspinner = { git = "https://github.com/ka-de/YarnSpinner-Rust" }
 wgpu = { version = "0.19.3", default-features = false, features = [
-  "wgsl",
   "dx12",
   "metal",
   "naga",
   "naga-ir",
-  "fragile-send-sync-non-atomic-wasm",
 ] }
 unicode-segmentation = "1.11.0"
 bevy_hanabi = { git = "https://github.com/ka-de/bevy_hanabi" }
-
-# Only enable dynamic linking in `sickle_ui` when not building wasm32.
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies.sickle_ui]
-git = "https://github.com/ka-de/sickle_ui"
-features = ["dev"]
 
 [dependencies.bevy]
 version = "0.13.2"
@@ -68,28 +61,17 @@ features = [
   "bevy_text",
   "subpixel_glyph_atlas",
   "bevy_render",
-]
-
-[dependencies.bevy_asset_loader]
-git = "https://github.com/ka-de/bevy_asset_loader"
-default-features = false
-features = ["2d", "standard_dynamic_assets", "progress_tracking"]
-
-# Only enable `webgpu` on wasm32
-[target.'cfg(target_arch = "wasm32")'.dependencies.bevy]
-version = "0.13.2"
-features = ["webgpu"]
-
-# Only enable dynamic linking when not building wasm32.
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies.bevy]
-version = "0.13.2"
-features = [
   "dynamic_linking",
   "multi-threaded",
   "file_watcher",
   "bevy_winit",
   "embedded_watcher",
 ]
+
+[dependencies.bevy_asset_loader]
+git = "https://github.com/ka-de/bevy_asset_loader"
+default-features = false
+features = ["2d", "standard_dynamic_assets", "progress_tracking"]
 
 [workspace]
 resolver = "2"

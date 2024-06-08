@@ -27,18 +27,6 @@ cargo run 2>&1 | Out-String -Stream | Where-Object { $_ -notmatch "ID3D12Device:
 
 ???
 
-## wasm-server-runner
-
-### Current Progress
-
-⚠️ STILL BAD ⚠️
-
-The asset loading error has been replaced by multiple different asset loading errors!
-
-```r
-
-```
-
 ### Set Custom HTML
 
 Needed so the thing can find `#separated-canvas`.
