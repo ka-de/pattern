@@ -15,3 +15,15 @@ impl From<&EntityInstance> for Items {
         )
     }
 }
+
+pub fn dbg_player_items(
+    input: Res<ButtonInput<KeyCode>>,
+    mut query: Query<(&Items, &EntityInstance), With<Player>>
+) {
+    for (items, entity_instance) in &mut query {
+        if input.just_pressed(KeyCode::KeyP) {
+            dbg!(&items);
+            dbg!(&entity_instance);
+        }
+    }
+}

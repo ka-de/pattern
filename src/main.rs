@@ -24,6 +24,11 @@ use bevy_steamworks::*;
 use bevy::winit::WinitWindows;
 use winit::window::Icon;
 
+// ⚠️ TODO: Move this with Game Settings
+mod settings;
+use settings::{ GameSettings, update_window_level };
+use plugins::ui::settings_widget::spawn_settings_ui;
+
 // ⚠️ TODO: This will need to get eventually removed from main.
 // RANDOM GAMEPLAY COMPONENTS
 // use components::player::Player;
@@ -169,7 +174,6 @@ fn main() {
                     default_spatial_scale: SpatialScale::new_2d(AUDIO_SCALE),
                     ..default()
                 }),
-            // Tweening
             TweeningPlugin,
             plugins::gamestate::game_state_plugin,
             components::systems::setup_ldtk,
@@ -179,9 +183,15 @@ fn main() {
             plugins::ui::plugin,
         ))
         .add_systems(Startup, set_window_icon) // Set the Window icon.
+
         // AUDIO TESTING ⚠️
         .insert_resource(GlobalVolume::new(0.2)) // Set the GlobalVolume ⚠️ WIP
-        .add_systems(Startup, change_global_volume); // Change the GlobalVolume ⚠️ WIP
+        .add_systems(Startup, change_global_volume) // Change the GlobalVolume ⚠️ WIP
+
+        // GAME SETTINGS ⚠️
+        .insert_resource(GameSettings::default())
+        .add_systems(Update, update_window_level)
+        .add_systems(Startup, spawn_settings_ui);
 
     //.add_systems(Startup, play_2d_spatial_audio);
 

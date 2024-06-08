@@ -31,7 +31,7 @@ pub fn setup_ldtk(app: &mut App) {
                 patrol,
                 super::camera::fit_inside_current_level,
                 update_level_selection,
-                dbg_player_items,
+                super::items::dbg_player_items,
                 super::ground::spawn_ground_sensor,
                 super::ground::ground_detection,
                 super::ground::update_on_ground,
@@ -72,18 +72,6 @@ pub fn spawn_ldtk_world(mut commands: Commands, asset_server: Res<AssetServer>) 
         ldtk_handle,
         ..Default::default()
     });
-}
-
-pub fn dbg_player_items(
-    input: Res<ButtonInput<KeyCode>>,
-    mut query: Query<(&Items, &EntityInstance), With<Player>>
-) {
-    for (items, entity_instance) in &mut query {
-        if input.just_pressed(KeyCode::KeyP) {
-            dbg!(&items);
-            dbg!(&entity_instance);
-        }
-    }
 }
 
 pub fn detect_climb_range(
