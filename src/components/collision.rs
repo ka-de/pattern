@@ -14,6 +14,9 @@ pub struct ColliderBundle {
     pub collision_group: CollisionGroups,
 }
 
+const PLAYER_GROUP: Group = Group::GROUP_1;
+const NPC_GROUP: Group = Group::GROUP_2;
+
 impl From<&EntityInstance> for ColliderBundle {
     fn from(entity_instance: &EntityInstance) -> ColliderBundle {
         let rotation_constraints = LockedAxes::ROTATION_LOCKED;
