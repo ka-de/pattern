@@ -32,7 +32,7 @@ impl From<&EntityInstance> for ColliderBundle {
                 },
             "Mob" =>
                 ColliderBundle {
-                    collider: Collider::cuboid(5.0, 5.0),
+                    collider: Collider::cuboid(12.0, 12.0),
                     rigid_body: RigidBody::KinematicVelocityBased,
                     rotation_constraints,
                     ..Default::default()
