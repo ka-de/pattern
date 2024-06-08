@@ -8,6 +8,10 @@
 // Provides functions to read and manipulate environment variables.
 use std::env;
 
+// Particle effects
+// ⚠️ TODO: Move to plugin or something?
+use bevy_hanabi::prelude::*;
+
 use bevy::render::settings::WgpuSettings;
 use bevy::render::RenderPlugin;
 use wgpu::Backends;
@@ -32,6 +36,7 @@ use components::settings::GameSettings;
 // use components::player::Player;
 use components::torch::Torch;
 
+// ⚠️ TODO: Move to ui!
 fn set_window_icon(
     // we have to use `NonSend` here
     windows: NonSend<WinitWindows>
@@ -157,6 +162,7 @@ fn main() {
                     default_spatial_scale: SpatialScale::new_2d(AUDIO_SCALE),
                     ..default()
                 }),
+            HanabiPlugin,
             TweeningPlugin,
             plugins::gamestate::game_state_plugin,
             components::systems::setup_ldtk,
