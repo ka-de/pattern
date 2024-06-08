@@ -20,7 +20,7 @@ pub fn setup_ldtk(app: &mut App) {
         .register_ldtk_entity::<super::npc::NpcPatrolBundle>("NpcPatrol")
         .register_ldtk_entity::<super::enemy::MobBundle>("Mob")
         .register_ldtk_entity::<super::chest::ChestBundle>("Chest")
-        .register_ldtk_entity::<super::pumpkins::PumpkinsBundle>("Pumpkins")
+        .register_ldtk_entity::<super::pumpkin::PumpkinBundle>("Pumpkins")
         .add_systems(
             Update,
             (

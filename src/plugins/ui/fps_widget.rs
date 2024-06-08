@@ -13,6 +13,8 @@ use sickle_ui::{
     widgets::{ container::UiContainerExt, label::{ LabelConfig, UiLabelExt } },
 };
 
+use super::flying::Flying;
+
 pub fn plugin(app: &mut App) {
     app.add_plugins(FrameTimeDiagnosticsPlugin).add_systems(Update, update_fps);
 }
@@ -30,7 +32,8 @@ pub trait UiFPSWidgetExt<'w, 's> {
 impl<'w, 's> UiFPSWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
     fn fps<'a>(&'a mut self) -> UiBuilder<'w, 's, 'a, Entity> {
         self.container((NodeBundle::default(), FpsWidget), |fps| {
-            fps.style()
+            fps.insert(Flying)
+                .style()
                 .position_type(PositionType::Absolute)
                 .right(Val::Px(10.0))
                 .top(Val::Px(10.0))

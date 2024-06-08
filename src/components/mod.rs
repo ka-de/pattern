@@ -16,7 +16,7 @@ pub(crate) mod enemy;
 pub(crate) mod patrol;
 pub(crate) mod animation;
 pub(crate) mod npc;
-pub(crate) mod pumpkins;
+pub(crate) mod pumpkin;
 pub(crate) mod wall;
 pub(crate) mod chest;
 pub(crate) mod settings;
