@@ -45,6 +45,7 @@ wgpu = { version = "0.19.3", default-features = false, features = [
   "fragile-send-sync-non-atomic-wasm",
 ] }
 unicode-segmentation = "1.11.0"
+bevy_hanabi = { git = "https://github.com/ka-de/bevy_hanabi" }
 
 # Only enable dynamic linking in `sickle_ui` when not building wasm32.
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies.sickle_ui]
