@@ -11,6 +11,7 @@ pub struct ColliderBundle {
     pub gravity_scale: GravityScale,
     pub friction: Friction,
     pub density: ColliderMassProperties,
+    pub collision_group: CollisionGroups,
 }
 
 impl From<&EntityInstance> for ColliderBundle {
@@ -26,6 +27,7 @@ impl From<&EntityInstance> for ColliderBundle {
                         combine_rule: CoefficientCombineRule::Min,
                     },
                     rotation_constraints,
+                    collision_group: CollisionGroups::new(PLAYER_GROUP, Group::ALL - NPC_GROUP),
                     ..Default::default()
                 },
             "Mob" =>
@@ -41,6 +43,7 @@ impl From<&EntityInstance> for ColliderBundle {
                     rigid_body: RigidBody::KinematicVelocityBased,
                     rotation_constraints,
                     density: ColliderMassProperties::Density(50.0),
+                    collision_group: CollisionGroups::new(NPC_GROUP, Group::ALL - NPC_GROUP),
                     ..Default::default()
                 },
             "NpcPatrol" =>
@@ -49,6 +52,7 @@ impl From<&EntityInstance> for ColliderBundle {
                     rigid_body: RigidBody::KinematicVelocityBased,
                     rotation_constraints,
                     density: ColliderMassProperties::Density(50.0),
+                    collision_group: CollisionGroups::new(NPC_GROUP, Group::ALL),
                     ..Default::default()
                 },
             "Chest" =>
