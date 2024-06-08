@@ -2687,7 +2687,7 @@
 						},
 						{
 							"__identifier": "Npc",
-							"__grid": [12,19],
+							"__grid": [4,9],
 							"__pivot": [0.5,1],
 							"__tags": [],
 							"__tile": { "tilesetUid": 105, "x": 192, "y": 192, "w": 32, "h": 32 },
@@ -2696,7 +2696,7 @@
 							"width": 24,
 							"height": 24,
 							"defUid": 112,
-							"px": [200,320],
+							"px": [72,160],
 							"fieldInstances": [
 								{ "__identifier": "hasDialogue", "__type": "Bool", "__value": true, "__tile": null, "defUid": 113, "realEditorValues": [] },
 								{ "__identifier": "name", "__type": "String", "__value": "Bob Marley", "__tile": null, "defUid": 114, "realEditorValues": [{
@@ -2704,8 +2704,8 @@
 									"params": ["Bob Marley"]
 								}] }
 							],
-							"__worldX": -792,
-							"__worldY": 320
+							"__worldX": -920,
+							"__worldY": 160
 						},
 						{
 							"__identifier": "NpcPatrol",
