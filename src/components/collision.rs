@@ -37,7 +37,7 @@ impl From<&EntityInstance> for ColliderBundle {
                 },
             "Npc" =>
                 ColliderBundle {
-                    collider: Collider::cuboid(5.0, 5.0),
+                    collider: Collider::cuboid(12.0, 12.0),
                     rigid_body: RigidBody::KinematicVelocityBased,
                     rotation_constraints,
                     density: ColliderMassProperties::Density(50.0),
@@ -45,7 +45,7 @@ impl From<&EntityInstance> for ColliderBundle {
                 },
             "NpcPatrol" =>
                 ColliderBundle {
-                    collider: Collider::cuboid(5.0, 5.0),
+                    collider: Collider::cuboid(12.0, 12.0),
                     rigid_body: RigidBody::KinematicVelocityBased,
                     rotation_constraints,
                     density: ColliderMassProperties::Density(50.0),
