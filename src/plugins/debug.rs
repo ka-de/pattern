@@ -12,8 +12,9 @@ pub(crate) fn plugin(app: &mut bevy::app::App) {
         super::ui::fps_widget::plugin,
         // WorldInspectorPlugin
         WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::F11)),
+		RapierDebugRenderPlugin::default()
     ));
-
+ .add_plugins(())
     // FpsWidget
     app.add_systems(Update, spawn_fps_widget.run_if(not(any_with_component::<FpsWidget>)));
 }
