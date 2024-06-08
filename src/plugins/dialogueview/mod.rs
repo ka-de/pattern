@@ -67,5 +67,6 @@ fn spawn_dialogue_runner(mut commands: Commands, project: Res<YarnProject>) {
     info!("Starting dialogue");
     // Create a dialogue runner from the project.
     let mut dialogue_runner = project.create_dialogue_runner();
+    dialogue_runner.start_node("Start");
     commands.spawn(dialogue_runner);
 }

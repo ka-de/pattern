@@ -41,6 +41,7 @@ pub fn setup_ldtk(app: &mut App) {
                 super::npc::print_npcpatrol_info,
             ).run_if(in_state(GameState::Playing))
         )
+        // RapierPhysicsPlugin
         .add_plugins((LdtkPlugin, RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0)));
 }
 

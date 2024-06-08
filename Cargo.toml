@@ -1,3 +1,14 @@
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+codegen-units = 1
+
+[profile.release]
+codegen-units = 1
+
+
 [package]
 name = "separated"
 version = "1.0.0"
@@ -81,9 +92,3 @@ features = [
 
 [workspace]
 resolver = "2"
-
-[profile.dev]
-opt-level = 1
-
-[profile.dev.package."*"]
-opt-level = 3
