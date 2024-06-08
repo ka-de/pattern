@@ -1,5 +1,4 @@
 use super::{
-    items::Items,
     ladders::{ Climbable, Climber },
     patrol::patrol,
     player::Player,

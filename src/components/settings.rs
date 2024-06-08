@@ -1,3 +1,4 @@
+use bevy::ecs::change_detection::DetectChanges;
 use bevy::window::{ WindowLevel, PresentMode, PrimaryWindow };
 use bevy::prelude::{ Resource, Res, Query, With, Window };
 

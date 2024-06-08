@@ -25,8 +25,7 @@ use bevy::winit::WinitWindows;
 use winit::window::Icon;
 
 // ⚠️ TODO: Move this with Game Settings
-use settings::{ GameSettings, update_window_settings };
-use plugins::ui::settings_widget::spawn_settings_ui;
+use components::settings::GameSettings;
 
 // ⚠️ TODO: This will need to get eventually removed from main.
 // RANDOM GAMEPLAY COMPONENTS
@@ -190,9 +189,7 @@ fn main() {
         //.add_systems(Startup, play_2d_spatial_audio)
 
         // GAME SETTINGS ⚠️
-        .insert_resource(GameSettings::default())
-        .add_systems(Startup, spawn_settings_ui)
-        .add_systems(Update, update_window_level);
+        .insert_resource(GameSettings::default());
 
     app.run();
 }

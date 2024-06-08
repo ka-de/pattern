@@ -19,3 +19,4 @@ pub(crate) mod npc;
 pub(crate) mod pumpkins;
 pub(crate) mod wall;
 pub(crate) mod chest;
+pub(crate) mod settings;
