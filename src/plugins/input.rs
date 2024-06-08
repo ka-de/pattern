@@ -9,7 +9,7 @@ use bevy::{
 };
 use bevy_rapier2d::dynamics::Velocity;
 
-use crate::components::ground::GroundDetection;
+use crate::components::{ ground::GroundDetection, water::Swimmer };
 use crate::components::player::Player;
 use crate::components::ladders::Climber;
 
@@ -26,9 +26,9 @@ pub(crate) struct KeyPressStates(pub HashMap<KeyCode, KeyPressState>);
 
 pub(crate) fn movement(
     input: Res<ButtonInput<KeyCode>>,
-    mut query: Query<(&mut Velocity, &mut Climber, &GroundDetection), With<Player>>
+    mut query: Query<(&mut Velocity, &mut Climber, &mut Swimmer, &GroundDetection), With<Player>>
 ) {
-    for (mut velocity, mut climber, ground_detection) in &mut query {
+    for (mut velocity, mut climber, mut swimmer, ground_detection) in &mut query {
         let right = if input.pressed(KeyCode::KeyD) { 1.0 } else { 0.0 };
         let left = if input.pressed(KeyCode::KeyA) { 1.0 } else { 0.0 };
 
@@ -50,6 +50,14 @@ pub(crate) fn movement(
         if input.just_pressed(KeyCode::Space) && (ground_detection.on_ground || climber.climbing) {
             velocity.linvel.y = 500.0;
             climber.climbing = false;
+        }
+
+        if swimmer.intersecting_swimmables.is_empty() {
+            swimmer.swimming = false;
+        } else {
+            swimmer.swimming = true;
+            velocity.linvel.x = velocity.linvel.x / 2.0;
+            velocity.linvel.y = velocity.linvel.y / 2.0;
         }
     }
 }
