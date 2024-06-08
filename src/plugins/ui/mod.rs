@@ -7,6 +7,7 @@ pub(crate) mod release_label;
 pub(crate) mod flying;
 pub(crate) mod set;
 pub(crate) mod banner_widget;
+pub(crate) mod settings_widget;
 
 use crate::plugins::ui::flying_labels::flying_labels;
 

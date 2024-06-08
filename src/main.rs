@@ -25,8 +25,7 @@ use bevy::winit::WinitWindows;
 use winit::window::Icon;
 
 // ⚠️ TODO: Move this with Game Settings
-mod settings;
-use settings::{ GameSettings, update_window_level };
+use settings::{ GameSettings, update_window_settings };
 use plugins::ui::settings_widget::spawn_settings_ui;
 
 // ⚠️ TODO: This will need to get eventually removed from main.
@@ -187,6 +186,7 @@ fn main() {
         // AUDIO TESTING ⚠️
         .insert_resource(GlobalVolume::new(0.2)) // Set the GlobalVolume ⚠️ WIP
         .add_systems(Startup, change_global_volume) // Change the GlobalVolume ⚠️ WIP
+
         //.add_systems(Startup, play_2d_spatial_audio)
 
         // GAME SETTINGS ⚠️

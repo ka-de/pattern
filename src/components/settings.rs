@@ -1,5 +1,5 @@
 use bevy::window::{ WindowLevel, PresentMode, PrimaryWindow };
-use bevy::prelude::{Resource, Res, Query, With, Window};
+use bevy::prelude::{ Resource, Res, Query, With, Window };
 
 // GameWindowLevel
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
