@@ -190,8 +190,8 @@ fn main() {
 
         // GAME SETTINGS ⚠️
         .insert_resource(GameSettings::default())
-        .add_systems(Update, update_window_level)
         .add_systems(Startup, spawn_settings_ui);
+        .add_systems(Update, update_window_level)
 
     //.add_systems(Startup, play_2d_spatial_audio);
 
