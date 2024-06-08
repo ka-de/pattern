@@ -187,13 +187,12 @@ fn main() {
         // AUDIO TESTING ⚠️
         .insert_resource(GlobalVolume::new(0.2)) // Set the GlobalVolume ⚠️ WIP
         .add_systems(Startup, change_global_volume) // Change the GlobalVolume ⚠️ WIP
+        //.add_systems(Startup, play_2d_spatial_audio)
 
         // GAME SETTINGS ⚠️
         .insert_resource(GameSettings::default())
-        .add_systems(Startup, spawn_settings_ui);
-        .add_systems(Update, update_window_level)
-
-    //.add_systems(Startup, play_2d_spatial_audio);
+        .add_systems(Startup, spawn_settings_ui)
+        .add_systems(Update, update_window_level);
 
     app.run();
 }

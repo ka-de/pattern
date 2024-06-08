@@ -1,5 +1,10 @@
-use bevy::ecs::component::Component;
+use bevy::{
+    input::{ ButtonInput, keyboard::KeyCode } ,
+    ecs::{ component::Component, system::Res, system::Query, query::With },
+};
 use bevy_ecs_ldtk::{ ldtk::ldtk_fields::LdtkFields, EntityInstance };
+
+use crate::components::player::Player;
 
 #[derive(Clone, Component, Debug, Eq, Default, PartialEq)]
 pub struct Items(Vec<String>);
