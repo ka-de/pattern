@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
-use bevy_asset_loader::standard_dynamic_asset::StandardDynamicAsset;
+use bevy_asset_loader::prelude::*;
 use crate::plugins::splashscreen::{ SplashScreenPlugin, SplashScreenConfiguration };
 
 #[derive(States, Default, Debug, Clone, Eq, PartialEq, Hash, Reflect)]
@@ -24,12 +24,8 @@ pub fn set_state_mainmenu() {
     info!("Set GameState: MainMenu");
 }
 
-pub fn set_state_playing(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn set_state_playing() {
     info!("Set GameState: Playing");
-    // 🎥
-    let camera = Camera2dBundle::default();
-    commands.spawn(camera);
-    crate::components::systems::spawn_ldtk_world(commands, asset_server);
 }
 
 pub fn game_state_plugin(app: &mut App) {
@@ -49,6 +45,7 @@ pub fn game_state_plugin(app: &mut App) {
     // GameState
     app.init_state::<GameState>()
         .register_type::<GameState>()
+        .add_loading_state(LoadingState::new(GameState::SplashScreen))
         .add_systems(OnEnter(GameState::SplashScreen), set_state_splashscreen)
         .add_systems(OnEnter(GameState::Loading), set_state_loading)
         .add_systems(OnEnter(GameState::MainMenu), set_state_mainmenu)

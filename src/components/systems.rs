@@ -7,6 +7,7 @@ use super::{
 use crate::plugins::gamestate::GameState;
 
 use bevy::prelude::*;
+use bevy_asset_loader::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
@@ -26,6 +27,10 @@ pub fn setup_ldtk(app: &mut App) {
         .register_ldtk_entity::<super::enemy::MobBundle>("Mob")
         .register_ldtk_entity::<super::chest::ChestBundle>("Chest")
         .register_ldtk_entity::<super::pumpkin::PumpkinBundle>("Pumpkins")
+        .configure_loading_state(
+            LoadingStateConfig::new(GameState::SplashScreen).load_collection::<LdtkAssets>()
+        )
+        .add_systems(OnEnter(GameState::Playing), spawn_ldtk_world)
         .add_systems(
             Update,
             (
@@ -51,11 +56,15 @@ pub fn setup_ldtk(app: &mut App) {
         .add_plugins((LdtkPlugin, RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0)));
 }
 
+#[derive(AssetCollection, Resource)]
+struct LdtkAssets {
+    #[asset(path = "first_level.ldtk")]
+    first_level: Handle<LdtkProject>,
+}
+
 // Loads the first level of the game from an LDTK file and spawns the game world.
 // It also sets up the physics configuration and the level selection resource.
-pub fn spawn_ldtk_world(mut commands: Commands, asset_server: Res<AssetServer>) {
-    // TODO: use bevy_asset_loader states
-    let ldtk_handle = asset_server.load("first_level.ldtk");
+fn spawn_ldtk_world(mut commands: Commands, ldtk_assets: Res<LdtkAssets>) {
     commands.insert_resource(RapierConfiguration {
         gravity: Vec2::new(0.0, -2000.0),
         physics_pipeline_active: true,
@@ -76,8 +85,11 @@ pub fn spawn_ldtk_world(mut commands: Commands, asset_server: Res<AssetServer>) 
         set_clear_color: SetClearColor::FromLevelBackground,
         ..Default::default()
     });
+
+    // 🎥
+    commands.spawn(Camera2dBundle::default());
     commands.spawn(LdtkWorldBundle {
-        ldtk_handle,
+        ldtk_handle: ldtk_assets.first_level.clone(),
         ..Default::default()
     });
 }

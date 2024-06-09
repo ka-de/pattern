@@ -14,6 +14,7 @@ use bevy_hanabi::prelude::*;
 
 use bevy::render::RenderPlugin;
 use bevy::render::settings::{ WgpuFeatures, WgpuSettings };
+use plugins::gamestate::GameState;
 use wgpu::Backends;
 
 mod components;
@@ -168,7 +169,10 @@ fn main() {
             TweeningPlugin,
             plugins::gamestate::game_state_plugin,
             components::systems::setup_ldtk,
-            plugins::dialogueview::YarnSpinnerDialogueViewPlugin,
+            plugins::dialogueview::YarnSpinnerDialogueViewPlugin {
+                loading_state: GameState::SplashScreen,
+                playing_state: GameState::Playing,
+            },
             plugins::debug::plugin,
             plugins::input::InputPlugin,
             plugins::ui::plugin,

@@ -49,7 +49,8 @@ fn create_options(
     mut commands: Commands,
     children: Query<&Children>,
     mut options_node: Query<(Entity, &mut Style, &mut Visibility), With<OptionsNode>>,
-    mut root_visibility: Query<&mut Visibility, (With<UiRootNode>, Without<OptionsNode>)>
+    mut root_visibility: Query<&mut Visibility, (With<UiRootNode>, Without<OptionsNode>)>,
+    assets: Res<super::Assets>
 ) {
     let (entity, mut style, mut visibility) = options_node.single_mut();
     style.display = Display::Flex;
@@ -57,7 +58,7 @@ fn create_options(
     if children.iter_descendants(entity).next().is_none() {
         *root_visibility.single_mut() = Visibility::Inherited;
         let mut entity_commands = commands.entity(entity);
-        spawn_options(&mut entity_commands, &option_selection.options);
+        spawn_options(&mut entity_commands, &option_selection.options, &assets);
     }
 }
 

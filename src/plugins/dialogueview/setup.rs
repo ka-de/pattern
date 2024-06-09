@@ -1,11 +1,7 @@
-use super::assets::{ font_handle, image_handle };
 use bevy::ecs::system::EntityCommands;
 use bevy::prelude::*;
 use bevy_yarnspinner::prelude::*;
-
-pub(crate) fn ui_setup_plugin(app: &mut App) {
-    app.add_systems(Startup, setup);
-}
+use super::Assets;
 
 /// Marker for the [`Node`] that is the root of the UI
 #[derive(Debug, Default, Component)]
@@ -26,7 +22,7 @@ pub(crate) struct OptionsNode;
 #[derive(Debug, Component)]
 pub(crate) struct OptionButton(pub OptionId);
 
-fn setup(mut commands: Commands) {
+pub(crate) fn setup(mut commands: Commands, assets: Res<Assets>) {
     // root node
     commands
         .spawn((
@@ -66,7 +62,7 @@ fn setup(mut commands: Commands) {
                         ImageBundle {
                             image: UiImage {
                                 // 29 pixels high
-                                texture: image_handle::EDGE,
+                                texture: assets.edge.clone(),
                                 ..default()
                             },
                             style: Style {
@@ -81,7 +77,7 @@ fn setup(mut commands: Commands) {
                     parent.spawn((
                         fmt_name("name"),
                         TextBundle {
-                            text: Text::from_section(String::new(), text_style::name()),
+                            text: Text::from_section(String::new(), text_style::name(&assets)),
                             style: Style {
                                 position_type: PositionType::Absolute,
                                 left: Val::Px(TEXT_BORDER / 2.0),
@@ -117,9 +113,10 @@ fn setup(mut commands: Commands) {
                     // Dialog itself
                     parent.spawn((
                         fmt_name("text"),
-                        TextBundle::from_section(String::new(), text_style::standard()).with_style(
-                            style::standard()
-                        ),
+                        TextBundle::from_section(
+                            String::new(),
+                            text_style::standard(&assets)
+                        ).with_style(style::standard()),
                         DialogueNode,
                         Label,
                     ));
@@ -163,7 +160,7 @@ fn setup(mut commands: Commands) {
                         ImageBundle {
                             image: UiImage {
                                 // 29 pixels high
-                                texture: image_handle::EDGE,
+                                texture: assets.edge.clone(),
                                 flip_y: true,
                                 ..default()
                             },
@@ -181,7 +178,7 @@ fn setup(mut commands: Commands) {
                         ImageBundle {
                             image: UiImage {
                                 // 27 x 27 pixels
-                                texture: image_handle::CONTINUE_INDICATOR,
+                                texture: assets.continue_indicator.clone(),
                                 ..default()
                             },
                             style: Style {
@@ -205,23 +202,31 @@ fn fmt_name(name: &str) -> Name {
 
 pub(crate) const INITIAL_DIALOGUE_CONTINUE_BOTTOM: f32 = -5.0;
 
-pub(crate) fn create_dialog_text(text: impl Into<String>, invisible: impl Into<String>) -> Text {
+pub(crate) fn create_dialog_text(
+    text: impl Into<String>,
+    invisible: impl Into<String>,
+    assets: &Assets
+) -> Text {
     Text::from_sections([
         TextSection {
             value: text.into(),
-            style: text_style::standard(),
+            style: text_style::standard(assets),
         },
         TextSection {
             value: invisible.into(),
             style: TextStyle {
                 color: Color::NONE,
-                ..text_style::standard()
+                ..text_style::standard(assets)
             },
         },
     ])
 }
 
-pub(crate) fn spawn_options<'a, T>(entity_commands: &mut EntityCommands, options: T)
+pub(crate) fn spawn_options<'a, T>(
+    entity_commands: &mut EntityCommands,
+    options: T,
+    assets: &Assets
+)
     where T: IntoIterator<Item = &'a DialogueOption>, <T as IntoIterator>::IntoIter: 'a
 {
     entity_commands.with_children(|parent| {
@@ -243,11 +248,11 @@ pub(crate) fn spawn_options<'a, T>(entity_commands: &mut EntityCommands, options
                     let sections = [
                         TextSection {
                             value: format!("{}: ", i + 1),
-                            style: text_style::option_id(),
+                            style: text_style::option_id(assets),
                         },
                         TextSection {
                             value: option.line.text.clone(),
-                            style: text_style::option_text(),
+                            style: text_style::option_text(assets),
                         },
                     ];
 
@@ -284,34 +289,32 @@ mod style {
 
 mod text_style {
     use super::*;
-    pub(crate) fn standard() -> TextStyle {
+    pub(crate) fn standard(assets: &Assets) -> TextStyle {
         TextStyle {
-            font: font_handle::MEDIUM,
+            font: assets.font.clone(),
             font_size: 20.0,
             color: Color::WHITE,
         }
     }
-    pub(crate) fn name() -> TextStyle {
+    pub(crate) fn name(assets: &Assets) -> TextStyle {
         TextStyle {
-            font: font_handle::MEDIUM,
             font_size: 18.0,
-            ..standard()
+            ..standard(assets)
         }
     }
 
-    pub(crate) fn option_id() -> TextStyle {
+    pub(crate) fn option_id(assets: &Assets) -> TextStyle {
         TextStyle {
-            font: font_handle::MEDIUM,
             color: Color::ALICE_BLUE,
-            ..option_text()
+            ..option_text(assets)
         }
     }
 
-    pub(crate) fn option_text() -> TextStyle {
+    pub(crate) fn option_text(assets: &Assets) -> TextStyle {
         TextStyle {
             font_size: 18.0,
             color: Color::TOMATO,
-            ..standard()
+            ..standard(assets)
         }
     }
 }

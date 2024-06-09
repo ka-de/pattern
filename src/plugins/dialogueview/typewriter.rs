@@ -22,7 +22,7 @@ pub(crate) fn typewriter_plugin(app: &mut App) {
             spawn.run_if(on_event::<DialogueStartEvent>()),
             write_text.run_if(in_dialogue),
             show_continue.run_if(in_dialogue),
-            bob_continue,
+            bob_continue.run_if(any_with_component::<UiRootNode>),
         )
             .chain()
             .after(YarnSpinnerSystemSet)
@@ -113,7 +113,8 @@ fn write_text(
     mut typewriter: ResMut<Typewriter>,
     option_selection: Option<Res<OptionSelection>>,
     mut speaker_change_events: EventWriter<SpeakerChangeEvent>,
-    mut root_visibility: Query<&mut Visibility, With<UiRootNode>>
+    mut root_visibility: Query<&mut Visibility, With<UiRootNode>>,
+    assets: Res<super::Assets>
 ) {
     let mut text = text.single_mut();
     if typewriter.last_before_options && option_selection.is_none() {
@@ -139,7 +140,7 @@ fn write_text(
 
     let current_text = &typewriter.current_text;
     let rest = typewriter.graphemes_left.join("");
-    *text = create_dialog_text(current_text, rest);
+    *text = create_dialog_text(current_text, rest, &assets);
 }
 
 fn show_continue(

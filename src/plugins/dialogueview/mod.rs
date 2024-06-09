@@ -20,6 +20,8 @@
 #![warn(missing_docs, missing_debug_implementations)]
 
 use bevy::prelude::*;
+use bevy_asset_loader::prelude::*;
+
 use bevy_yarnspinner::prelude::{ YarnFileSource, YarnSpinnerPlugin, YarnProject };
 
 pub use updating::SpeakerChangeEvent;
@@ -27,27 +29,42 @@ pub(crate) use typewriter::{ in_dialogue, not_in_dialogue };
 
 /// The plugin registering all systems of the dialogue view.
 #[derive(Debug, Default)]
-#[non_exhaustive]
-pub struct YarnSpinnerDialogueViewPlugin;
+pub struct YarnSpinnerDialogueViewPlugin<T> {
+    /// Assets loading will be added to this loading state
+    pub loading_state: T,
+    /// Dialogue view will be spawn when transitioning to this state
+    pub playing_state: T,
+}
 
 /// The [`SystemSet`] containing all systems added by the [`YarnSpinnerDialogueViewPlugin`].
 /// Is run after the [`YarnSpinnerSystemSet`](bevy_yarnspinner::prelude::YarnSpinnerSystemSet).
 #[derive(Debug, Default, Clone, Copy, SystemSet, Eq, PartialEq, Hash)]
 pub struct YarnSpinnerDialogueViewSystemSet;
 
-mod assets;
 mod option_selection;
 mod setup;
 mod typewriter;
 mod updating;
 
-impl Plugin for YarnSpinnerDialogueViewPlugin {
+#[derive(AssetCollection, Resource)]
+struct Assets {
+    #[asset(path = "fonts/bahnschrift.ttf")]
+    font: Handle<Font>,
+    #[asset(path = "dialogue_continue.png")]
+    continue_indicator: Handle<Image>,
+    #[asset(path = "dialogue_edge.png")]
+    edge: Handle<Image>,
+}
+
+impl<T: States> Plugin for YarnSpinnerDialogueViewPlugin<T> {
     fn build(&self, app: &mut App) {
         app.add_plugins(
             YarnSpinnerPlugin::with_yarn_source(YarnFileSource::file("dialogues/test_dialog.yarn"))
         )
-            .add_plugins(assets::ui_assets_plugin)
-            .add_plugins(setup::ui_setup_plugin)
+            .configure_loading_state(
+                LoadingStateConfig::new(self.loading_state.clone()).load_collection::<Assets>()
+            )
+            .add_systems(Update, setup::setup.run_if(resource_added::<Assets>))
             .add_plugins(updating::ui_updating_plugin)
             .add_plugins(typewriter::typewriter_plugin)
             .add_plugins(option_selection::option_selection_plugin)
@@ -55,9 +72,7 @@ impl Plugin for YarnSpinnerDialogueViewPlugin {
                 Update,
                 // Spawn the dialogue runner once the Yarn project has finished compiling
                 spawn_dialogue_runner.run_if(
-                    in_state(crate::plugins::gamestate::GameState::Playing).and_then(
-                        resource_added::<YarnProject>
-                    )
+                    in_state(self.playing_state.clone()).and_then(resource_added::<YarnProject>)
                 )
             );
     }
