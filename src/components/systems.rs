@@ -39,10 +39,12 @@ pub fn setup_ldtk(app: &mut App) {
                 super::ground::spawn_ground_sensor,
                 super::ground::ground_detection,
                 super::ground::update_on_ground,
+                super::interactions::spawn_interaction_sensor,
+                super::interactions::interaction_detection,
+                super::interactions::update_interaction,
+                super::interactions::setup_interactive_entity,
                 restart_level,
                 respawn_world,
-                super::npc::print_npc_info,
-                super::npc::print_npcpatrol_info,
             ).run_if(in_state(GameState::Playing))
         )
         // RapierPhysicsPlugin
@@ -88,47 +90,26 @@ pub fn detect_climb_range(
     climbables: Query<Entity, With<Climbable>>,
     mut collisions: EventReader<CollisionEvent>
 ) {
-    for collision in collisions.read() {
-        match collision {
-            CollisionEvent::Started(collider_a, collider_b, _) => {
-                if
-                    let (Ok(mut climber), Ok(climbable)) = (
-                        climbers.get_mut(*collider_a),
-                        climbables.get(*collider_b),
-                    )
-                {
+    crate::rapier_utils::reciprocal_collisions(
+        &mut collisions,
+        move |collider_a, collider_b, _, start| {
+            if
+                let (Ok(mut climber), Ok(climbable)) = (
+                    climbers.get_mut(*collider_a),
+                    climbables.get(*collider_b),
+                )
+            {
+                if start {
                     climber.intersecting_climbables.insert(climbable);
-                }
-                if
-                    let (Ok(mut climber), Ok(climbable)) = (
-                        climbers.get_mut(*collider_b),
-                        climbables.get(*collider_a),
-                    )
-                {
-                    climber.intersecting_climbables.insert(climbable);
-                };
-            }
-            CollisionEvent::Stopped(collider_a, collider_b, _) => {
-                if
-                    let (Ok(mut climber), Ok(climbable)) = (
-                        climbers.get_mut(*collider_a),
-                        climbables.get(*collider_b),
-                    )
-                {
+                } else {
                     climber.intersecting_climbables.remove(&climbable);
                 }
-
-                if
-                    let (Ok(mut climber), Ok(climbable)) = (
-                        climbers.get_mut(*collider_b),
-                        climbables.get(*collider_a),
-                    )
-                {
-                    climber.intersecting_climbables.remove(&climbable);
-                }
+                true
+            } else {
+                false
             }
         }
-    }
+    );
 }
 
 // Checks if a climber entity is climbing.

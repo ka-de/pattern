@@ -18,6 +18,7 @@ use wgpu::Backends;
 
 mod components;
 mod plugins;
+mod rapier_utils;
 
 use bevy::prelude::*;
 use bevy_tweening::*;
