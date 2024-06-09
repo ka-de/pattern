@@ -88,47 +88,26 @@ pub fn detect_climb_range(
     climbables: Query<Entity, With<Climbable>>,
     mut collisions: EventReader<CollisionEvent>
 ) {
-    for collision in collisions.read() {
-        match collision {
-            CollisionEvent::Started(collider_a, collider_b, _) => {
-                if
-                    let (Ok(mut climber), Ok(climbable)) = (
-                        climbers.get_mut(*collider_a),
-                        climbables.get(*collider_b),
-                    )
-                {
+    crate::rapier_utils::reciprocal_collisions(
+        &mut collisions,
+        move |collider_a, collider_b, _, start| {
+            if
+                let (Ok(mut climber), Ok(climbable)) = (
+                    climbers.get_mut(*collider_a),
+                    climbables.get(*collider_b),
+                )
+            {
+                if start {
                     climber.intersecting_climbables.insert(climbable);
-                }
-                if
-                    let (Ok(mut climber), Ok(climbable)) = (
-                        climbers.get_mut(*collider_b),
-                        climbables.get(*collider_a),
-                    )
-                {
-                    climber.intersecting_climbables.insert(climbable);
-                };
-            }
-            CollisionEvent::Stopped(collider_a, collider_b, _) => {
-                if
-                    let (Ok(mut climber), Ok(climbable)) = (
-                        climbers.get_mut(*collider_a),
-                        climbables.get(*collider_b),
-                    )
-                {
+                } else {
                     climber.intersecting_climbables.remove(&climbable);
                 }
-
-                if
-                    let (Ok(mut climber), Ok(climbable)) = (
-                        climbers.get_mut(*collider_b),
-                        climbables.get(*collider_a),
-                    )
-                {
-                    climber.intersecting_climbables.remove(&climbable);
-                }
+                true
+            } else {
+                false
             }
         }
-    }
+    );
 }
 
 // Checks if a climber entity is climbing.

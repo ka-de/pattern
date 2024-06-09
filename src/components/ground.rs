@@ -61,32 +61,18 @@ pub fn ground_detection(
     mut collisions: EventReader<CollisionEvent>,
     collidables: Query<Entity, (With<Collider>, Without<Sensor>)>
 ) {
-    for collision_event in collisions.read() {
-        match collision_event {
-            CollisionEvent::Started(e1, e2, _) => {
-                if collidables.contains(*e1) {
-                    if let Ok(mut sensor) = ground_sensors.get_mut(*e2) {
-                        sensor.intersecting_ground_entities.insert(*e1);
-                    }
-                } else if collidables.contains(*e2) {
-                    if let Ok(mut sensor) = ground_sensors.get_mut(*e1) {
-                        sensor.intersecting_ground_entities.insert(*e2);
-                    }
-                }
+    crate::rapier_utils::reciprocal_collisions(&mut collisions, move |e1, e2, _, start| {
+        if let (true, Ok(mut sensor)) = (collidables.contains(*e1), ground_sensors.get_mut(*e2)) {
+            if start {
+                sensor.intersecting_ground_entities.insert(*e1);
+            } else {
+                sensor.intersecting_ground_entities.remove(e1);
             }
-            CollisionEvent::Stopped(e1, e2, _) => {
-                if collidables.contains(*e1) {
-                    if let Ok(mut sensor) = ground_sensors.get_mut(*e2) {
-                        sensor.intersecting_ground_entities.remove(e1);
-                    }
-                } else if collidables.contains(*e2) {
-                    if let Ok(mut sensor) = ground_sensors.get_mut(*e1) {
-                        sensor.intersecting_ground_entities.remove(e2);
-                    }
-                }
-            }
+            true
+        } else {
+            false
         }
-    }
+    });
 }
 
 pub fn update_on_ground(
