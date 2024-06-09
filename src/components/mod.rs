@@ -21,3 +21,4 @@ pub(crate) mod wall;
 pub(crate) mod chest;
 pub(crate) mod settings;
 pub(crate) mod water;
+pub(crate) mod interactions;

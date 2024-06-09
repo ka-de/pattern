@@ -39,10 +39,12 @@ pub fn setup_ldtk(app: &mut App) {
                 super::ground::spawn_ground_sensor,
                 super::ground::ground_detection,
                 super::ground::update_on_ground,
+                super::interactions::spawn_interaction_sensor,
+                super::interactions::interaction_detection,
+                super::interactions::update_interaction,
+                super::interactions::setup_interactive_entity,
                 restart_level,
                 respawn_world,
-                super::npc::print_npc_info,
-                super::npc::print_npcpatrol_info,
             ).run_if(in_state(GameState::Playing))
         )
         // RapierPhysicsPlugin
