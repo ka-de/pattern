@@ -13,9 +13,14 @@ use bevy::{
     log::info,
     math::Vec2,
     transform::components::Transform,
+    prelude::Color,
 };
 use bevy_ecs_ldtk::{ ldtk::ldtk_fields::LdtkFields, EntityInstance };
-use bevy_rapier2d::{ geometry::{ ActiveEvents, Collider, Sensor }, pipeline::CollisionEvent };
+use bevy_rapier2d::{
+    geometry::{ ActiveEvents, Collider, Sensor },
+    pipeline::CollisionEvent,
+    render::ColliderDebugColor,
+};
 
 use super::player::Player;
 
@@ -65,7 +70,8 @@ pub fn spawn_interaction_sensor(
                     .insert(InteractionSensor {
                         interaction_detection_entity: entity,
                         intersecting_entities: HashSet::new(),
-                    });
+                    })
+                    .insert(ColliderDebugColor(Color::rgb(0.0, 1.0, 0.0)));
             });
         }
     }
@@ -108,10 +114,10 @@ pub fn interaction_detection(
 //     interaction_sensors: Query<(&InteractionSensor, &Name, &Transform), Changed<InteractionSensor>>
 // ) {
 //     for (sensor, sensor_name, sensor_transform) in &interaction_sensors {
-//         for (interactive_component, interactive_tranform, ei) in interactive.iter_many(
+//         for (interactive_component, interactive_transform, ei) in interactive.iter_many(
 //             &sensor.intersecting_entities
 //         ) {
-//             let distance = sensor_transform.translation.distance(interactive_tranform.translation);
+//             let distance = sensor_transform.translation.distance(interactive_transform.translation);
 //             info!(
 //                 "{} interacting with a {} named {} at {}px",
 //                 sensor_name,
