@@ -2,6 +2,18 @@
 name = "separated"
 version = "1.0.0"
 edition = "2021"
+authors = ["Balazs Horvath", "Gaeros"]
+description = "A 2D platformer game."
+documentation = "https://cringe.live/docs/games/separated/"
+readme = "README.md"
+homepage = "https://cringe.live/separated/"
+repository = "https://github.com/ka-de/separated"
+license =  "MIT"
+keywords = ["gamedev"]
+publish = false
+
+[lints.rust]
+unsafe_code = "warn"
 
 [workspace]
 resolver = "2"
