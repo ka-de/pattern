@@ -27,7 +27,7 @@ pub struct PlayerBundle {
     #[worldly]
     pub worldly: Worldly,
     pub climber: Climber,
-    pub swimer: Swimmer,
+    pub swimmer: Swimmer,
     pub ground_detection: GroundDetection,
     pub health: Health,
     pub armor: Armor,
