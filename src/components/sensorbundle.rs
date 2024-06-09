@@ -14,8 +14,16 @@ impl From<IntGridCell> for SensorBundle {
     fn from(int_grid_cell: IntGridCell) -> SensorBundle {
         let rotation_constraints = LockedAxes::ROTATION_LOCKED;
 
-        // ladder
+        // Ladder
         if int_grid_cell.value == 2 {
+            SensorBundle {
+                collider: Collider::cuboid(8.0, 8.0),
+                sensor: Sensor,
+                rotation_constraints,
+                active_events: ActiveEvents::COLLISION_EVENTS,
+            }
+            // Water
+        } else if int_grid_cell.value == 4 {
             SensorBundle {
                 collider: Collider::cuboid(8.0, 8.0),
                 sensor: Sensor,

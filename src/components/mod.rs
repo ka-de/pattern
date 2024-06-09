@@ -22,3 +22,4 @@ pub(crate) mod chest;
 pub(crate) mod settings;
 pub(crate) mod water;
 pub(crate) mod interactions;
+pub(crate) mod gamepad;
