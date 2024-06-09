@@ -5,7 +5,7 @@ Ancient Reptilian Brain: There is nothing. Only warm, primordial blackness. Your
 Ancient Reptilian Brain: Ever.
 Ancient Reptilian Brain: Never ever.
 <<set $never to false>>
-<<jump Hub0>>
+// <<jump Hub0>>
 ===
 title: Hub0
 position: -43,-216
