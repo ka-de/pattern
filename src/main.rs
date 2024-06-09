@@ -164,7 +164,6 @@ fn main() {
                     default_spatial_scale: SpatialScale::new_2d(AUDIO_SCALE),
                     ..default()
                 }),
-            HanabiPlugin,
             TweeningPlugin,
             plugins::gamestate::game_state_plugin,
             components::systems::setup_ldtk,
@@ -172,6 +171,7 @@ fn main() {
             plugins::debug::plugin,
             plugins::input::InputPlugin,
             plugins::ui::plugin,
+            //HanabiPlugin,
         ))
         .add_systems(Startup, set_window_icon) // Set the Window icon.
 

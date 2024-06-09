@@ -1,3 +1,11 @@
+[package]
+name = "separated"
+version = "1.0.0"
+edition = "2021"
+
+[workspace]
+resolver = "2"
+
 [profile.dev]
 opt-level = 1
 
@@ -8,42 +16,21 @@ codegen-units = 1
 [profile.release]
 codegen-units = 1
 
-
-[package]
-name = "separated"
-version = "1.0.0"
-edition = "2021"
-
 [build-dependencies]
 embed-resource = "2.4.2"
 
 [dependencies]
 winit = { version = "0.29.15", default-features = false, features = ["rwh_06"] }
 image = "0.25.1"
-bevy_ecs_ldtk = { git = "https://github.com/ka-de/bevy_ecs_ldtk" }
-bevy-inspector-egui = { git = "https://github.com/ka-de/bevy-inspector-egui" }
-bevy_tweening = { git = "https://github.com/ka-de/bevy_tweening" }
-#bevy_framepace = { git = "https://github.com/ka-de/bevy_framepace" }
-#bevy_smooth_pixel_camera = { git = "https://github.com/ka-de/bevy_smooth_pixel_camera" }
-bevy_progress = { git = "https://github.com/ka-de/bevy_progress", features = [
-  "assets",
-  "debug",
-] }
-bevy-steamworks = { git = "https://github.com/ka-de/bevy_steamworks", features = [
-  "serde",
-] }
 rand = "0.8.5"
+unicode-segmentation = "1.11.0"
 bevy_rapier2d = { version = "0.26.0", features = ["simd-stable"] }
-sickle_ui = { git = "https://github.com/ka-de/sickle_ui", features = ["dev"] }
-bevy_yarnspinner = { git = "https://github.com/ka-de/YarnSpinner-Rust" }
 wgpu = { version = "0.19.3", default-features = false, features = [
   "dx12",
   "metal",
   "naga",
   "naga-ir",
 ] }
-unicode-segmentation = "1.11.0"
-bevy_hanabi = { git = "https://github.com/ka-de/bevy_hanabi" }
 
 [dependencies.bevy]
 version = "0.13.2"
@@ -53,7 +40,7 @@ features = [
   "vorbis",
   "animation",
   "bevy_audio",
-  "bevy_gilrs",           # gamepad support
+  "bevy_gilrs",
   "bevy_gizmos",
   "bevy_sprite",
   "bevy_animation",
@@ -73,5 +60,31 @@ git = "https://github.com/ka-de/bevy_asset_loader"
 default-features = false
 features = ["2d", "standard_dynamic_assets", "progress_tracking"]
 
-[workspace]
-resolver = "2"
+[dependencies.bevy_ecs_ldtk]
+git = "https://github.com/ka-de/bevy_ecs_ldtk"
+
+[dependencies.bevy-inspector-egui]
+git = "https://github.com/ka-de/bevy-inspector-egui"
+
+[dependencies.bevy_tweening]
+git = "https://github.com/ka-de/bevy_tweening"
+
+[dependencies.bevy_progress]
+git = "https://github.com/ka-de/bevy_progress"
+features = ["assets", "debug"]
+
+[dependencies.bevy-steamworks]
+git = "https://github.com/ka-de/bevy_steamworks"
+features = ["serde"]
+
+[dependencies.sickle_ui]
+git = "https://github.com/ka-de/sickle_ui"
+features = ["dev"]
+
+[dependencies.bevy_yarnspinner]
+git = "https://github.com/ka-de/YarnSpinner-Rust"
+
+[dependencies.bevy_hanabi]
+git = "https://github.com/ka-de/bevy_hanabi"
+default-features = false
+features = ["2d"]
