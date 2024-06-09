@@ -12,8 +12,8 @@ use std::env;
 // ⚠️ TODO: Move to plugin or something?
 use bevy_hanabi::prelude::*;
 
-use bevy::render::settings::WgpuSettings;
 use bevy::render::RenderPlugin;
+use bevy::render::settings::{ WgpuFeatures, WgpuSettings };
 use wgpu::Backends;
 
 mod components;
@@ -139,7 +139,12 @@ fn main() {
         }
     }
 
+    let mut wgpu_settings = WgpuSettings::default();
+    wgpu_settings.features.set(WgpuFeatures::VERTEX_WRITABLE_STORAGE, true);
+
     let backend = get_backend();
+    wgpu_settings.backends = backend;
+
     let mut app = App::new();
 
     //app.add_systems(Startup, play_background_audio);
@@ -148,13 +153,10 @@ fn main() {
         // DefaultPlugins
         .add_plugins((
             DefaultPlugins.set(RenderPlugin {
-                render_creation: (WgpuSettings {
-                    backends: backend,
-                    ..default()
-                }).into(),
+                render_creation: wgpu_settings.into(),
+                synchronous_pipeline_compilation: false,
                 ..default()
             })
-                .set(window_plugin)
                 .set(ImagePlugin::default_nearest())
                 .set(plugins::debug::make_log_plugin())
                 // ⚠️ TODO: Maybe move this to its own thing? I'm not sure!

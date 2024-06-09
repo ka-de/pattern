@@ -10,10 +10,15 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
+// Sets up the game world using the LDTK plugin.
+//
+// It registers different entities and their corresponding bundles to be used in the game world.
+// It also adds various systems to the game update loop, which will be run if the game state is Playing.
 pub fn setup_ldtk(app: &mut App) {
     app.register_ldtk_int_cell::<super::wall::WallBundle>(1)
         .register_ldtk_int_cell::<super::ladders::LadderBundle>(2)
         .register_ldtk_int_cell::<super::wall::WallBundle>(3)
+        .register_ldtk_int_cell::<super::water::WaterBundle>(4)
         .register_ldtk_entity::<super::torch::TorchBundle>("Torch")
         .register_ldtk_entity::<super::player::PlayerBundle>("Player")
         .register_ldtk_entity::<super::npc::NpcBundle>("Npc")
@@ -44,6 +49,8 @@ pub fn setup_ldtk(app: &mut App) {
         .add_plugins((LdtkPlugin, RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0)));
 }
 
+// Loads the first level of the game from an LDTK file and spawns the game world.
+// It also sets up the physics configuration and the level selection resource.
 pub fn spawn_ldtk_world(mut commands: Commands, asset_server: Res<AssetServer>) {
     // TODO: use bevy_asset_loader states
     let ldtk_handle = asset_server.load("first_level.ldtk");
@@ -73,6 +80,9 @@ pub fn spawn_ldtk_world(mut commands: Commands, asset_server: Res<AssetServer>) 
     });
 }
 
+// Checks for collision events between climbers and climbable entities.
+// If a collision starts, the climbable entity is added to the climber’s set of intersecting climbables.
+// If a collision stops, the climbable entity is removed from the set.
 pub fn detect_climb_range(
     mut climbers: Query<&mut Climber>,
     climbables: Query<Entity, With<Climbable>>,
@@ -121,6 +131,9 @@ pub fn detect_climb_range(
     }
 }
 
+// Checks if a climber entity is climbing.
+// If it is, the gravity scale is set to 0.0, effectively ignoring gravity.
+// If the climber is not climbing, the gravity scale is set back to 1.0.
 pub fn ignore_gravity_if_climbing(
     mut query: Query<(&Climber, &mut GravityScale), Changed<Climber>>
 ) {
@@ -133,6 +146,8 @@ pub fn ignore_gravity_if_climbing(
     }
 }
 
+// Updates the current level selection based on the player’s position.
+// If the player is within the bounds of a level, that level is set as the current level.
 pub fn update_level_selection(
     level_query: Query<(&LevelIid, &Transform), Without<Player>>,
     player_query: Query<&Transform, With<Player>>,
@@ -171,6 +186,8 @@ pub fn update_level_selection(
     }
 }
 
+// Respawns the game world when the ‘T’ key is pressed.
+// It does this by inserting a Respawn component into the entity that holds the LDtk project.
 fn respawn_world(
     mut commands: Commands,
     ldtk_projects: Query<Entity, With<Handle<LdtkProject>>>,
@@ -181,6 +198,8 @@ fn respawn_world(
     }
 }
 
+// This function restarts the current level when the ‘R’ key is pressed.
+// It does this by inserting a Respawn component into all entities that are part of the current level.
 pub fn restart_level(
     mut commands: Commands,
     level_query: Query<Entity, With<LevelIid>>,
