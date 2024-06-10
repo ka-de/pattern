@@ -1,35 +1,53 @@
 use std::collections::HashSet;
-
-use bevy::{
-    core::Name,
-    ecs::{
-        component::Component,
-        entity::Entity,
-        event::EventReader,
-        query::{ Added, Changed, With },
-        system::{ Commands, Query },
-    },
-    hierarchy::BuildChildren,
-    log::info,
-    math::Vec2,
-    transform::components::Transform,
-    prelude::Color,
-};
-use bevy_ecs_ldtk::{ ldtk::ldtk_fields::LdtkFields, EntityInstance };
-use bevy_rapier2d::{
-    geometry::{ ActiveEvents, Collider, Sensor },
-    pipeline::CollisionEvent,
-    render::ColliderDebugColor,
-};
+use bevy::{ ecs::schedule::SystemConfigs, prelude::* };
+use bevy_rapier2d::prelude::*;
+use bevy_ecs_ldtk::prelude::*;
 
 use super::player::Player;
 
-#[derive(Clone, Component)]
+#[derive(Component, Default)]
+pub struct InteractionSensor {
+    pub intersecting_entities: HashSet<Entity>,
+    pub closest_entity: Option<Entity>,
+}
+
+/// Spawn a sensing region around the Player.
+///
+/// The sensor is spawn as a children to the Player. It contains an
+/// [`InteractionSensor`] component that tracks interactive entities in range
+/// and the closest one.
+fn spawn_interaction_sensor(
+    mut commands: Commands,
+    mut detect_interaction_for: Query<(Entity, &Collider), Added<Player>>
+) {
+    for (parent, shape) in &mut detect_interaction_for {
+        if let Some(cuboid) = shape.as_cuboid() {
+            let Vec2 { x: half_extents_x, y: half_extents_y } = cuboid.half_extents();
+            let mut sensor_cmds = commands.spawn((
+                ActiveEvents::COLLISION_EVENTS,
+                Collider::cuboid(half_extents_x * 4.0, half_extents_y * 1.5),
+                Sensor,
+                InteractionSensor::default(),
+            ));
+            #[cfg(debug_assertions)]
+            sensor_cmds.insert((
+                Name::new("interaction_sensor"),
+                ColliderDebugColor(Color::rgb(0.0, 1.0, 0.0)),
+            ));
+            let child = sensor_cmds.id();
+            commands.add(PushChild { parent, child });
+        }
+    }
+}
+
+#[derive(Component)]
 pub struct Interactive {
     pub name: String,
 }
 
-pub fn setup_interactive_entity(
+/// Adds the [`Interactive`] component to LDtk entities that have a name and the
+/// `hasDialogue` field set to true
+fn setup_interactive_entity(
     mut commands: Commands,
     query: Query<(Entity, &EntityInstance), Added<EntityInstance>>
 ) {
@@ -46,40 +64,11 @@ pub fn setup_interactive_entity(
     }
 }
 
-#[derive(Component)]
-pub struct InteractionSensor {
-    pub interaction_detection_entity: Entity,
-    pub intersecting_entities: HashSet<Entity>,
-}
-
-pub fn spawn_interaction_sensor(
-    mut commands: Commands,
-    detect_interaction_for: Query<(Entity, &Collider), Added<Player>>
-) {
-    for (entity, shape) in &detect_interaction_for {
-        if let Some(cuboid) = shape.as_cuboid() {
-            let Vec2 { x: half_extents_x, y: half_extents_y } = cuboid.half_extents();
-            let detector_shape = Collider::cuboid(half_extents_x * 4.0, half_extents_y * 1.5);
-            commands.entity(entity).with_children(|builder| {
-                builder
-                    .spawn_empty()
-                    .insert(Name::new("interaction_sensor"))
-                    .insert(ActiveEvents::COLLISION_EVENTS)
-                    .insert(detector_shape)
-                    .insert(Sensor)
-                    .insert(InteractionSensor {
-                        interaction_detection_entity: entity,
-                        intersecting_entities: HashSet::new(),
-                    })
-                    .insert(ColliderDebugColor(Color::rgb(0.0, 1.0, 0.0)));
-            });
-        }
-    }
-}
-
-pub fn interaction_detection(
-    mut interactors: Query<&mut InteractionSensor>,
-    interactives: Query<Entity, With<Interactive>>,
+/// System collecting collision events of the interaction sensor with
+/// interactive entities
+fn interaction_detection(
+    mut interaction_sensors: Query<&mut InteractionSensor>,
+    interactive_entities: Query<Entity, With<Interactive>>,
     mut collisions: EventReader<CollisionEvent>
 ) {
     crate::rapier_utils::reciprocal_collisions(
@@ -87,19 +76,15 @@ pub fn interaction_detection(
         move |interactor_entity, interactive_entity, _, start| {
             if
                 let (Ok(mut interactor), true) = (
-                    interactors.get_mut(*interactor_entity),
-                    interactives.contains(*interactive_entity),
+                    interaction_sensors.get_mut(*interactor_entity),
+                    interactive_entities.contains(*interactive_entity),
                 )
             {
+                let set = &mut interactor.intersecting_entities;
                 if start {
-                    info!(
-                        "{:?} starts interacting with {:?}",
-                        interactor_entity,
-                        interactive_entity
-                    );
-                    interactor.intersecting_entities.insert(*interactive_entity);
+                    set.insert(*interactive_entity);
                 } else {
-                    interactor.intersecting_entities.remove(interactive_entity);
+                    set.remove(interactive_entity);
                 }
                 true
             } else {
@@ -109,40 +94,68 @@ pub fn interaction_detection(
     );
 }
 
-// pub fn update_interaction(
-//     mut interactive: Query<(&Interactive, &Transform, &EntityInstance)>,
-//     interaction_sensors: Query<(&InteractionSensor, &Name, &Transform), Changed<InteractionSensor>>
-// ) {
-//     for (sensor, sensor_name, sensor_transform) in &interaction_sensors {
-//         for (interactive_component, interactive_transform, ei) in interactive.iter_many(
-//             &sensor.intersecting_entities
-//         ) {
-//             let distance = sensor_transform.translation.distance(interactive_transform.translation);
-//             info!(
-//                 "{} interacting with a {} named {} at {}px",
-//                 sensor_name,
-//                 ei.identifier,
-//                 interactive_component.name,
-//                 distance
-//             );
-//         }
-//     }
-// }
-
-pub fn update_interaction(
-    mut interactive: Query<(&Interactive, Entity)>,
-    interaction_sensors: Query<(&InteractionSensor, Entity), Changed<InteractionSensor>>
+/// System that tracks distances between interactive entities and the sensor, in
+/// order to elect the closest interactive entity.
+fn update_interactions(
+    mut interaction_sensors: Query<(&mut InteractionSensor, &Parent)>,
+    player_query: Query<&GlobalTransform, With<Player>>,
+    interactive: Query<(&GlobalTransform, &Collider), With<Interactive>>
 ) {
-    for (sensor, sensor_entity) in &interaction_sensors {
-        for (interactive_component, interactive_entity) in interactive.iter_many(
-            &sensor.intersecting_entities
-        ) {
-            info!(
-                "{:?} interacting with {:?}:{}",
-                sensor_entity,
-                interactive_entity,
-                interactive_component.name
+    for (mut sensor, parent) in &mut interaction_sensors {
+        // Bypass the player transform query if the is no interactive entities
+        // in range
+        if sensor.intersecting_entities.is_empty() {
+            if sensor.closest_entity != None {
+                sensor.closest_entity = None;
+            }
+            continue;
+        }
+        let player_transform = player_query.get(**parent).unwrap();
+        // Find the closest entity.
+        let mut closest_dist = f32::INFINITY;
+        let mut closest_entity = None;
+        for interactive_entity in &sensor.intersecting_entities {
+            let (interactive_transform, interactive_collider) = interactive
+                .get(*interactive_entity)
+                .unwrap();
+
+            let distance = interactive_collider.distance_to_local_point(
+                player_transform.reparented_to(interactive_transform).translation.truncate(),
+                false
             );
+            if distance < closest_dist {
+                closest_dist = distance;
+                closest_entity = Some(*interactive_entity);
+            }
+        }
+        // Gate the mutation such that only real change are detected when using
+        // `Changed<InteractionSensor>` (See `Mut<>` mutation detection)
+        if sensor.closest_entity != closest_entity {
+            sensor.closest_entity = closest_entity;
         }
     }
+}
+
+fn test_interaction(
+    players: Query<&Name, With<Player>>,
+    sensors: Query<(&Parent, &InteractionSensor), Changed<InteractionSensor>>,
+    interactives: Query<&Interactive>
+) {
+    for (parent, sensor) in sensors.iter() {
+        info!(
+            "{} interacting with {:?}",
+            players.get(**parent).unwrap().as_str(),
+            sensor.closest_entity.and_then(|e| interactives.get(e).ok()).map(|i| &i.name)
+        );
+    }
+}
+
+pub fn make_interaction_systems() -> SystemConfigs {
+    (
+        spawn_interaction_sensor,
+        setup_interactive_entity,
+        interaction_detection,
+        update_interactions,
+        test_interaction,
+    ).chain()
 }
