@@ -29,6 +29,7 @@ pub fn set_state_playing() {
 }
 
 pub fn game_state_plugin(app: &mut App) {
+    let splash_timer = if cfg!(debug_assertions) { 0.5 } else { 3.0 };
     // Splash Screen Configuration
     let config = SplashScreenConfiguration {
         run_state: GameState::SplashScreen,
@@ -37,7 +38,7 @@ pub fn game_state_plugin(app: &mut App) {
         //next_state: GameState::MainMenu,
         images: StandardDynamicAsset::Files { paths: vec!["splash_screens/splash.png".to_owned()] },
         custom_size: Some(Vec2::ONE),
-        splash_timer: 3.0,
+        splash_timer,
         clear_color: Color::BLACK,
         camera_scaling_mode: ScalingMode::Fixed { width: 1.0, height: 1.0 },
     };
