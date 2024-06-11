@@ -69,15 +69,6 @@ fn change_global_volume(mut volume: ResMut<GlobalVolume>) {
     volume.volume = Volume::new(0.5);
 }
 
-// ⚠️ TODO: Currently very dumb, just plays one music on repeat!
-fn play_background_audio(asset_server: Res<AssetServer>, mut commands: Commands) {
-    // Create an entity dedicated to playing our background music
-    commands.spawn(AudioBundle {
-        source: asset_server.load("music/garam_masala_wip.ogg"),
-        settings: PlaybackSettings::LOOP,
-    });
-}
-
 fn main() {
     #[cfg(not(debug_assertions))] // ⚠️ TODO: At some point we will need to dev with Steam.
     match SteamworksPlugin::init_app(981370) {
