@@ -19,6 +19,11 @@
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 #![warn(missing_docs, missing_debug_implementations)]
 
+mod option_selection;
+mod setup;
+mod typewriter;
+mod updating;
+
 use bevy::{
     app::{ App, Plugin, Update },
     asset::Handle,
@@ -58,11 +63,6 @@ pub struct YarnSpinnerDialogueViewPlugin<T> {
 /// Is run after the [`YarnSpinnerSystemSet`](bevy_yarnspinner::prelude::YarnSpinnerSystemSet).
 #[derive(Debug, Default, Clone, Copy, SystemSet, Eq, PartialEq, Hash)]
 pub struct YarnSpinnerDialogueViewSystemSet;
-
-mod option_selection;
-mod setup;
-mod typewriter;
-mod updating;
 
 #[derive(AssetCollection, Resource)]
 struct Assets {

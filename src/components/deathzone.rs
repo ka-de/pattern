@@ -1,5 +1,5 @@
-use bevy::prelude::*;
+use bevy::ecs::component::Component;
 
 // 💀 Zone
 #[derive(Component)]
-struct DeathZone {}
+pub struct DeathZone;
