@@ -1,12 +1,15 @@
-use bevy::ecs;
-use bevy::log::info;
+use bevy::{
+    log::info,
+    core::Name,
+    audio::SpatialListener,
+    ecs::{ entity::Entity, query::Added, system::{ Query, Commands } },
+};
+
+use crate::components::player::Player;
 
 pub fn insert_spatial_listener(
     mut commands: Commands,
-    added_player: ecs::system::Query<
-        (ecs::entity::Entity, &bevy::core::Name),
-        ecs::query::Added<components::player::Player>
-    >
+    added_player: Query<(Entity, &Name), Added<Player>>
 ) {
     for (player_entity, name) in &added_player {
         info!("Inserted spatial listener for {}", name);

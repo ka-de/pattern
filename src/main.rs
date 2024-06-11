@@ -12,7 +12,7 @@ use bevy_hanabi::prelude::*;
 use bevy::{
     prelude::PluginGroup,
     utils::default,
-    app::{ App, Startup },
+    app::{ Update, App, Startup },
     DefaultPlugins,
     asset::AssetServer,
     // ⚠️ TODO: Move audio stuff!
@@ -122,7 +122,7 @@ fn main() {
         .insert_resource(GlobalVolume::new(1.0)) // Set the GlobalVolume ⚠️ WIP
         .add_systems(Startup, change_global_volume) // Change the GlobalVolume ⚠️ WIP
 
-        .add_systems(bevy::app::Update, insert_spatial_listener)
+        .add_systems(Update, insert_spatial_listener)
 
         // GAME SETTINGS ⚠️
         .insert_resource(GameSettings::default());
