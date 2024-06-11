@@ -1,3 +1,5 @@
+use bevy::ecs::schedule::States;
+
 /// Controls the flow of our plugin
 #[derive(States, Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SplashScreenState {

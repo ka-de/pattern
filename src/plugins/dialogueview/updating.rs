@@ -1,8 +1,31 @@
+use bevy::app::{ App, Update };
+use bevy::input::ButtonInput;
+use bevy::prelude::{
+    on_event,
+    Commands,
+    Condition,
+    Event,
+    EventReader,
+    EventWriter,
+    IntoSystemConfigs,
+    KeyCode,
+    MouseButton,
+    Query,
+    Res,
+    ResMut,
+    Touches,
+    With,
+    Without,
+};
+use bevy::reflect::Reflect;
+use bevy::render::view::Visibility;
+use bevy::text::Text;
+use bevy_yarnspinner::{ events::*, prelude::* };
+
 use super::option_selection::OptionSelection;
 use super::setup::{ DialogueContinueNode, DialogueNameNode, UiRootNode };
 use super::typewriter::{ self, Typewriter, in_dialogue };
 use super::YarnSpinnerDialogueViewSystemSet;
-use bevy_yarnspinner::{ events::*, prelude::* };
 
 pub(crate) fn ui_updating_plugin(app: &mut App) {
     app.add_systems(

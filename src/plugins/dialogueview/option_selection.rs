@@ -1,9 +1,38 @@
+use bevy::app::{ App, Update };
+use bevy::hierarchy::{ Children, DespawnRecursiveExt, HierarchyQueryExt };
+use bevy::input::ButtonInput;
+use bevy::prelude::{
+    any_with_component,
+    resource_added,
+    resource_exists,
+    Changed,
+    Commands,
+    Condition,
+    Entity,
+    Event,
+    EventReader,
+    EventWriter,
+    IntoSystemConfigs,
+    KeyCode,
+    Query,
+    Res,
+    Resource,
+    With,
+    Without,
+};
+use bevy::reflect::Reflect;
+use bevy::render::color::Color;
+use bevy::render::view::Visibility;
+use bevy::text::Text;
+use bevy::ui::widget::Button;
+use bevy::ui::{ Display, Interaction, Style };
+use bevy::utils::HashMap;
+use bevy::window::{ CursorIcon, PrimaryWindow, Window };
+use bevy_yarnspinner::{ events::*, prelude::* };
+
 use super::setup::{ spawn_options, DialogueNode, OptionButton, OptionsNode, UiRootNode };
 use super::typewriter::{ self, Typewriter, TypewriterFinishedEvent };
 use super::YarnSpinnerDialogueViewSystemSet;
-use bevy::utils::HashMap;
-use bevy::window::PrimaryWindow;
-use bevy_yarnspinner::{ events::*, prelude::* };
 
 pub(crate) fn option_selection_plugin(app: &mut App) {
     app.add_systems(

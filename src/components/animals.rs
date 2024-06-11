@@ -1,7 +1,8 @@
-use super::names;
-
+use bevy::prelude::Component;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
+
+use super::names;
 
 // Animal types
 #[derive(Component, PartialEq, Eq)]

@@ -12,8 +12,34 @@ use std::env;
 // ⚠️ TODO: Move to plugin or something?
 use bevy_hanabi::prelude::*;
 
-use bevy::render::RenderPlugin;
-use bevy::render::settings::{ WgpuFeatures, WgpuSettings };
+use bevy::{
+    prelude::PluginGroup,
+    utils::default,
+    app::{ App, Startup },
+    DefaultPlugins,
+    asset::AssetServer,
+    // ⚠️ TODO: Move audio stuff!
+    audio::{
+        SpatialScale,
+        SpatialListener,
+        AudioPlugin,
+        Volume,
+        GlobalVolume,
+        AudioBundle,
+        PlaybackSettings,
+    },
+    ecs::system::{ NonSend, ResMut, Res, Commands },
+    render::{
+        view::Msaa,
+        // ⚠️ - Audio stuff!
+        prelude::SpatialBundle,
+        // End of audio stuff!
+        RenderPlugin,
+        settings::WgpuFeatures,
+        settings::WgpuSettings,
+        texture::ImagePlugin,
+    },
+};
 use plugins::gamestate::GameState;
 use wgpu::Backends;
 
@@ -59,8 +85,6 @@ fn set_window_icon(
 }
 
 // ⚠️ TODO: Move audio stuff to its own thing
-use bevy::audio::{ SpatialScale, AudioPlugin };
-use bevy::audio::Volume;
 
 const AUDIO_SCALE: f32 = 1.0 / 100.0;
 

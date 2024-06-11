@@ -1,6 +1,14 @@
-use crate::plugins::splashscreen::{SplashScreenConfiguration, SplashScreenPlugin};
-use bevy::render::camera::ScalingMode;
+use bevy::{
+    app::App,
+    log::info,
+    math::Vec2,
+    prelude::{ KeyCode, OnEnter, States },
+    reflect::Reflect,
+    render::{ camera::ScalingMode, color::Color },
+};
 use bevy_asset_loader::prelude::*;
+
+use crate::plugins::splashscreen::{ SplashScreenConfiguration, SplashScreenPlugin };
 
 #[derive(States, Default, Debug, Clone, Eq, PartialEq, Hash, Reflect)]
 pub enum GameState {
@@ -62,8 +70,8 @@ pub fn game_state_plugin(app: &mut App) {
     // StateInspectorPlugin
     #[cfg(debug_assertions)]
     app.add_plugins(
-        bevy_inspector_egui::quick::StateInspectorPlugin::<GameState>::default().run_if(
-            bevy::input::common_conditions::input_toggle_active(false, KeyCode::F10),
-        ),
+        bevy_inspector_egui::quick::StateInspectorPlugin::<GameState>
+            ::default()
+            .run_if(bevy::input::common_conditions::input_toggle_active(false, KeyCode::F10))
     );
 }

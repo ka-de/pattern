@@ -1,6 +1,7 @@
 use bevy::{
     core::Name,
     ecs::system::EntityCommands,
+    hierarchy::BuildChildren,
     prelude::{ default, Commands, Component, Res },
     render::{ color::Color, view::Visibility },
     text::{ Text, TextSection, TextStyle },

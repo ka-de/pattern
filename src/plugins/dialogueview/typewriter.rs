@@ -1,3 +1,29 @@
+use bevy::app::{ App, Update };
+use bevy::log::info;
+use bevy::prelude::{
+    any_with_component,
+    on_event,
+    Commands,
+    Event,
+    EventReader,
+    EventWriter,
+    IntoSystemConfigs,
+    Local,
+    Query,
+    Res,
+    ResMut,
+    Resource,
+    With,
+};
+use bevy::reflect::Reflect;
+use bevy::render::view::Visibility;
+use bevy::text::Text;
+use bevy::time::Time;
+use bevy::ui::{ Style, Val };
+use bevy::utils::{ default, Instant };
+use bevy_yarnspinner::{ events::*, prelude::* };
+use unicode_segmentation::UnicodeSegmentation;
+
 use super::option_selection::OptionSelection;
 use super::setup::{
     create_dialog_text,
@@ -8,9 +34,6 @@ use super::setup::{
 };
 use super::updating::SpeakerChangeEvent;
 use super::YarnSpinnerDialogueViewSystemSet;
-use bevy::utils::Instant;
-use bevy_yarnspinner::{ events::*, prelude::* };
-use unicode_segmentation::UnicodeSegmentation;
 
 pub(crate) fn typewriter_plugin(app: &mut App) {
     app.add_systems(

@@ -3,7 +3,7 @@
 use bevy::{
     app::{ Plugin, Update },
     input::{ common_conditions::input_toggle_active, ButtonInput },
-    prelude::{ any_with_component, not, KeyCode, Res, ResMut },
+    prelude::{ any_with_component, not, IntoSystemConfigs, KeyCode, Res, ResMut },
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier2d::render::{ DebugRenderContext, RapierDebugRenderPlugin };

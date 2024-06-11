@@ -1,3 +1,5 @@
+use bevy::{ prelude::Component, time::Timer };
+
 /// Component for showing the splash screen image
 #[derive(Component)]
 pub struct SplashScreenImage {

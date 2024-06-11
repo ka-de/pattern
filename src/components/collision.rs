@@ -1,3 +1,4 @@
+use bevy::{ log::debug, prelude::Bundle, utils::default };
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
