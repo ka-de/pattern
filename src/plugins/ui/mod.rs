@@ -5,7 +5,7 @@ pub(crate) mod bouncing;
 pub(crate) mod flying;
 pub(crate) mod rotating;
 pub(crate) mod zooming;
-
+pub(crate) mod set_window_icon;
 pub(crate) mod fps_widget;
 pub(crate) mod release_label;
 pub(crate) mod set;

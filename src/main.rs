@@ -10,7 +10,7 @@ use std::env;
 
 // Particle effects
 // ⚠️ TODO: Move to plugin or something?
-// use bevy_hanabi::prelude::*;
+use bevy_hanabi::prelude::*;
 
 use bevy::{
     prelude::PluginGroup,
@@ -63,29 +63,9 @@ use components::settings::GameSettings;
 // use components::player::Player;
 use components::torch::Torch;
 
-// ⚠️ TODO: Move to ui!
-fn set_window_icon(
-    // we have to use `NonSend` here
-    windows: NonSend<WinitWindows>
-) {
-    // here we use the `image` crate to load our icon data from a png file
-    // this is not a very bevy-native solution, but it will do
-    let (icon_rgba, icon_width, icon_height) = {
-        let image = image::open("assets/icon.png").expect("Failed to open icon path").into_rgba8();
-        let (width, height) = image.dimensions();
-        let rgba = image.into_raw();
-        (rgba, width, height)
-    };
-    let icon = Icon::from_rgba(icon_rgba, icon_width, icon_height).unwrap();
-
-    // do it for all windows
-    for window in windows.windows.values() {
-        window.set_window_icon(Some(icon.clone()));
-    }
-}
+use crate::plugins::ui::set_window_icon::set_window_icon;
 
 // ⚠️ TODO: Move audio stuff to its own thing
-
 const AUDIO_SCALE: f32 = 1.0 / 100.0;
 
 fn change_global_volume(mut volume: ResMut<GlobalVolume>) {
