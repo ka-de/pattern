@@ -1,4 +1,12 @@
-use bevy::{ diagnostic::{ DiagnosticsStore, FrameTimeDiagnosticsPlugin }, prelude::* };
+use bevy::{
+    app::{ App, Update },
+    ecs::{ entity::Entity, component::Component, query::With, system::{ Commands, Query, Res } },
+    render::color::Color,
+    text::TextStyle,
+    ui::{ node_bundles::NodeBundle, JustifyContent, PositionType, Val },
+};
+
+use bevy::{ asset::AssetServer, diagnostic::{ DiagnosticsStore, FrameTimeDiagnosticsPlugin } };
 use sickle_ui::{
     ui_builder::{ UiBuilder, UiBuilderExt, UiRoot },
     ui_commands::SetTextExt,

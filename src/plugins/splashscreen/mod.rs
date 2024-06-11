@@ -7,9 +7,12 @@ use bevy::{
     app::{ App, Plugin, Update },
     prelude::{ in_state, Condition, IntoSystemConfigs, OnEnter, OnExit, States },
 };
-use bevy_asset_loader::prelude::*;
-use bevy_progress::prelude::*;
-
+use bevy_asset_loader::loading_state::{
+    config::ConfigureLoadingState,
+    LoadingState,
+    LoadingStateAppExt,
+};
+use bevy_progress::ProgressPlugin;
 pub use resources::SplashScreenConfiguration;
 
 use self::{

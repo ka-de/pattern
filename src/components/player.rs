@@ -1,12 +1,9 @@
-use bevy::ecs::bundle::Bundle;
-use bevy::ecs::component::Component;
-use bevy::sprite::SpriteBundle;
+use bevy::{ ecs::{ bundle::Bundle, component::Component }, sprite::SpriteBundle };
 use bevy_ecs_ldtk::{ EntityInstance, LdtkEntity, Worldly };
 
-use super::armor::Armor;
-use super::health::Health;
-
 use super::{
+    armor::Armor,
+    health::Health,
     ladders::Climber,
     collision::ColliderBundle,
     ground::GroundDetection,
