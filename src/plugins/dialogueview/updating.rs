@@ -1,31 +1,27 @@
-use bevy::app::{ App, Update };
-use bevy::input::ButtonInput;
-use bevy::prelude::{
-    on_event,
-    Commands,
-    Condition,
-    Event,
-    EventReader,
-    EventWriter,
-    IntoSystemConfigs,
-    KeyCode,
-    MouseButton,
-    Query,
-    Res,
-    ResMut,
-    Touches,
-    With,
-    Without,
+use bevy::{
+    app::{ App, Update },
+    ecs::{
+        system::{ Commands, Query, Res, ResMut },
+        schedule::{ IntoSystemConfigs, Condition, common_conditions::on_event },
+        query::{ With, Without },
+        event::{ Event, EventWriter, EventReader },
+    },
+    input::{ touch::Touches, keyboard::KeyCode, mouse::MouseButton, ButtonInput },
+    reflect::Reflect,
+    render::view::Visibility,
+    text::Text,
 };
-use bevy::reflect::Reflect;
-use bevy::render::view::Visibility;
-use bevy::text::Text;
-use bevy_yarnspinner::{ events::*, prelude::* };
+use bevy_yarnspinner::{
+    events::{ DialogueCompleteEvent, DialogueStartEvent, PresentLineEvent, PresentOptionsEvent },
+    prelude::{ DialogueRunner, YarnSpinnerSystemSet },
+};
 
-use super::option_selection::OptionSelection;
-use super::setup::{ DialogueContinueNode, DialogueNameNode, UiRootNode };
-use super::typewriter::{ self, Typewriter, in_dialogue };
-use super::YarnSpinnerDialogueViewSystemSet;
+use super::{
+    option_selection::OptionSelection,
+    setup::{ DialogueContinueNode, DialogueNameNode, UiRootNode },
+    typewriter::{ self, Typewriter, in_dialogue },
+    YarnSpinnerDialogueViewSystemSet,
+};
 
 pub(crate) fn ui_updating_plugin(app: &mut App) {
     app.add_systems(

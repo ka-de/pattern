@@ -1,27 +1,23 @@
-use bevy::app::{ App, Update };
-use bevy::log::info;
-use bevy::prelude::{
-    any_with_component,
-    on_event,
-    Commands,
-    Event,
-    EventReader,
-    EventWriter,
-    IntoSystemConfigs,
-    Local,
-    Query,
-    Res,
-    ResMut,
-    Resource,
-    With,
+use bevy::{
+    app::{ App, Update },
+    ecs::{
+        system::{ Commands, Query, Local, Resource, Res, ResMut },
+        schedule::{ IntoSystemConfigs, common_conditions::{ on_event, any_with_component } },
+        query::With,
+        event::{ Event, EventWriter, EventReader },
+    },
+    time::Time,
+    render::view::Visibility,
+    ui::{ Style, Val },
+    text::Text,
+    reflect::Reflect,
+    utils::{ default, Instant },
+    log::info,
 };
-use bevy::reflect::Reflect;
-use bevy::render::view::Visibility;
-use bevy::text::Text;
-use bevy::time::Time;
-use bevy::ui::{ Style, Val };
-use bevy::utils::{ default, Instant };
-use bevy_yarnspinner::{ events::*, prelude::* };
+use bevy_yarnspinner::{
+    events::{ DialogueCompleteEvent, DialogueStartEvent },
+    prelude::{ LocalizedLine, YarnSpinnerSystemSet },
+};
 use unicode_segmentation::UnicodeSegmentation;
 
 use super::option_selection::OptionSelection;

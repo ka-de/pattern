@@ -1,38 +1,35 @@
-use bevy::app::{ App, Update };
-use bevy::hierarchy::{ Children, DespawnRecursiveExt, HierarchyQueryExt };
-use bevy::input::ButtonInput;
-use bevy::prelude::{
-    any_with_component,
-    resource_added,
-    resource_exists,
-    Changed,
-    Commands,
-    Condition,
-    Entity,
-    Event,
-    EventReader,
-    EventWriter,
-    IntoSystemConfigs,
-    KeyCode,
-    Query,
-    Res,
-    Resource,
-    With,
-    Without,
+use bevy::{
+    app::{ App, Update },
+    ecs::{
+        entity::Entity,
+        system::{ Commands, Query, Res, Resource },
+        schedule::{
+            IntoSystemConfigs,
+            Condition,
+            common_conditions::{ resource_added, resource_exists, any_with_component },
+        },
+        query::{ With, Without, Changed },
+        event::{ Event, EventReader, EventWriter },
+    },
+    hierarchy::{ Children, DespawnRecursiveExt, HierarchyQueryExt },
+    reflect::Reflect,
+    render::{ color::Color, view::Visibility },
+    text::Text,
+    ui::{ widget::Button, Display, Interaction, Style },
+    utils::HashMap,
+    input::{ ButtonInput, keyboard::KeyCode },
+    window::{ CursorIcon, PrimaryWindow, Window },
 };
-use bevy::reflect::Reflect;
-use bevy::render::color::Color;
-use bevy::render::view::Visibility;
-use bevy::text::Text;
-use bevy::ui::widget::Button;
-use bevy::ui::{ Display, Interaction, Style };
-use bevy::utils::HashMap;
-use bevy::window::{ CursorIcon, PrimaryWindow, Window };
-use bevy_yarnspinner::{ events::*, prelude::* };
+use bevy_yarnspinner::{
+    events::DialogueCompleteEvent,
+    prelude::{ DialogueOption, DialogueRunner, YarnSpinnerSystemSet },
+};
 
-use super::setup::{ spawn_options, DialogueNode, OptionButton, OptionsNode, UiRootNode };
-use super::typewriter::{ self, Typewriter, TypewriterFinishedEvent };
-use super::YarnSpinnerDialogueViewSystemSet;
+use super::{
+    setup::{ spawn_options, DialogueNode, OptionButton, OptionsNode, UiRootNode },
+    typewriter::{ self, Typewriter, TypewriterFinishedEvent },
+    YarnSpinnerDialogueViewSystemSet,
+};
 
 pub(crate) fn option_selection_plugin(app: &mut App) {
     app.add_systems(

@@ -20,7 +20,7 @@ use bevy::{
         ZIndex,
     },
 };
-use bevy_yarnspinner::prelude::*;
+use bevy_yarnspinner::prelude::{ DialogueOption, OptionId };
 use super::Assets;
 
 /// Marker for the [`Node`] that is the root of the UI

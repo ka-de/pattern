@@ -1,5 +1,13 @@
-use bevy::{ prelude::*, render::camera::ScalingMode };
-use bevy_asset_loader::prelude::*;
+use bevy::{
+    asset::Handle,
+    math::Vec2,
+    prelude::{ Resource, States },
+    render::{ camera::ScalingMode, color::Color, texture::Image },
+};
+use bevy_asset_loader::{
+    asset_collection::AssetCollection,
+    standard_dynamic_asset::StandardDynamicAsset,
+};
 
 /// Configuration for the SplashScreenPlugin
 #[derive(Resource, Debug, Clone)]
