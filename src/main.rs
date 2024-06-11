@@ -10,8 +10,7 @@
 use bevy_hanabi::prelude::*;
 
 use bevy::{
-    app::{ App, Startup, Update },
-    audio::{ AudioPlugin, GlobalVolume, SpatialScale },
+    app::{ App, Startup },
     prelude::PluginGroup,
     render::{
         settings::{ WgpuFeatures, WgpuSettings },
@@ -40,13 +39,7 @@ use components::settings::GameSettings;
 
 use crate::plugins::ui::set_window_icon::set_window_icon;
 use crate::plugins::get_backend::get_backend;
-use crate::plugins::audio::insert_audio_components::{
-    insert_spatial_listener,
-    insert_audio_sources,
-};
-
 // ⚠️ TODO: Move audio stuff to its own thing
-const AUDIO_SCALE: f32 = 1.0 / 100.0;
 
 fn main() {
     #[cfg(not(debug_assertions))] // ⚠️ TODO: At some point we will need to dev with Steam.
@@ -77,12 +70,7 @@ fn main() {
                 ..default()
             })
                 .set(ImagePlugin::default_nearest())
-                .set(plugins::debug::make_log_plugin())
-                // ⚠️ TODO: Maybe move this to its own thing? I'm not sure!
-                .set(AudioPlugin {
-                    default_spatial_scale: SpatialScale::new_2d(AUDIO_SCALE),
-                    ..default()
-                }),
+                .set(plugins::debug::make_log_plugin()),
             TweeningPlugin,
             plugins::gamestate::game_state_plugin,
             components::systems::setup_ldtk,
@@ -93,14 +81,10 @@ fn main() {
             plugins::debug::plugin,
             plugins::input::InputPlugin,
             plugins::ui::plugin,
+            plugins::audio::plugin,
             //HanabiPlugin,
         ))
         .add_systems(Startup, set_window_icon) // Set the Window icon.
-
-        // AUDIO TESTING ⚠️
-        .insert_resource(GlobalVolume::new(1.0)) // Set the GlobalVolume
-        .add_systems(Update, (insert_spatial_listener, insert_audio_sources))
-
         // GAME SETTINGS ⚠️
         .insert_resource(GameSettings::default());
 
