@@ -65,10 +65,6 @@ use crate::plugins::audio::insert_spatial_listener::insert_spatial_listener;
 // ⚠️ TODO: Move audio stuff to its own thing
 const AUDIO_SCALE: f32 = 1.0 / 100.0;
 
-fn change_global_volume(mut volume: ResMut<GlobalVolume>) {
-    volume.volume = Volume::new(0.5);
-}
-
 fn main() {
     #[cfg(not(debug_assertions))] // ⚠️ TODO: At some point we will need to dev with Steam.
     match SteamworksPlugin::init_app(981370) {
@@ -119,9 +115,7 @@ fn main() {
         .add_systems(Startup, set_window_icon) // Set the Window icon.
 
         // AUDIO TESTING ⚠️
-        .insert_resource(GlobalVolume::new(1.0)) // Set the GlobalVolume ⚠️ WIP
-        .add_systems(Startup, change_global_volume) // Change the GlobalVolume ⚠️ WIP
-
+        .insert_resource(GlobalVolume::new(1.0)) // Set the GlobalVolume
         .add_systems(Update, insert_spatial_listener)
 
         // GAME SETTINGS ⚠️
