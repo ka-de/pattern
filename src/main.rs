@@ -146,9 +146,25 @@ fn main() {
         .add_systems(Startup, change_global_volume) // Change the GlobalVolume ⚠️ WIP
 
         .add_systems(Startup, play_2d_spatial_audio)
+        .add_systems(bevy::app::Update, insert_spatial_listener)
 
         // GAME SETTINGS ⚠️
         .insert_resource(GameSettings::default());
 
     app.run();
+}
+
+use bevy::ecs;
+use bevy::log::info;
+fn insert_spatial_listener(
+    mut commands: Commands,
+    added_player: ecs::system::Query<
+        (ecs::entity::Entity, &bevy::core::Name),
+        ecs::query::Added<components::player::Player>
+    >
+) {
+    for (player_entity, name) in &added_player {
+        info!("Inserted spatial listener for {}", name);
+        commands.entity(player_entity).insert(SpatialListener::default());
+    }
 }
