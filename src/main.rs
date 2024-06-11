@@ -60,6 +60,7 @@ use components::torch::Torch;
 
 use crate::plugins::ui::set_window_icon::set_window_icon;
 use crate::plugins::get_backend::get_backend;
+use crate::plugins::audio::insert_spatial_listener::insert_spatial_listener;
 
 // ⚠️ TODO: Move audio stuff to its own thing
 const AUDIO_SCALE: f32 = 1.0 / 100.0;
@@ -76,21 +77,6 @@ fn play_background_audio(asset_server: Res<AssetServer>, mut commands: Commands)
         settings: PlaybackSettings::LOOP,
     });
 }
-
-// ⚠️ TODO: This is at the moment just testing Spatial Audio
-//
-//
-fn play_2d_spatial_audio(mut commands: Commands, asset_server: Res<AssetServer>) {
-    // Spawn our emitter
-    commands.spawn((
-        Torch,
-        AudioBundle {
-            source: asset_server.load("sfx/torch.ogg"),
-            settings: PlaybackSettings::LOOP.with_spatial(true),
-        },
-    ));
-}
-// End of TODO
 
 fn main() {
     #[cfg(not(debug_assertions))] // ⚠️ TODO: At some point we will need to dev with Steam.
@@ -145,26 +131,10 @@ fn main() {
         .insert_resource(GlobalVolume::new(1.0)) // Set the GlobalVolume ⚠️ WIP
         .add_systems(Startup, change_global_volume) // Change the GlobalVolume ⚠️ WIP
 
-        .add_systems(Startup, play_2d_spatial_audio)
         .add_systems(bevy::app::Update, insert_spatial_listener)
 
         // GAME SETTINGS ⚠️
         .insert_resource(GameSettings::default());
 
     app.run();
-}
-
-use bevy::ecs;
-use bevy::log::info;
-fn insert_spatial_listener(
-    mut commands: Commands,
-    added_player: ecs::system::Query<
-        (ecs::entity::Entity, &bevy::core::Name),
-        ecs::query::Added<components::player::Player>
-    >
-) {
-    for (player_entity, name) in &added_player {
-        info!("Inserted spatial listener for {}", name);
-        commands.entity(player_entity).insert(SpatialListener::default());
-    }
 }

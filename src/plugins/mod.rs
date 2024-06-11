@@ -6,6 +6,7 @@ pub(crate) mod ui;
 pub(crate) mod easing;
 pub(crate) mod get_backend;
 pub(crate) mod rapier_utils;
+pub(crate) mod audio;
 
 #[cfg(debug_assertions)]
 pub(crate) mod debug;
