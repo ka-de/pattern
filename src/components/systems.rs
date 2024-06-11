@@ -6,7 +6,6 @@ use super::{
 };
 use crate::plugins::gamestate::GameState;
 
-use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;

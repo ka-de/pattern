@@ -1,4 +1,3 @@
-use bevy::prelude::*;
 use bevy_asset_loader::dynamic_asset::DynamicAssets;
 
 use super::{

@@ -3,7 +3,6 @@ pub(crate) mod resources;
 pub(crate) mod state;
 pub(crate) mod systems;
 
-use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 use bevy_progress::prelude::*;
 

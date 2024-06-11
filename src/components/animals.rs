@@ -3,8 +3,6 @@ use super::names;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
-use bevy::prelude::*;
-
 // Animal types
 #[derive(Component, PartialEq, Eq)]
 pub enum AnimalType {

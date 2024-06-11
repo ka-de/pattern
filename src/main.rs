@@ -21,7 +21,6 @@ mod components;
 mod plugins;
 mod rapier_utils;
 
-use bevy::prelude::*;
 use bevy_tweening::*;
 // Steamworks
 use bevy_steamworks::*;

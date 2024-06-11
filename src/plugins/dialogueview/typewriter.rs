@@ -8,7 +8,6 @@ use super::setup::{
 };
 use super::updating::SpeakerChangeEvent;
 use super::YarnSpinnerDialogueViewSystemSet;
-use bevy::prelude::*;
 use bevy::utils::Instant;
 use bevy_yarnspinner::{ events::*, prelude::* };
 use unicode_segmentation::UnicodeSegmentation;

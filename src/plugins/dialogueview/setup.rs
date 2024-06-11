@@ -1,5 +1,24 @@
-use bevy::ecs::system::EntityCommands;
-use bevy::prelude::*;
+use bevy::{
+    core::Name,
+    ecs::system::EntityCommands,
+    prelude::{ default, Commands, Component, Res },
+    render::{ color::Color, view::Visibility },
+    text::{ Text, TextSection, TextStyle },
+    ui::{
+        node_bundles::{ ButtonBundle, ImageBundle, NodeBundle, TextBundle },
+        widget::Label,
+        AlignItems,
+        Display,
+        FlexDirection,
+        JustifyContent,
+        PositionType,
+        Style,
+        UiImage,
+        UiRect,
+        Val,
+        ZIndex,
+    },
+};
 use bevy_yarnspinner::prelude::*;
 use super::Assets;
 

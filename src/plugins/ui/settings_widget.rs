@@ -1,4 +1,3 @@
-use bevy::prelude::*;
 use sickle_ui::ui_builder::{ UiBuilder, UiBuilderExt, UiRoot };
 use sickle_ui::ui_style::{ SetNodeHeightExt, SetNodeLeftExt, SetNodeTopExt, SetNodeWidthExt };
 

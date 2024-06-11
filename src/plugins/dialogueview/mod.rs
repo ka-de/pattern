@@ -19,7 +19,14 @@
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 #![warn(missing_docs, missing_debug_implementations)]
 
-use bevy::prelude::*;
+use bevy::{
+    app::{ App, Plugin, Update },
+    asset::Handle,
+    log::info,
+    prelude::{ in_state, resource_added, Commands, Res, Resource, States, SystemSet },
+    render::texture::Image,
+    text::Font,
+};
 use bevy_asset_loader::prelude::*;
 
 use bevy_yarnspinner::prelude::{ YarnFileSource, YarnSpinnerPlugin, YarnProject };

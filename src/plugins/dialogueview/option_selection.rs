@@ -1,7 +1,6 @@
 use super::setup::{ spawn_options, DialogueNode, OptionButton, OptionsNode, UiRootNode };
 use super::typewriter::{ self, Typewriter, TypewriterFinishedEvent };
 use super::YarnSpinnerDialogueViewSystemSet;
-use bevy::prelude::*;
 use bevy::utils::HashMap;
 use bevy::window::PrimaryWindow;
 use bevy_yarnspinner::{ events::*, prelude::* };

@@ -1,7 +1,6 @@
-use bevy::prelude::*;
+use crate::plugins::splashscreen::{SplashScreenConfiguration, SplashScreenPlugin};
 use bevy::render::camera::ScalingMode;
 use bevy_asset_loader::prelude::*;
-use crate::plugins::splashscreen::{ SplashScreenPlugin, SplashScreenConfiguration };
 
 #[derive(States, Default, Debug, Clone, Eq, PartialEq, Hash, Reflect)]
 pub enum GameState {
@@ -36,11 +35,16 @@ pub fn game_state_plugin(app: &mut App) {
         next_state: GameState::Playing,
         // TODO: Implement this motherfucker!
         //next_state: GameState::MainMenu,
-        images: StandardDynamicAsset::Files { paths: vec!["splash_screens/splash.png".to_owned()] },
+        images: StandardDynamicAsset::Files {
+            paths: vec!["splash_screens/splash.png".to_owned()],
+        },
         custom_size: Some(Vec2::ONE),
         splash_timer,
         clear_color: Color::BLACK,
-        camera_scaling_mode: ScalingMode::Fixed { width: 1.0, height: 1.0 },
+        camera_scaling_mode: ScalingMode::Fixed {
+            width: 1.0,
+            height: 1.0,
+        },
     };
 
     // GameState
@@ -58,8 +62,8 @@ pub fn game_state_plugin(app: &mut App) {
     // StateInspectorPlugin
     #[cfg(debug_assertions)]
     app.add_plugins(
-        bevy_inspector_egui::quick::StateInspectorPlugin::<GameState>
-            ::default()
-            .run_if(bevy::input::common_conditions::input_toggle_active(false, KeyCode::F10))
+        bevy_inspector_egui::quick::StateInspectorPlugin::<GameState>::default().run_if(
+            bevy::input::common_conditions::input_toggle_active(false, KeyCode::F10),
+        ),
     );
 }
