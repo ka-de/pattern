@@ -1,10 +1,5 @@
-use bevy::{
-    ecs::{ bundle::Bundle, component::Component, query::Added },
-    log::info,
-    prelude::Query,
-    sprite::SpriteBundle,
-};
-use bevy_ecs_ldtk::{ prelude::{ LdtkEntity, LdtkFields }, EntityInstance };
+use bevy::{ ecs::{ bundle::Bundle, component::Component }, sprite::SpriteBundle };
+use bevy_ecs_ldtk::{ prelude::LdtkEntity, EntityInstance };
 
 use super::{ collision::ColliderBundle, patrol::Patrol };
 

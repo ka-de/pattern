@@ -23,22 +23,23 @@ use bevy::{
     app::{ App, Plugin, Update },
     asset::Handle,
     log::info,
-    prelude::{
-        in_state,
-        resource_added,
-        Commands,
-        Condition,
-        IntoSystemConfigs,
-        Res,
-        Resource,
-        States,
-        SystemSet,
+    ecs::{
+        schedule::{
+            SystemSet,
+            IntoSystemConfigs,
+            Condition,
+            States,
+            common_conditions::{ in_state, resource_added },
+        },
+        system::{ Commands, Res, Resource },
     },
     render::texture::Image,
     text::Font,
 };
-use bevy_asset_loader::prelude::*;
-
+use bevy_asset_loader::{
+    asset_collection::AssetCollection,
+    loading_state::{ config::{ ConfigureLoadingState, LoadingStateConfig }, LoadingStateAppExt },
+};
 use bevy_yarnspinner::prelude::{ YarnFileSource, YarnSpinnerPlugin, YarnProject };
 
 pub use updating::SpeakerChangeEvent;

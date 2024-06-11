@@ -1,4 +1,4 @@
-use bevy::ecs::{entity::Entity, event::{Event, EventReader}};
+use bevy::ecs::{entity::Entity, event::EventReader};
 use bevy_rapier2d::{pipeline::CollisionEvent, rapier::geometry::CollisionEventFlags};
 
 

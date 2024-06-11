@@ -1,6 +1,9 @@
 use bevy::{ log::debug, prelude::Bundle, utils::default };
-use bevy_ecs_ldtk::prelude::*;
-use bevy_rapier2d::prelude::*;
+use bevy_ecs_ldtk::{ EntityInstance, LdtkIntCell };
+use bevy_rapier2d::{
+    dynamics::{ CoefficientCombineRule, GravityScale, LockedAxes, RigidBody, Velocity },
+    geometry::{ Collider, ColliderMassProperties, CollisionGroups, Friction, Group },
+};
 
 #[derive(Clone, Default, Bundle, LdtkIntCell)]
 pub struct ColliderBundle {

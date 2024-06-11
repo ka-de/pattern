@@ -6,7 +6,10 @@ use bevy::{
     reflect::Reflect,
     render::{ camera::ScalingMode, color::Color },
 };
-use bevy_asset_loader::prelude::*;
+use bevy_asset_loader::{
+    loading_state::{ LoadingState, LoadingStateAppExt },
+    standard_dynamic_asset::StandardDynamicAsset,
+};
 
 use crate::plugins::splashscreen::{ SplashScreenConfiguration, SplashScreenPlugin };
 

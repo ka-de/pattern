@@ -10,7 +10,7 @@ use std::env;
 
 // Particle effects
 // ⚠️ TODO: Move to plugin or something?
-use bevy_hanabi::prelude::*;
+// use bevy_hanabi::prelude::*;
 
 use bevy::{
     prelude::PluginGroup,

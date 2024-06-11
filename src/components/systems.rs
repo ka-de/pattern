@@ -1,30 +1,40 @@
 use bevy::{
     app::{ App, Update },
     asset::{ Assets, Handle },
-    input::ButtonInput,
-    math::{ Rect, Vec2 },
-    prelude::{
-        in_state,
-        Camera2dBundle,
-        Changed,
-        Commands,
-        Entity,
-        EventReader,
-        IntoSystemConfigs,
-        KeyCode,
-        OnEnter,
-        Query,
-        Res,
-        ResMut,
-        Resource,
-        With,
-        Without,
+    core_pipeline::core_2d::Camera2dBundle,
+    ecs::{
+        entity::Entity,
+        event::EventReader,
+        query::{ Changed, With, Without },
+        schedule::{ common_conditions::in_state, OnEnter },
+        system::{ Commands, Query, Res, ResMut, Resource },
     },
+    input::{ keyboard::KeyCode, ButtonInput },
+    math::{ Rect, Vec2 },
+    prelude::IntoSystemConfigs,
     transform::components::Transform,
 };
-use bevy_asset_loader::prelude::*;
-use bevy_ecs_ldtk::prelude::*;
-use bevy_rapier2d::prelude::*;
+use bevy_asset_loader::{
+    asset_collection::AssetCollection,
+    loading_state::{ config::{ ConfigureLoadingState, LoadingStateConfig }, LoadingStateAppExt },
+};
+use bevy_ecs_ldtk::{
+    app::{ LdtkEntityAppExt, LdtkIntCellAppExt },
+    assets::{ LdtkProject, LevelIndices, LevelMetadataAccessor },
+    LdtkPlugin,
+    LdtkSettings,
+    LdtkWorldBundle,
+    LevelIid,
+    LevelSelection,
+    LevelSpawnBehavior,
+    Respawn,
+    SetClearColor,
+};
+use bevy_rapier2d::{
+    dynamics::GravityScale,
+    pipeline::CollisionEvent,
+    plugin::{ NoUserData, RapierConfiguration, RapierPhysicsPlugin, TimestepMode },
+};
 
 use super::{
     ladders::{ Climbable, Climber },

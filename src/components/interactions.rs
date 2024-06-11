@@ -1,7 +1,27 @@
 use std::collections::HashSet;
-use bevy::{ ecs::schedule::SystemConfigs, prelude::* };
-use bevy_rapier2d::prelude::*;
-use bevy_ecs_ldtk::prelude::*;
+
+use bevy::{
+    core::Name,
+    render::color::Color,
+    ecs::{
+        component::Component,
+        entity::Entity,
+        event::EventReader,
+        query::{ Added, Changed, With },
+        schedule::{ IntoSystemConfigs, SystemConfigs },
+        system::{ Commands, Query },
+    },
+    hierarchy::{ Parent, PushChild },
+    log::info,
+    math::Vec2,
+    transform::components::GlobalTransform,
+};
+use bevy_ecs_ldtk::{ ldtk::ldtk_fields::LdtkFields, EntityInstance };
+use bevy_rapier2d::{
+    geometry::{ ActiveEvents, Collider, Sensor },
+    pipeline::CollisionEvent,
+    render::ColliderDebugColor,
+};
 
 use super::player::Player;
 
