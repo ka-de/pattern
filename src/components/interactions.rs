@@ -24,6 +24,7 @@ use bevy_rapier2d::{
 };
 
 use super::player::Player;
+use crate::plugins::rapier_utils::reciprocal_collisions;
 
 #[derive(Component, Default)]
 pub struct InteractionSensor {
@@ -91,27 +92,24 @@ fn interaction_detection(
     interactive_entities: Query<Entity, With<Interactive>>,
     mut collisions: EventReader<CollisionEvent>
 ) {
-    crate::rapier_utils::reciprocal_collisions(
-        &mut collisions,
-        move |interactor_entity, interactive_entity, _, start| {
-            if
-                let (Ok(mut interactor), true) = (
-                    interaction_sensors.get_mut(*interactor_entity),
-                    interactive_entities.contains(*interactive_entity),
-                )
-            {
-                let set = &mut interactor.intersecting_entities;
-                if start {
-                    set.insert(*interactive_entity);
-                } else {
-                    set.remove(interactive_entity);
-                }
-                true
+    reciprocal_collisions(&mut collisions, move |interactor_entity, interactive_entity, _, start| {
+        if
+            let (Ok(mut interactor), true) = (
+                interaction_sensors.get_mut(*interactor_entity),
+                interactive_entities.contains(*interactive_entity),
+            )
+        {
+            let set = &mut interactor.intersecting_entities;
+            if start {
+                set.insert(*interactive_entity);
             } else {
-                false
+                set.remove(interactive_entity);
             }
+            true
+        } else {
+            false
         }
-    );
+    });
 }
 
 /// System that tracks distances between interactive entities and the sensor, in

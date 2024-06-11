@@ -42,7 +42,7 @@ use super::{
     player::Player,
     wall::spawn_wall_collision,
 };
-use crate::plugins::gamestate::GameState;
+use crate::plugins::{ gamestate::GameState, rapier_utils::reciprocal_collisions };
 
 // Sets up the game world using the LDTK plugin.
 //
@@ -132,26 +132,23 @@ pub fn detect_climb_range(
     climbables: Query<Entity, With<Climbable>>,
     mut collisions: EventReader<CollisionEvent>
 ) {
-    crate::rapier_utils::reciprocal_collisions(
-        &mut collisions,
-        move |collider_a, collider_b, _, start| {
-            if
-                let (Ok(mut climber), Ok(climbable)) = (
-                    climbers.get_mut(*collider_a),
-                    climbables.get(*collider_b),
-                )
-            {
-                if start {
-                    climber.intersecting_climbables.insert(climbable);
-                } else {
-                    climber.intersecting_climbables.remove(&climbable);
-                }
-                true
+    reciprocal_collisions(&mut collisions, move |collider_a, collider_b, _, start| {
+        if
+            let (Ok(mut climber), Ok(climbable)) = (
+                climbers.get_mut(*collider_a),
+                climbables.get(*collider_b),
+            )
+        {
+            if start {
+                climber.intersecting_climbables.insert(climbable);
             } else {
-                false
+                climber.intersecting_climbables.remove(&climbable);
             }
+            true
+        } else {
+            false
         }
-    );
+    });
 }
 
 // Checks if a climber entity is climbing.

@@ -41,7 +41,6 @@ use plugins::gamestate::GameState;
 
 mod components;
 mod plugins;
-mod rapier_utils;
 
 use bevy_tweening::*;
 // Steamworks
@@ -86,16 +85,9 @@ fn play_2d_spatial_audio(mut commands: Commands, asset_server: Res<AssetServer>)
     commands.spawn((
         Torch,
         AudioBundle {
-            source: asset_server.load("vo/dogspeak.ogg"),
-            settings: PlaybackSettings::LOOP, // ⚠️ TODO: Change it later to `ONCE` when done testing.
-            //settings: PlaybackSettings::ONCE,
+            source: asset_server.load("sfx/torch.ogg"),
+            settings: PlaybackSettings::LOOP.with_spatial(true),
         },
-    ));
-
-    // Spawn our listener
-    commands.spawn((
-        SpatialListener::new(100.0), // Gap between the ears
-        SpatialBundle::default(),
     ));
 }
 // End of TODO
@@ -150,10 +142,10 @@ fn main() {
         .add_systems(Startup, set_window_icon) // Set the Window icon.
 
         // AUDIO TESTING ⚠️
-        .insert_resource(GlobalVolume::new(0.2)) // Set the GlobalVolume ⚠️ WIP
+        .insert_resource(GlobalVolume::new(1.0)) // Set the GlobalVolume ⚠️ WIP
         .add_systems(Startup, change_global_volume) // Change the GlobalVolume ⚠️ WIP
 
-        //.add_systems(Startup, play_2d_spatial_audio)
+        .add_systems(Startup, play_2d_spatial_audio)
 
         // GAME SETTINGS ⚠️
         .insert_resource(GameSettings::default());

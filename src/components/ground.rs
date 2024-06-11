@@ -15,6 +15,8 @@ use bevy::{
 };
 use bevy_rapier2d::{ geometry::{ ActiveEvents, Collider, Sensor }, pipeline::CollisionEvent };
 
+use crate::plugins::rapier_utils::reciprocal_collisions;
+
 #[derive(Clone, Default, Component)]
 pub struct GroundDetection {
     pub on_ground: bool,
@@ -61,7 +63,7 @@ pub fn ground_detection(
     mut collisions: EventReader<CollisionEvent>,
     collidables: Query<Entity, (With<Collider>, Without<Sensor>)>
 ) {
-    crate::rapier_utils::reciprocal_collisions(&mut collisions, move |e1, e2, _, start| {
+    reciprocal_collisions(&mut collisions, move |e1, e2, _, start| {
         if let (true, Ok(mut sensor)) = (collidables.contains(*e1), ground_sensors.get_mut(*e2)) {
             if start {
                 sensor.intersecting_ground_entities.insert(*e1);
