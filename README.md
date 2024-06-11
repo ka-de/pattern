@@ -11,29 +11,20 @@ cargo run 2>&1 | Out-String -Stream | Where-Object { $_ -notmatch "ID3D12Device:
 ## TODO
 
 - Use something to copy `dxil.dll` and `dxcompiler.dll` to Windows builds.
-- begin YarnSpinner integration
+- ~~begin YarnSpinner integration~~
 - YarnSpinner+LDTK integration
 - sickle_ui
 
 ## Debugging Keyboard Shortcuts
 
 | Action                         | KeyCode |
-| :----------------------------- | :-----: | ------------- |
+| :----------------------------- | :-----: |
 | StateInspector (**GameState**) |   F10   |
 | WorldInspector                 |   F11   |
-| PerformanceUI                  |   F12   | <!-- TODO --> |
 
 ## `filesystem_watcher` and `asset_processor`
 
 ???
-
-### Set Custom HTML
-
-Needed so the thing can find `#separated-canvas`.
-
-```bash
-set WASM_SERVER_RUNNER_CUSTOM_INDEX_HTML=C:\Users\kade\Desktop\rust\separated\separated.html
-```
 
 ## Default RapierConfiguration
 
