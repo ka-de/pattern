@@ -1,5 +1,5 @@
 use bevy::{ ecs::{ bundle::Bundle, component::Component }, sprite::SpriteSheetBundle };
-use bevy_ecs_ldtk::LdtkEntity;
+use bevy_ecs_ldtk::{ EntityInstance, LdtkEntity };
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct Torch;
@@ -9,4 +9,6 @@ pub struct TorchBundle {
     #[sprite_sheet_bundle]
     pub sprite_sheet_bundle: SpriteSheetBundle,
     pub torch: Torch,
+    #[from_entity_instance]
+    pub instance: EntityInstance,
 }

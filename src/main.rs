@@ -10,32 +10,17 @@
 use bevy_hanabi::prelude::*;
 
 use bevy::{
+    app::{ App, Startup, Update },
+    audio::{ AudioPlugin, GlobalVolume, SpatialScale },
     prelude::PluginGroup,
-    utils::default,
-    app::{ Update, App, Startup },
-    DefaultPlugins,
-    asset::AssetServer,
-    // ⚠️ TODO: Move audio stuff!
-    audio::{
-        SpatialScale,
-        SpatialListener,
-        AudioPlugin,
-        Volume,
-        GlobalVolume,
-        AudioBundle,
-        PlaybackSettings,
-    },
-    ecs::system::{ ResMut, Res, Commands },
     render::{
-        view::Msaa,
-        // ⚠️ - Audio stuff!
-        prelude::SpatialBundle,
-        // End of audio stuff!
-        RenderPlugin,
-        settings::WgpuFeatures,
-        settings::WgpuSettings,
+        settings::{ WgpuFeatures, WgpuSettings },
         texture::ImagePlugin,
+        view::Msaa,
+        RenderPlugin,
     },
+    utils::default,
+    DefaultPlugins,
 };
 use plugins::gamestate::GameState;
 
@@ -53,14 +38,12 @@ use winit::window::Icon;
 // ⚠️ TODO: Move this with Game Settings
 use components::settings::GameSettings;
 
-// ⚠️ TODO: This will need to get eventually removed from main.
-// RANDOM GAMEPLAY COMPONENTS
-// use components::player::Player;
-use components::torch::Torch;
-
 use crate::plugins::ui::set_window_icon::set_window_icon;
 use crate::plugins::get_backend::get_backend;
-use crate::plugins::audio::insert_spatial_listener::insert_spatial_listener;
+use crate::plugins::audio::insert_audio_components::{
+    insert_spatial_listener,
+    insert_audio_sources,
+};
 
 // ⚠️ TODO: Move audio stuff to its own thing
 const AUDIO_SCALE: f32 = 1.0 / 100.0;
@@ -116,7 +99,7 @@ fn main() {
 
         // AUDIO TESTING ⚠️
         .insert_resource(GlobalVolume::new(1.0)) // Set the GlobalVolume
-        .add_systems(Update, insert_spatial_listener)
+        .add_systems(Update, (insert_spatial_listener, insert_audio_sources))
 
         // GAME SETTINGS ⚠️
         .insert_resource(GameSettings::default());
