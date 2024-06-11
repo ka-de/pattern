@@ -5,9 +5,6 @@
 // only for Release builds.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-// Provides functions to read and manipulate environment variables.
-use std::env;
-
 // Particle effects
 // ⚠️ TODO: Move to plugin or something?
 use bevy_hanabi::prelude::*;
@@ -28,7 +25,7 @@ use bevy::{
         AudioBundle,
         PlaybackSettings,
     },
-    ecs::system::{ NonSend, ResMut, Res, Commands },
+    ecs::system::{ ResMut, Res, Commands },
     render::{
         view::Msaa,
         // ⚠️ - Audio stuff!
@@ -41,7 +38,6 @@ use bevy::{
     },
 };
 use plugins::gamestate::GameState;
-use wgpu::Backends;
 
 mod components;
 mod plugins;
@@ -64,6 +60,7 @@ use components::settings::GameSettings;
 use components::torch::Torch;
 
 use crate::plugins::ui::set_window_icon::set_window_icon;
+use crate::plugins::get_backend::get_backend;
 
 // ⚠️ TODO: Move audio stuff to its own thing
 const AUDIO_SCALE: f32 = 1.0 / 100.0;
@@ -102,37 +99,6 @@ fn play_2d_spatial_audio(mut commands: Commands, asset_server: Res<AssetServer>)
     ));
 }
 // End of TODO
-
-// Allow the user to set the WGPU_BACKEND but have sane defaults for each platform.
-fn get_backend() -> Option<Backends> {
-    // Check if the WGPU_BACKEND environment variable is set
-    if let Ok(backend_str) = env::var("WGPU_BACKEND") {
-        // Convert the environment variable value to a Backend
-        match backend_str.to_lowercase().as_str() {
-            "vulkan" => {
-                return Some(Backends::VULKAN);
-            }
-            "dx12" | "direct3d12" => {
-                return Some(Backends::DX12);
-            }
-            "metal" => {
-                return Some(Backends::METAL);
-            }
-            _ => eprintln!("Unsupported backend: {}", backend_str),
-        }
-    }
-
-    // If the environment variable is not set, use the default logic
-    if cfg!(target_os = "linux") {
-        Some(Backends::VULKAN)
-    } else if cfg!(target_os = "windows") {
-        Some(Backends::DX12)
-    } else if cfg!(target_os = "macos") {
-        Some(Backends::METAL)
-    } else {
-        panic!("Unsupported Operating System!");
-    }
-}
 
 fn main() {
     #[cfg(not(debug_assertions))] // ⚠️ TODO: At some point we will need to dev with Steam.

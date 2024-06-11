@@ -4,6 +4,7 @@ pub(crate) mod gamestate;
 pub(crate) mod input;
 pub(crate) mod ui;
 pub(crate) mod easing;
+pub(crate) mod get_backend;
 
 #[cfg(debug_assertions)]
 pub(crate) mod debug;
