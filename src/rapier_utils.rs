@@ -1,7 +1,5 @@
-use bevy::ecs::{entity::Entity, event::EventReader};
-use bevy_rapier2d::{pipeline::CollisionEvent, rapier::geometry::CollisionEventFlags};
-
-
+use bevy::ecs::{ entity::Entity, event::EventReader };
+use bevy_rapier2d::{ pipeline::CollisionEvent, rapier::geometry::CollisionEventFlags };
 
 /// Apply the function to the permutations of colliding entities
 #[inline]
