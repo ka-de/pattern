@@ -14,28 +14,28 @@ use bevy_ecs_ldtk::{
     prelude::LdtkFields,
 };
 use bevy_rapier2d::dynamics::Velocity;
-pub fn patrol(mut query: Query<(&mut Transform, &mut Velocity, &mut MovingPlatform)>) {
+pub fn moving_platform(mut query: Query<(&mut Transform, &mut Velocity, &mut MovingPlatform)>) {
     for (mut transform, mut velocity, mut movingplatform) in &mut query {
-        if patrol.points.len() <= 1 {
+        if path.points.len() <= 1 {
             continue;
         }
         let mut new_velocity =
-            (patrol.points[patrol.index] - transform.translation.truncate()).normalize() * 20.0;
+            (path.points[path.index] - transform.translation.truncate()).normalize() * 20.0;
         if new_velocity.dot(velocity.linvel) < 0.0 {
-            if patrol.index == 0 {
-                patrol.forward = true;
-            } else if patrol.index == patrol.points.len() - 1 {
-                patrol.forward = false;
+            if path.index == 0 {
+                path.forward = true;
+            } else if path.index == path.points.len() - 1 {
+                path.forward = false;
             }
-            transform.translation.x = patrol.points[patrol.index].x;
-            transform.translation.y = patrol.points[patrol.index].y;
-            if patrol.forward {
-                patrol.index += 1;
+            transform.translation.x = path.points[path.index].x;
+            transform.translation.y = path.points[path.index].y;
+            if path.forward {
+                path.index += 1;
             } else {
-                patrol.index -= 1;
+                path.index -= 1;
             }
             new_velocity =
-                (patrol.points[patrol.index] - transform.translation.truncate()).normalize() * 20.0;
+                (path.points[path.index] - transform.translation.truncate()).normalize() * 20.0;
         }
         velocity.linvel = new_velocity;
     }
@@ -67,7 +67,7 @@ impl LdtkEntity for MovingPlatform {
         let ldtk_path_points = entity_instance
             .iter_points_field("Path")
             .expect("Path field should be correctly typed");
-        for ldtk_point in ldtk_patrol_points {
+        for ldtk_point in ldtk_path_points {
             let pixel_coords =
                 (ldtk_point.as_vec2() + Vec2::new(0.5, 1.0)) *
                 Vec2::splat(layer_instance.grid_size as f32);
