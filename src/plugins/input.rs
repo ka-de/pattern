@@ -1,4 +1,5 @@
 use bevy::{
+    log::info,
     app::{ App, Plugin, Update },
     ecs::{ query::With, system::{ Query, Res } },
     input::{ keyboard::{ KeyCode, KeyboardInput }, ButtonInput, ButtonState },
@@ -47,17 +48,19 @@ pub(crate) fn movement(
             velocity.linvel.y = (up - down) * 200.0;
         }
 
-        if input.just_pressed(KeyCode::Space) && (ground_detection.on_ground || climber.climbing) {
-            velocity.linvel.y = 500.0;
-            climber.climbing = false;
-        }
-
         if swimmer.intersecting_swimmables.is_empty() {
             swimmer.swimming = false;
         } else {
             swimmer.swimming = true;
             velocity.linvel.x /= 2.0;
-            velocity.linvel.y /= 2.0;
+        }
+
+        if
+            input.just_pressed(KeyCode::Space) &&
+            (ground_detection.on_ground || climber.climbing || swimmer.swimming)
+        {
+            velocity.linvel.y = 500.0;
+            climber.climbing = false;
         }
     }
 }

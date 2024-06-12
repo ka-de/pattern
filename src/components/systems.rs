@@ -38,9 +38,11 @@ use bevy_rapier2d::{
 
 use super::{
     ladders::{ Climbable, Climber },
+    water::Swimmer,
     patrol::patrol,
     player::Player,
     wall::spawn_wall_collision,
+    water::Swimmable,
 };
 use crate::plugins::{ gamestate::GameState, rapier_utils::reciprocal_collisions };
 
@@ -69,6 +71,7 @@ pub fn setup_ldtk(app: &mut App) {
             (
                 spawn_wall_collision,
                 detect_climb_range,
+                detect_swim_range,
                 ignore_gravity_if_climbing,
                 patrol,
                 super::camera::fit_inside_current_level,
@@ -143,6 +146,30 @@ pub fn detect_climb_range(
                 climber.intersecting_climbables.insert(climbable);
             } else {
                 climber.intersecting_climbables.remove(&climbable);
+            }
+            true
+        } else {
+            false
+        }
+    });
+}
+
+pub fn detect_swim_range(
+    mut swimmers: Query<&mut Swimmer>,
+    swimmables: Query<Entity, With<Swimmable>>,
+    mut collisions: EventReader<CollisionEvent>
+) {
+    reciprocal_collisions(&mut collisions, move |collider_a, collider_b, _, start| {
+        if
+            let (Ok(mut swimmer), Ok(swimmable)) = (
+                swimmers.get_mut(*collider_a),
+                swimmables.get(*collider_b),
+            )
+        {
+            if start {
+                swimmer.intersecting_swimmables.insert(swimmable);
+            } else {
+                swimmer.intersecting_swimmables.remove(&swimmable);
             }
             true
         } else {
