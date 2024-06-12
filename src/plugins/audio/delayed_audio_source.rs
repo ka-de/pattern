@@ -48,11 +48,14 @@ fn convert_delayed_settings_to_audio_bundle(
         };
 
         // Force PlaybackMode::Once in the PlaybackSettings
-        if let PlaybackMode::Loop = settings.mode {
-            warn!(
-                "Playback mode in DelayedPlaybackSettings on entity {:?} is not Loop. It will be looped anyway!",
-                entity
-            );
+        match settings.mode {
+            PlaybackMode::Loop => {}
+            _ => {
+                warn!(
+                    "Playback mode in DelayedPlaybackSettings on entity {:?} is not Loop. It will be looped anyway!",
+                    entity
+                );
+            }
         }
         let settings = PlaybackSettings {
             // The source in delayed_handle is already looped
