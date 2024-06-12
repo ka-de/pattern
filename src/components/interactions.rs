@@ -7,7 +7,7 @@ use bevy::{
         component::Component,
         entity::Entity,
         event::EventReader,
-        query::{ Added, Changed, With },
+        query::{ Added, With },
         schedule::{ IntoSystemConfigs, SystemConfigs },
         system::{ Commands, Query },
     },
@@ -154,26 +154,11 @@ fn update_interactions(
     }
 }
 
-fn test_interaction(
-    players: Query<&Name, With<Player>>,
-    sensors: Query<(&Parent, &InteractionSensor), Changed<InteractionSensor>>,
-    interactives: Query<&Interactive>
-) {
-    for (parent, sensor) in sensors.iter() {
-        info!(
-            "{} interacting with {:?}",
-            players.get(**parent).unwrap().as_str(),
-            sensor.closest_entity.and_then(|e| interactives.get(e).ok()).map(|i| &i.name)
-        );
-    }
-}
-
 pub fn make_interaction_systems() -> SystemConfigs {
     (
         spawn_interaction_sensor,
         setup_interactive_entity,
         interaction_detection,
         update_interactions,
-        test_interaction,
     ).chain()
 }
