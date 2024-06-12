@@ -8,7 +8,7 @@ documentation = "https://cringe.live/docs/games/separated/"
 readme = "README.md"
 homepage = "https://cringe.live/separated/"
 repository = "https://github.com/ka-de/separated"
-license =  "MIT"
+license = "MIT"
 keywords = ["gamedev"]
 publish = false
 
@@ -42,6 +42,10 @@ wgpu = { version = "0.19.3", default-features = false, features = [
   "metal",
   "naga",
   "naga-ir",
+] }
+bevy_rand = { git = "https://github.com/ka-de/bevy_rand", features = [
+  "rand_chacha",
+  "wyrand",
 ] }
 
 [dependencies.bevy]
