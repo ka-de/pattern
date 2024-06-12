@@ -13,6 +13,8 @@ pub(crate) mod release_label;
 pub(crate) mod set;
 pub(crate) mod keycap;
 pub(crate) mod keycap_demo;
+mod tooltip;
+
 /*
 pub(crate) mod flying;
 pub(crate) mod bouncing;
@@ -20,7 +22,6 @@ pub(crate) mod rotating;
 pub(crate) mod zooming;
 
 pub(crate) mod settings_widget;
-mod tooltip;
 
 use crate::plugins::ui::flying::flying_labels;
 */
