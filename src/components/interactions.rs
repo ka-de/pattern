@@ -133,9 +133,11 @@ fn update_interactions(
         let mut closest_dist = f32::INFINITY;
         let mut closest_entity = None;
         for interactive_entity in &sensor.intersecting_entities {
-            let (interactive_transform, interactive_collider) = interactive
-                .get(*interactive_entity)
-                .unwrap();
+            let Ok((interactive_transform, interactive_collider)) = interactive.get(
+                *interactive_entity
+            ) else {
+                continue;
+            };
 
             let distance = interactive_collider.distance_to_local_point(
                 player_transform.reparented_to(interactive_transform).translation.truncate(),
