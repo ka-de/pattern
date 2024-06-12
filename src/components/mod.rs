@@ -24,3 +24,4 @@ pub(crate) mod water;
 pub(crate) mod interactions;
 pub(crate) mod gamepad;
 pub(crate) mod deathzone;
+pub(crate) mod movingplatform;
