@@ -1,6 +1,6 @@
 use bevy::{
     asset::AssetServer,
-    audio::{ AudioBundle, PlaybackSettings, SpatialListener },
+    audio::{ AudioBundle, PlaybackSettings, SpatialListener, SpatialScale },
     core::Name,
     ecs::{ entity::Entity, query::Added, system::{ Commands, Query, Res } },
     log::info,
@@ -31,10 +31,19 @@ pub fn insert_audio_sources(
     for (entity, ldtk_instance, name) in &added_player {
         if let Ok(sfx) = ldtk_instance.get_string_field("sfx") {
             let sfx_path = format!("sfx/{}", sfx);
+            let spatial_scale = ldtk_instance
+                .get_float_field("spatial_scale")
+                .ok()
+                .map(|s| SpatialScale::new(super::AUDIO_SCALE * s));
             info!("Inserted SFX {} for {}", sfx, name);
+
             commands.entity(entity).insert(AudioBundle {
                 source: asset_server.load(sfx_path),
-                settings: PlaybackSettings::LOOP.with_spatial(true),
+                settings: PlaybackSettings {
+                    spatial: true,
+                    spatial_scale,
+                    ..PlaybackSettings::LOOP
+                },
             });
         }
     }
