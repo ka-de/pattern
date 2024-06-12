@@ -39,7 +39,7 @@ use bevy_rapier2d::{
 use super::{
     ladders::{ Climbable, Climber },
     water::Swimmer,
-    patrol::patrol,
+    predefinedpath::move_on_path,
     player::Player,
     wall::spawn_wall_collision,
     water::Swimmable,
@@ -59,6 +59,7 @@ pub fn setup_ldtk(app: &mut App) {
         .register_ldtk_entity::<super::player::PlayerBundle>("Player")
         .register_ldtk_entity::<super::npc::NpcBundle>("Npc")
         .register_ldtk_entity::<super::npc::NpcPatrolBundle>("NpcPatrol")
+        .register_ldtk_entity::<super::movingplatform::MovingPlatformBundle>("MovingPlatform")
         .register_ldtk_entity::<super::enemy::MobBundle>("Mob")
         .register_ldtk_entity::<super::chest::ChestBundle>("Chest")
         .register_ldtk_entity::<super::pumpkin::PumpkinBundle>("Pumpkins")
@@ -73,7 +74,7 @@ pub fn setup_ldtk(app: &mut App) {
                 detect_climb_range,
                 detect_swim_range,
                 ignore_gravity_if_climbing,
-                patrol,
+                move_on_path,
                 super::camera::fit_inside_current_level,
                 update_level_selection,
                 super::items::dbg_player_items,

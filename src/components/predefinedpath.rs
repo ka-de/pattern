@@ -15,33 +15,33 @@ use bevy_ecs_ldtk::{
 };
 use bevy_rapier2d::dynamics::Velocity;
 
-pub fn patrol(mut query: Query<(&mut Transform, &mut Velocity, &mut Patrol)>) {
-    for (mut transform, mut velocity, mut patrol) in &mut query {
-        if patrol.points.len() <= 1 {
+pub fn move_on_path(mut query: Query<(&mut Transform, &mut Velocity, &mut PredefinedPath)>) {
+    for (mut transform, mut velocity, mut path) in &mut query {
+        if path.points.len() <= 1 {
             continue;
         }
 
         let mut new_velocity =
-            (patrol.points[patrol.index] - transform.translation.truncate()).normalize() * 20.0;
+            (path.points[path.index] - transform.translation.truncate()).normalize() * 20.0;
 
         if new_velocity.dot(velocity.linvel) < 0.0 {
-            if patrol.index == 0 {
-                patrol.forward = true;
-            } else if patrol.index == patrol.points.len() - 1 {
-                patrol.forward = false;
+            if path.index == 0 {
+                path.forward = true;
+            } else if path.index == path.points.len() - 1 {
+                path.forward = false;
             }
 
-            transform.translation.x = patrol.points[patrol.index].x;
-            transform.translation.y = patrol.points[patrol.index].y;
+            transform.translation.x = path.points[path.index].x;
+            transform.translation.y = path.points[path.index].y;
 
-            if patrol.forward {
-                patrol.index += 1;
+            if path.forward {
+                path.index += 1;
             } else {
-                patrol.index -= 1;
+                path.index -= 1;
             }
 
             new_velocity =
-                (patrol.points[patrol.index] - transform.translation.truncate()).normalize() * 20.0;
+                (path.points[path.index] - transform.translation.truncate()).normalize() * 20.0;
         }
 
         velocity.linvel = new_velocity;
@@ -49,13 +49,13 @@ pub fn patrol(mut query: Query<(&mut Transform, &mut Velocity, &mut Patrol)>) {
 }
 
 #[derive(Clone, PartialEq, Debug, Default, Component)]
-pub struct Patrol {
+pub struct PredefinedPath {
     pub points: Vec<Vec2>,
     pub index: usize,
     pub forward: bool,
 }
 
-impl LdtkEntity for Patrol {
+impl LdtkEntity for PredefinedPath {
     fn bundle_entity(
         entity_instance: &EntityInstance,
         layer_instance: &LayerInstance,
@@ -63,7 +63,7 @@ impl LdtkEntity for Patrol {
         _: Option<&TilesetDefinition>,
         _: &AssetServer,
         _: &mut Assets<TextureAtlasLayout>
-    ) -> Patrol {
+    ) -> PredefinedPath {
         let mut points = Vec::new();
         points.push(
             ldtk_pixel_coords_to_translation_pivoted(
@@ -74,14 +74,14 @@ impl LdtkEntity for Patrol {
             )
         );
 
-        let ldtk_patrol_points = entity_instance
-            .iter_points_field("patrol")
-            .expect("patrol field should be correctly typed");
+        let ldtk_path_points = entity_instance
+            .iter_points_field("path")
+            .expect("path field should be correctly typed");
 
-        for ldtk_point in ldtk_patrol_points {
+        for ldtk_point in ldtk_path_points {
             // The +1 is necessary here due to the pivot of the entities in the sample
             // file.
-            // The patrols set up in the file look flat and grounded,
+            // The paths set up in the file look flat and grounded,
             // but technically they're not if you consider the pivot,
             // which is at the bottom-center for the skulls.
             let pixel_coords =
@@ -98,7 +98,7 @@ impl LdtkEntity for Patrol {
             );
         }
 
-        Patrol {
+        PredefinedPath {
             points,
             index: 1,
             forward: true,

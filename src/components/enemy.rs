@@ -1,7 +1,7 @@
 use bevy::{ ecs::{ bundle::Bundle, component::Component }, sprite::SpriteSheetBundle };
 use bevy_ecs_ldtk::prelude::LdtkEntity;
 
-use super::{ collision::ColliderBundle, patrol::Patrol };
+use super::{ collision::ColliderBundle, predefinedpath::PredefinedPath };
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct Enemy;
@@ -14,5 +14,5 @@ pub struct MobBundle {
     pub collider_bundle: ColliderBundle,
     pub enemy: Enemy,
     #[ldtk_entity]
-    pub patrol: Patrol,
+    pub predefined_path: PredefinedPath,
 }

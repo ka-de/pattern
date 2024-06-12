@@ -13,7 +13,7 @@ pub(crate) mod names;
 pub(crate) mod armor;
 pub(crate) mod torch;
 pub(crate) mod enemy;
-pub(crate) mod patrol;
+pub(crate) mod predefinedpath;
 pub(crate) mod animation;
 pub(crate) mod npc;
 pub(crate) mod pumpkin;
