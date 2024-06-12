@@ -10,10 +10,35 @@ cargo run 2>&1 | Out-String -Stream | Where-Object { $_ -notmatch "ID3D12Device:
 
 ## TODO
 
+- Use WyRand instead of thread_rng()
+
+```rust
+.add_plugins(EntropyPlugin::<WyRand>::with_seed([1; 32])))
+
+
+use bevy_prng::WyRand;
+use bevy_rand::prelude::{GlobalEntropy, ForkableRng};
+
+#[derive(Component)]
+struct Source;
+
+fn setup_source(mut commands: Commands, mut global: ResMut<GlobalEntropy<WyRand>>) {
+    commands
+        .spawn((
+            Source,
+            global.fork_rng(),
+        ));
+}
+
+
+```
+
 - Use something to copy `dxil.dll` and `dxcompiler.dll` to Windows builds.
-- ~~begin YarnSpinner integration~~
-- YarnSpinner+LDTK integration
+- begin YarnSpinner integration ✅
+- YarnSpinner+LDTK integration ⚠️ Started work
 - sickle_ui
+  - labels ✅
+  - keycap/gamepad button switching ⚠️
 
 ## Debugging Keyboard Shortcuts
 
