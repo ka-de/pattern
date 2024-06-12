@@ -54,8 +54,8 @@ default-features = false
 features = [
   "png",
   "vorbis",
-  "animation",
   "bevy_audio",
+  "animation",
   "bevy_gilrs",
   "bevy_gizmos",
   "bevy_sprite",
@@ -69,6 +69,8 @@ features = [
   "file_watcher",
   "bevy_winit",
   "embedded_watcher",
+  "x11",
+  "wayland",
 ]
 
 [dependencies.bevy_asset_loader]
