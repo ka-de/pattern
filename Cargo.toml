@@ -106,3 +106,8 @@ git = "https://github.com/ka-de/YarnSpinner-Rust"
 git = "https://github.com/ka-de/bevy_hanabi"
 default-features = false
 features = ["2d"]
+
+[dependencies.rodio]
+version = "0.17"
+default-features = false
+features = ["vorbis"]
