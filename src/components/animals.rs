@@ -101,14 +101,20 @@ fn generate_animal_name(animal_type: AnimalType) -> String {
 
     // Choose a random animal name from the ANIMAL_NAMES array
     // The chosen element is a tuple containing the name, gender, and type of the animal
-    let (name, _gender, name_type) = names::ANIMAL_NAMES.choose(&mut rng).unwrap();
-
-    // If the type of the chosen animal matches the given animal type
-    if *name_type == animal_type {
-        // Return the name of the animal as a string
-        (*name).to_string()
-    } else {
-        // If the types don't match, recursively call the function until a matching animal name is found
-        generate_animal_name(animal_type)
+    match names::ANIMAL_NAMES.choose(&mut rng) {
+        Some((name, _gender, name_type)) => {
+            // If the type of the chosen animal matches the given animal type
+            if *name_type == animal_type {
+                // Return the name of the animal as a string
+                name.to_string()
+            } else {
+                // If the types don't match, recursively call the function until a matching animal name is found
+                generate_animal_name(animal_type)
+            }
+        }
+        None => {
+            // If the ANIMAL_NAMES array is empty, return a default name
+            "Default Animal Name".to_string()
+        }
     }
 }
