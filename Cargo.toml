@@ -44,7 +44,12 @@ wgpu = { version = "0.19.3", default-features = false, features = [
   "naga-ir",
 ] }
 bevy_rand = { git = "https://github.com/ka-de/bevy_rand", features = [
-  "rand_chacha",
+  #"rand_chacha",
+  "wyrand",
+  "serialize",
+] }
+bevy_prng = { git = "https://github.com/ka-de/bevy_rand", features = [
+  #"rand_chacha",
   "wyrand",
 ] }
 

@@ -13,8 +13,9 @@ cargo run 2>&1 | Out-String -Stream | Where-Object { $_ -notmatch "ID3D12Device:
 - Use WyRand instead of thread_rng()
 
 ```rust
-.add_plugins(EntropyPlugin::<WyRand>::with_seed([1; 32])))
-
+fn print_random_value(mut rng: ResMut<GlobalEntropy<WyRand>>) {
+    println!("Random value: {}", rng.next_u32());
+}
 
 use bevy_prng::WyRand;
 use bevy_rand::prelude::{GlobalEntropy, ForkableRng};

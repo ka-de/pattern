@@ -5,11 +5,17 @@
 // only for Release builds.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use rand::RngCore;
+
 // Particle effects
 // ⚠️ TODO: Move to plugin or something?
 use bevy_hanabi::prelude::*;
 
+// bevy_rand
+use bevy_prng::*;
+use bevy_rand::{ resource::GlobalEntropy, prelude::EntropyPlugin };
 use bevy::{
+    ecs::system::ResMut,
     app::{ App, Startup },
     prelude::PluginGroup,
     render::{
@@ -41,6 +47,10 @@ use crate::plugins::ui::set_window_icon::set_window_icon;
 use crate::plugins::get_backend::get_backend;
 // ⚠️ TODO: Move audio stuff to its own thing
 
+fn print_random_value(mut rng: ResMut<GlobalEntropy<WyRand>>) {
+    println!("Random value: {}", rng.next_u32());
+}
+
 fn main() {
     #[cfg(not(debug_assertions))] // ⚠️ TODO: At some point we will need to dev with Steam.
     match SteamworksPlugin::init_app(981370) {
@@ -50,6 +60,9 @@ fn main() {
             return;
         }
     }
+
+    // The Seed 🌱
+    let seed: u64 = 1990;
 
     let mut wgpu_settings = WgpuSettings::default();
     wgpu_settings.features.set(WgpuFeatures::VERTEX_WRITABLE_STORAGE, true);
@@ -62,6 +75,7 @@ fn main() {
     //app.add_systems(Startup, play_background_audio);
 
     app.insert_resource(Msaa::Off) // Disable Multi-Sample Anti-Aliasing
+        .add_plugins(EntropyPlugin::<WyRand>::with_seed(seed.to_ne_bytes()))
         // DefaultPlugins
         .add_plugins((
             DefaultPlugins.set(RenderPlugin {
@@ -84,7 +98,8 @@ fn main() {
             plugins::audio::plugin,
             //HanabiPlugin,
         ))
-        .add_systems(Startup, set_window_icon) // Set the Window icon.
+        .add_systems(Startup, set_window_icon)
+        .add_systems(Startup, print_random_value) // Set the Window icon.
         // GAME SETTINGS ⚠️
         .insert_resource(GameSettings::default());
 
