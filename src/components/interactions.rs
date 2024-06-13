@@ -8,11 +8,10 @@ use bevy::{
         entity::Entity,
         event::EventReader,
         query::{ Added, With },
-        schedule::{ IntoSystemConfigs, SystemConfigs },
         system::{ Commands, Query },
     },
     hierarchy::{ Parent, PushChild },
-    log::info,
+    log,
     math::Vec2,
     transform::components::GlobalTransform,
 };
@@ -79,7 +78,7 @@ pub(crate) fn setup_interactive_entity(
                 ldtk_entity.get_bool_field("hasDialogue"),
             )
         {
-            info!("New interactive {}: {}", ldtk_entity.identifier, name);
+            log::debug!("New interactive {}: {}", ldtk_entity.identifier, name);
             commands.entity(entity).insert(Interactive { name: name.into() });
         }
     }

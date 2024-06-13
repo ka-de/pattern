@@ -37,7 +37,7 @@ pub(crate) fn plugin(app: &mut bevy::app::App) {
 pub(crate) fn make_log_plugin() -> impl Plugin {
     bevy::log::LogPlugin {
         level: bevy::log::Level::DEBUG,
-        filter: "info,pattern=debug,wgpu_core=warn,wgpu_hal=warn,pattern=debug".into(),
+        filter: "info,separated=debug,wgpu_core=warn,wgpu_hal=warn".into(),
         update_subscriber: None,
     }
 }

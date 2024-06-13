@@ -20,7 +20,7 @@ pub(crate) mod debug {
     pub(crate) fn make_log_plugin() -> impl bevy::app::Plugin {
         bevy::log::LogPlugin {
             level: bevy::log::Level::INFO,
-            filter: "warning,pattern=info".into(),
+            filter: "warning,separated=info".into(),
             update_subscriber: None,
         }
     }

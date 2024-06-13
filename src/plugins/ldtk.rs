@@ -8,7 +8,7 @@ use bevy::{
         system::{ Commands, Query, Res, ResMut, Resource },
     },
     input::{ keyboard::KeyCode, ButtonInput },
-    log::info,
+    log,
     math::{ Rect, Vec2 },
     prelude::IntoSystemConfigs,
     transform::components::Transform,
@@ -68,7 +68,7 @@ pub(crate) fn spawn_ldtk_world(mut commands: Commands, ldtk_assets: Res<LdtkAsse
         ldtk_handle: ldtk_assets.first_level.clone(),
         ..Default::default()
     });
-    info!("Spawned ldtk world");
+    log::info!("Spawned ldtk world");
 }
 
 // Updates the current level selection based on the player’s position.
@@ -105,7 +105,7 @@ pub(crate) fn update_level_selection(
                 player_transform.translation.y > level_bounds.min.y &&
                 !level_selection.is_match(&LevelIndices::default(), level)
             {
-                info!("Updating level selection {:?} -> {:?}", level_selection, level.iid);
+                log::debug!("Updating level selection {:?} -> {:?}", level_selection, level.iid);
                 *level_selection = LevelSelection::iid(level.iid.clone());
             }
         }
