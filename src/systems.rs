@@ -57,6 +57,7 @@ pub fn setup_world_systems(app: &mut App) {
                 components::predefinedpath::move_on_path,
                 components::camera::fit_inside_current_level,
                 components::items::dbg_player_items,
+                components::line_of_sight::line_of_sight,
             ).run_if(in_state(GameState::Playing))
         );
     // RapierPhysicsPlugin

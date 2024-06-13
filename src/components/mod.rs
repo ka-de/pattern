@@ -16,3 +16,4 @@ pub(crate) mod gamepad;
 pub(crate) mod deathzone;
 pub(super) mod swimming;
 pub(super) mod climbing;
+pub(super) mod line_of_sight;

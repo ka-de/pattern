@@ -2,6 +2,7 @@ use bevy::{ ecs::{ bundle::Bundle, component::Component }, sprite::SpriteSheetBu
 use bevy_ecs_ldtk::prelude::LdtkEntity;
 
 use super::{ ColliderBundle, PredefinedPath };
+use crate::components::line_of_sight::LineOfSight;
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct Enemy;
@@ -15,4 +16,5 @@ pub struct EnemyBundle {
     pub enemy: Enemy,
     #[ldtk_entity]
     pub predefined_path: PredefinedPath,
+    pub line_of_sight: LineOfSight,
 }
