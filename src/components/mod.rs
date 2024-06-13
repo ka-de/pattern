@@ -1,7 +1,5 @@
 pub(crate) mod animals;
-pub(crate) mod systems;
 pub(crate) mod health;
-pub(crate) mod ladders;
 pub(crate) mod collision;
 pub(crate) mod ground;
 pub(crate) mod items;
@@ -12,10 +10,9 @@ pub(crate) mod names;
 pub(crate) mod armor;
 pub(crate) mod predefinedpath;
 pub(crate) mod animation;
-pub(crate) mod wall;
 pub(crate) mod settings;
-pub(crate) mod water;
 pub(crate) mod interactions;
 pub(crate) mod gamepad;
 pub(crate) mod deathzone;
-
+pub(super) mod swimming;
+pub(super) mod climbing;

@@ -15,39 +15,6 @@ use bevy_ecs_ldtk::{
 };
 use bevy_rapier2d::dynamics::Velocity;
 
-pub fn move_on_path(mut query: Query<(&mut Transform, &mut Velocity, &mut PredefinedPath)>) {
-    for (mut transform, mut velocity, mut path) in &mut query {
-        if path.points.len() <= 1 {
-            continue;
-        }
-
-        let mut new_velocity =
-            (path.points[path.index] - transform.translation.truncate()).normalize() * 20.0;
-
-        if new_velocity.dot(velocity.linvel) < 0.0 {
-            if path.index == 0 {
-                path.forward = true;
-            } else if path.index == path.points.len() - 1 {
-                path.forward = false;
-            }
-
-            transform.translation.x = path.points[path.index].x;
-            transform.translation.y = path.points[path.index].y;
-
-            if path.forward {
-                path.index += 1;
-            } else {
-                path.index -= 1;
-            }
-
-            new_velocity =
-                (path.points[path.index] - transform.translation.truncate()).normalize() * 20.0;
-        }
-
-        velocity.linvel = new_velocity;
-    }
-}
-
 #[derive(Clone, PartialEq, Debug, Default, Component)]
 pub struct PredefinedPath {
     pub points: Vec<Vec2>,
@@ -103,5 +70,38 @@ impl LdtkEntity for PredefinedPath {
             index: 1,
             forward: true,
         }
+    }
+}
+
+pub fn move_on_path(mut query: Query<(&mut Transform, &mut Velocity, &mut PredefinedPath)>) {
+    for (mut transform, mut velocity, mut path) in &mut query {
+        if path.points.len() <= 1 {
+            continue;
+        }
+
+        let mut new_velocity =
+            (path.points[path.index] - transform.translation.truncate()).normalize() * 20.0;
+
+        if new_velocity.dot(velocity.linvel) < 0.0 {
+            if path.index == 0 {
+                path.forward = true;
+            } else if path.index == path.points.len() - 1 {
+                path.forward = false;
+            }
+
+            transform.translation.x = path.points[path.index].x;
+            transform.translation.y = path.points[path.index].y;
+
+            if path.forward {
+                path.index += 1;
+            } else {
+                path.index -= 1;
+            }
+
+            new_velocity =
+                (path.points[path.index] - transform.translation.truncate()).normalize() * 20.0;
+        }
+
+        velocity.linvel = new_velocity;
     }
 }

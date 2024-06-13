@@ -30,6 +30,7 @@ use bevy::{
 use plugins::gamestate::GameState;
 
 mod components;
+mod systems;
 mod entities;
 mod plugins;
 
@@ -88,7 +89,7 @@ fn main() {
                 .set(plugins::debug::make_log_plugin()),
             TweeningPlugin,
             plugins::gamestate::game_state_plugin,
-            components::systems::setup_ldtk,
+            systems::setup_world_systems,
             plugins::dialogueview::YarnSpinnerDialogueViewPlugin {
                 loading_state: GameState::SplashScreen,
                 playing_state: GameState::Playing,

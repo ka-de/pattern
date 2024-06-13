@@ -1,3 +1,4 @@
+pub(crate) mod ldtk;
 pub(crate) mod splashscreen;
 pub(crate) mod dialogueview;
 pub(crate) mod gamestate;

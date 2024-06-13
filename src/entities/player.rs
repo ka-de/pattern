@@ -4,11 +4,11 @@ use bevy_ecs_ldtk::{ EntityInstance, LdtkEntity, Worldly };
 use crate::components::{
     armor::Armor,
     health::Health,
-    ladders::Climber,
     collision::ColliderBundle,
     ground::GroundDetection,
-    water::Swimmer,
     items::Items,
+    climbing::Climber,
+    swimming::Swimmer,
 };
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]

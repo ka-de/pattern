@@ -37,7 +37,7 @@ pub struct InteractionSensor {
 /// The sensor is spawn as a children to the Player. It contains an
 /// [`InteractionSensor`] component that tracks interactive entities in range
 /// and the closest one.
-fn spawn_interaction_sensor(
+pub(crate) fn spawn_interaction_sensor(
     mut commands: Commands,
     mut detect_interaction_for: Query<(Entity, &Collider), Added<Player>>
 ) {
@@ -68,7 +68,7 @@ pub struct Interactive {
 
 /// Adds the [`Interactive`] component to LDtk entities that have a name and the
 /// `hasDialogue` field set to true
-fn setup_interactive_entity(
+pub(crate) fn setup_interactive_entity(
     mut commands: Commands,
     query: Query<(Entity, &EntityInstance), Added<EntityInstance>>
 ) {
@@ -87,7 +87,7 @@ fn setup_interactive_entity(
 
 /// System collecting collision events of the interaction sensor with
 /// interactive entities
-fn interaction_detection(
+pub(crate) fn interaction_detection(
     mut interaction_sensors: Query<&mut InteractionSensor>,
     interactive_entities: Query<Entity, With<Interactive>>,
     mut collisions: EventReader<CollisionEvent>
@@ -114,7 +114,7 @@ fn interaction_detection(
 
 /// System that tracks distances between interactive entities and the sensor, in
 /// order to elect the closest interactive entity.
-fn update_interactions(
+pub(crate) fn update_interactions(
     mut interaction_sensors: Query<(&mut InteractionSensor, &Parent)>,
     player_query: Query<&GlobalTransform, With<Player>>,
     interactive: Query<(&GlobalTransform, &Collider), With<Interactive>>
@@ -154,13 +154,4 @@ fn update_interactions(
             sensor.closest_entity = closest_entity;
         }
     }
-}
-
-pub fn make_interaction_systems() -> SystemConfigs {
-    (
-        spawn_interaction_sensor,
-        setup_interactive_entity,
-        interaction_detection,
-        update_interactions,
-    ).chain()
 }

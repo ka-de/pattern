@@ -1,5 +1,4 @@
 use bevy::{
-    log::info,
     app::{ App, Plugin, Update },
     ecs::{ query::With, system::{ Query, Res } },
     input::{ keyboard::{ KeyCode, KeyboardInput }, ButtonInput, ButtonState },
@@ -10,11 +9,11 @@ use bevy_rapier2d::dynamics::Velocity;
 use std::collections::HashMap;
 use std::time::Instant;
 
-use crate::components::ladders::Climber;
-use crate::entities::player::Player;
-use crate::components::{ ground::GroundDetection, water::Swimmer };
-
-use super::{ dialogueview::not_in_dialogue, gamestate::GameState };
+use crate::{
+    components::{ climbing::Climber, swimming::Swimmer, ground::GroundDetection },
+    entities::player::Player,
+    plugins::{ dialogueview::not_in_dialogue, gamestate::GameState },
+};
 
 #[derive(Debug)]
 pub(crate) struct KeyPressState {
@@ -93,6 +92,7 @@ pub(crate) fn handle_keypress(
 }
 
 pub struct InputPlugin;
+use crate::components;
 
 impl Plugin for InputPlugin {
     fn build(&self, app: &mut App) {
@@ -100,7 +100,11 @@ impl Plugin for InputPlugin {
             Update,
             (
                 handle_keypress,
-                movement.run_if(not_in_dialogue.and_then(in_state(GameState::Playing))),
+                movement
+                    .after(components::ground::update_on_ground)
+                    .after(components::climbing::detect_climb_range)
+                    .after(components::swimming::detect_swim_range)
+                    .run_if(not_in_dialogue.and_then(in_state(GameState::Playing))),
             ).chain()
         );
     }
