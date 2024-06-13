@@ -27,3 +27,4 @@ pub(crate) mod deathzone;
 pub(crate) mod movingplatform;
 pub(crate) mod dog;
 pub(crate) mod cat;
+pub(crate) mod kade;

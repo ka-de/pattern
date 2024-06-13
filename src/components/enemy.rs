@@ -7,7 +7,7 @@ use super::{ collision::ColliderBundle, predefinedpath::PredefinedPath };
 pub struct Enemy;
 
 #[derive(Clone, Default, Bundle, LdtkEntity)]
-pub struct MobBundle {
+pub struct EnemyBundle {
     #[sprite_sheet_bundle]
     pub sprite_sheet_bundle: SpriteSheetBundle,
     #[from_entity_instance]

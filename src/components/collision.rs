@@ -36,7 +36,7 @@ impl From<&EntityInstance> for ColliderBundle {
                     collision_group: CollisionGroups::new(PLAYER_GROUP, Group::ALL - NPC_GROUP),
                     ..Default::default()
                 },
-            "Mob" =>
+            "Enemy" =>
                 ColliderBundle {
                     collider: Collider::cuboid(12.0, 12.0),
                     rigid_body: RigidBody::KinematicVelocityBased,
@@ -53,6 +53,60 @@ impl From<&EntityInstance> for ColliderBundle {
                     ..Default::default()
                 },
             "NpcPatrol" =>
+                ColliderBundle {
+                    collider: Collider::cuboid(12.0, 12.0),
+                    rigid_body: RigidBody::KinematicVelocityBased,
+                    rotation_constraints,
+                    density: ColliderMassProperties::Density(50.0),
+                    collision_group: CollisionGroups::new(NPC_GROUP, Group::ALL),
+                    ..Default::default()
+                },
+            "Cauldron" =>
+                ColliderBundle {
+                    collider: Collider::cuboid(12.0, 12.0),
+                    rigid_body: RigidBody::KinematicVelocityBased,
+                    rotation_constraints,
+                    density: ColliderMassProperties::Density(50.0),
+                    collision_group: CollisionGroups::new(NPC_GROUP, Group::ALL),
+                    ..Default::default()
+                },
+            "Kade" =>
+                ColliderBundle {
+                    collider: Collider::cuboid(12.0, 12.0),
+                    rigid_body: RigidBody::KinematicVelocityBased,
+                    rotation_constraints,
+                    density: ColliderMassProperties::Density(50.0),
+                    collision_group: CollisionGroups::new(NPC_GROUP, Group::ALL),
+                    ..Default::default()
+                },
+            "Dog" =>
+                ColliderBundle {
+                    collider: Collider::cuboid(12.0, 12.0),
+                    rigid_body: RigidBody::KinematicVelocityBased,
+                    rotation_constraints,
+                    density: ColliderMassProperties::Density(50.0),
+                    collision_group: CollisionGroups::new(NPC_GROUP, Group::ALL),
+                    ..Default::default()
+                },
+            "DogPatrol" =>
+                ColliderBundle {
+                    collider: Collider::cuboid(12.0, 12.0),
+                    rigid_body: RigidBody::KinematicVelocityBased,
+                    rotation_constraints,
+                    density: ColliderMassProperties::Density(50.0),
+                    collision_group: CollisionGroups::new(NPC_GROUP, Group::ALL),
+                    ..Default::default()
+                },
+            "Cat" =>
+                ColliderBundle {
+                    collider: Collider::cuboid(12.0, 12.0),
+                    rigid_body: RigidBody::KinematicVelocityBased,
+                    rotation_constraints,
+                    density: ColliderMassProperties::Density(50.0),
+                    collision_group: CollisionGroups::new(NPC_GROUP, Group::ALL),
+                    ..Default::default()
+                },
+            "CatPatrol" =>
                 ColliderBundle {
                     collider: Collider::cuboid(12.0, 12.0),
                     rigid_body: RigidBody::KinematicVelocityBased,

@@ -61,10 +61,12 @@ pub fn setup_ldtk(app: &mut App) {
         .register_ldtk_entity::<super::dog::DogPatrolBundle>("DogPatrol")
         .register_ldtk_entity::<super::cat::CatBundle>("Cat")
         .register_ldtk_entity::<super::cat::CatPatrolBundle>("CatPatrol")
+        .register_ldtk_entity::<super::cauldron::CauldronBundle>("CatPatrol")
+        .register_ldtk_entity::<super::kade::KadeBundle>("Npc")
         .register_ldtk_entity::<super::npc::NpcBundle>("Npc")
         .register_ldtk_entity::<super::npc::NpcPatrolBundle>("NpcPatrol")
         .register_ldtk_entity::<super::movingplatform::MovingPlatformBundle>("MovingPlatform")
-        .register_ldtk_entity::<super::enemy::MobBundle>("Mob")
+        .register_ldtk_entity::<super::enemy::EnemyBundle>("Enemy")
         .register_ldtk_entity::<super::chest::ChestBundle>("Chest")
         .register_ldtk_entity::<super::pumpkin::PumpkinBundle>("Pumpkins")
         .configure_loading_state(
