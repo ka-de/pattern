@@ -38,62 +38,6 @@ pub trait Animal: Component {
     }
 }
 
-// 🐈‍⬛
-#[derive(Component)]
-pub struct Cat {
-    name: String,
-}
-
-// Implement methods for the 'Cat' struct
-impl Cat {
-    // Define a new function that takes a String as an argument and returns a new instance of 'Cat'
-    fn new(name: String) -> Self {
-        // Return a new 'Cat' instance with the given name
-        Self { name }
-    }
-}
-
-// Implement the 'Animal' trait for the 'Cat' struct
-impl Animal for Cat {
-    // Define the 'species' method to return the static string "Cat"
-    fn species() -> &'static str {
-        "Cat"
-    }
-
-    // Define the 'name' method to return a reference to the 'name' field of the 'Cat' instance
-    fn name(&self) -> &String {
-        &self.name
-    }
-}
-
-// 🐕
-#[derive(Component)]
-pub struct Dog {
-    name: String,
-}
-
-// Implement methods for the 'Dog' struct
-impl Dog {
-    // Define a new function that takes a String as an argument and returns a new instance of 'Dog'
-    fn new(name: String) -> Self {
-        // Return a new 'Dog' instance with the given name
-        Self { name }
-    }
-}
-
-// Implement the 'Animal' trait for the 'Dog' struct
-impl Animal for Dog {
-    // Define the 'species' method to return the static string "Dog"
-    fn species() -> &'static str {
-        "Dog"
-    }
-
-    // Define the 'name' method to return a reference to the 'name' field of the 'Dog' instance
-    fn name(&self) -> &String {
-        &self.name
-    }
-}
-
 // Function to generate an animal name based on the given animal type
 fn generate_animal_name(animal_type: AnimalType) -> String {
     // Create a random number generator

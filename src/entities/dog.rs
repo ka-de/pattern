@@ -2,9 +2,35 @@ use bevy::{ ecs::{ bundle::Bundle, component::Component }, sprite::SpriteSheetBu
 use bevy_ecs_ldtk::prelude::LdtkEntity;
 
 use super::{ ColliderBundle, PredefinedPath };
+use crate::components::animals::Animal;
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
-pub struct Dog;
+// 🐕
+#[derive(Clone, Eq, PartialEq, Debug, Default, Component)]
+pub struct Dog {
+    name: String,
+}
+
+// Implement methods for the 'Dog' struct
+impl Dog {
+    // Define a new function that takes a String as an argument and returns a new instance of 'Dog'
+    fn new(name: String) -> Self {
+        // Return a new 'Dog' instance with the given name
+        Self { name }
+    }
+}
+
+// Implement the 'Animal' trait for the 'Dog' struct
+impl Animal for Dog {
+    // Define the 'species' method to return the static string "Dog"
+    fn species() -> &'static str {
+        "Dog"
+    }
+
+    // Define the 'name' method to return a reference to the 'name' field of the 'Dog' instance
+    fn name(&self) -> &String {
+        &self.name
+    }
+}
 
 #[derive(Clone, Default, Bundle, LdtkEntity)]
 pub struct DogBundle {

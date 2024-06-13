@@ -52,6 +52,7 @@ bevy_prng = { git = "https://github.com/ka-de/bevy_rand", features = [
   #"rand_chacha",
   "wyrand",
 ] }
+pathfinding = { git = "https://github.com/ka-de/pathfinding" }
 
 [dependencies.bevy]
 version = "0.13.2"
