@@ -23,7 +23,7 @@ use bevy_rapier2d::{
     render::ColliderDebugColor,
 };
 
-use super::player::Player;
+use crate::entities::Player;
 use crate::plugins::rapier_utils::reciprocal_collisions;
 
 #[derive(Component, Default)]

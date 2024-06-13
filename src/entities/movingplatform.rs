@@ -1,7 +1,7 @@
 use bevy::{ ecs::{ bundle::Bundle, component::Component }, sprite::SpriteSheetBundle };
 use bevy_ecs_ldtk::prelude::LdtkEntity;
 
-use super::{ collision::ColliderBundle, predefinedpath::PredefinedPath };
+use super::{ ColliderBundle, PredefinedPath };
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct MovingPlatform;

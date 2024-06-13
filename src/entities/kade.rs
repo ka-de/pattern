@@ -1,8 +1,7 @@
 use bevy::{ ecs::{ bundle::Bundle, component::Component }, sprite::SpriteBundle };
 use bevy_ecs_ldtk::{ prelude::LdtkEntity, EntityInstance };
 
-use super::{ collision::ColliderBundle, predefinedpath::PredefinedPath };
-use crate::components::npc::Npc;
+use super::ColliderBundle;
 
 // Kade
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
@@ -14,7 +13,7 @@ pub struct KadeBundle {
     pub sprite_bundle: SpriteBundle,
     #[from_entity_instance]
     pub collider_bundle: ColliderBundle,
-    pub npc: Npc,
+    pub kade: Kade,
     #[from_entity_instance]
     pub entity: EntityInstance,
 }

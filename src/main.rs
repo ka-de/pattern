@@ -30,6 +30,7 @@ use bevy::{
 use plugins::gamestate::GameState;
 
 mod components;
+mod entities;
 mod plugins;
 
 use bevy_tweening::*;

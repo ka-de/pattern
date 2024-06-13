@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use std::time::Instant;
 
 use crate::components::ladders::Climber;
-use crate::components::player::Player;
+use crate::entities::player::Player;
 use crate::components::{ ground::GroundDetection, water::Swimmer };
 
 use super::{ dialogueview::not_in_dialogue, gamestate::GameState };

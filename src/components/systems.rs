@@ -40,10 +40,10 @@ use super::{
     ladders::{ Climbable, Climber },
     water::Swimmer,
     predefinedpath::move_on_path,
-    player::Player,
     wall::spawn_wall_collision,
     water::Swimmable,
 };
+use crate::entities::Player;
 use crate::plugins::{ gamestate::GameState, rapier_utils::reciprocal_collisions };
 
 // Sets up the game world using the LDTK plugin.
@@ -55,20 +55,7 @@ pub fn setup_ldtk(app: &mut App) {
         .register_ldtk_int_cell::<super::ladders::LadderBundle>(2)
         .register_ldtk_int_cell::<super::wall::WallBundle>(3)
         .register_ldtk_int_cell::<super::water::WaterBundle>(4)
-        .register_ldtk_entity::<super::torch::TorchBundle>("Torch")
-        .register_ldtk_entity::<super::player::PlayerBundle>("Player")
-        .register_ldtk_entity::<super::dog::DogBundle>("Dog")
-        .register_ldtk_entity::<super::dog::DogPatrolBundle>("DogPatrol")
-        .register_ldtk_entity::<super::cat::CatBundle>("Cat")
-        .register_ldtk_entity::<super::cat::CatPatrolBundle>("CatPatrol")
-        .register_ldtk_entity::<super::cauldron::CauldronBundle>("Cauldron")
-        .register_ldtk_entity::<super::kade::KadeBundle>("Kade")
-        .register_ldtk_entity::<super::npc::NpcBundle>("Npc")
-        .register_ldtk_entity::<super::npc::NpcPatrolBundle>("NpcPatrol")
-        .register_ldtk_entity::<super::movingplatform::MovingPlatformBundle>("MovingPlatform")
-        .register_ldtk_entity::<super::enemy::EnemyBundle>("Enemy")
-        .register_ldtk_entity::<super::chest::ChestBundle>("Chest")
-        .register_ldtk_entity::<super::pumpkin::PumpkinBundle>("Pumpkins")
+        .add_plugins(crate::entities::plugin)
         .configure_loading_state(
             LoadingStateConfig::new(GameState::SplashScreen).load_collection::<LdtkAssets>()
         )

@@ -1,7 +1,7 @@
 use bevy::{ ecs::bundle::Bundle, sprite::SpriteSheetBundle };
 use bevy_ecs_ldtk::LdtkEntity;
 
-use super::collision::ColliderBundle;
+use super::ColliderBundle;
 
 #[derive(Clone, Default, Bundle, LdtkEntity)]
 pub struct CauldronBundle {

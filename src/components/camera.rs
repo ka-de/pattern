@@ -11,7 +11,7 @@ use bevy_ecs_ldtk::{
     LevelSelection,
 };
 
-use super::player::Player;
+use crate::entities::Player;
 
 const ASPECT_RATIO: f32 = 16.0 / 9.0;
 

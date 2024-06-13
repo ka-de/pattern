@@ -1,7 +1,7 @@
 use bevy::{ ecs::{ bundle::Bundle, component::Component }, sprite::SpriteBundle };
 use bevy_ecs_ldtk::{ EntityInstance, LdtkEntity, Worldly };
 
-use super::{
+use crate::components::{
     armor::Armor,
     health::Health,
     ladders::Climber,

@@ -4,7 +4,7 @@ use bevy::{
 };
 use bevy_ecs_ldtk::{ ldtk::ldtk_fields::LdtkFields, EntityInstance };
 
-use crate::components::player::Player;
+use crate::entities::Player;
 
 #[derive(Clone, Component, Debug, Eq, Default, PartialEq)]
 pub struct Items(Vec<String>);

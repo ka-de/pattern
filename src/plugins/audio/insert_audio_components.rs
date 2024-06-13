@@ -11,7 +11,7 @@ use bevy_ecs_ldtk::{ prelude::LdtkFields, EntityInstance };
 use rand::{ Rng, thread_rng };
 
 use super::delayed_audio_source::DelayedPlaybackSettings;
-use crate::components::player::Player;
+use crate::entities::Player;
 
 /// Insert SpatialListener into the Player entity
 /// FIXME ⚠️ remove debug code and Name query
