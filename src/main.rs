@@ -96,9 +96,11 @@ pub fn thirst_system(time: Res<Time>, mut thirsts: Query<&mut Thirst>) {
     for mut thirst in &mut thirsts {
         thirst.thirst += thirst.per_second * ((time.delta().as_micros() as f32) / 1_000_000.0);
         if thirst.thirst >= 100.0 {
+            debug!("Thirst >= {}", thirst.thirst);
             thirst.thirst = 100.0;
         }
-        debug!("Thirst: {}", thirst.thirst);
+
+        trace!("Thirst: {}", thirst.thirst);
     }
 }
 
@@ -211,7 +213,7 @@ pub fn thirsty_scorer_system(
 pub fn init_entities(mut cmd: Commands) {
     // Create the entity and throw the Thirst component in there. Nothing special here.
     cmd.spawn((
-        Thirst::new(75.0, 0.4),
+        Thirst::new(75.0, 1.6),
         Thinker::build()
             .label("AIBrain")
             .picker(FirstToScore { threshold: 0.8 })

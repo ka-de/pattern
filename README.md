@@ -15,7 +15,8 @@ cargo run
 
 ---
 
-```bash
+```pwsh
+$env:RUST_LOG="trace"
 cargo run --release --features bevy/trace_tracy
 ```
 
