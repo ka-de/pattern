@@ -184,6 +184,7 @@ fn main() {
         .add_systems(Update, thirst_system)
         .add_plugins((
             DefaultPlugins.build()
+                // ⚠️ TODO: Make this a feature flag or something!
                 //.disable::<LogPlugin>()
                 .set(plugins::debug::make_log_plugin())
                 .set(RenderPlugin {
