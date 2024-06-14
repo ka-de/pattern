@@ -7,6 +7,7 @@
 
 use rand::RngCore;
 
+/*
 // ⚠️ GraphViz
 use graphviz_rust::{
     dot_generator::*,
@@ -17,6 +18,7 @@ use graphviz_rust::{
     parse,
     printer::{ DotPrinter, PrinterContext },
 };
+*/
 
 // Particle effects
 // ⚠️ TODO: Move to plugin or something?
@@ -32,7 +34,20 @@ use bevy::{
         query::With,
         component::Component,
     },
-    app::{ App, PreStartup, Startup, PreUpdate, Update, PostUpdate },
+    app::{
+        App,
+        StateTransition,
+        RunFixedMainLoop,
+        FixedMain,
+        First,
+        PreStartup,
+        Startup,
+        PostStartup,
+        PreUpdate,
+        Update,
+        PostUpdate,
+        Last,
+    },
     prelude::PluginGroup,
     render::{
         settings::{ WgpuFeatures, WgpuSettings },
@@ -167,18 +182,16 @@ fn main() {
         .add_plugins(BigBrainPlugin::new(PreUpdate))
         .add_systems(Startup, init_entities)
         .add_systems(Update, thirst_system)
-
-        // DefaultPlugins
         .add_plugins((
             DefaultPlugins.build()
-                .disable::<LogPlugin>()
+                //.disable::<LogPlugin>()
+                .set(plugins::debug::make_log_plugin())
                 .set(RenderPlugin {
                     render_creation: wgpu_settings.into(),
                     synchronous_pipeline_compilation: false,
                     ..default()
                 })
                 .set(ImagePlugin::default_nearest()),
-            //.set(plugins::debug::make_log_plugin()),
             TweeningPlugin,
             plugins::gamestate::game_state_plugin,
             systems::setup_world_systems,
@@ -197,70 +210,306 @@ fn main() {
         // GAME SETTINGS ⚠️
         .insert_resource(GameSettings::default());
 
-    // ⚠️ debugdump 🐛
-    //
-    // ⚠️ TODO: Can we automate this +
-    // ```
-    // dot .\docs\{}.dot -Tsvg -o .\docs\{}.svg
-    // dot .\docs\{}.dot -Tpng -o .\docs\{}.png
-    // ```
-    let mut render_graph_settings = bevy_mod_debugdump::render_graph::Settings::default();
-    let mut schedule_graph_settings = bevy_mod_debugdump::schedule_graph::Settings::default();
+    /*
 
-    //bevy_mod_debugdump::print_render_graph(&mut app);
+    // ⚠️ debugdump 🐛
+    // ⚠️ TODO: OnEnter(…), OnExit(…), OnTransition(…)
+	// ⚠️ TODO: FixedFirst etc?
+
+    let mut _render_graph_settings = bevy_mod_debugdump::render_graph::Settings::default();
+    let mut _schedule_graph_settings = bevy_mod_debugdump::schedule_graph::Settings::default();
+
+    // Render Graph
+    let _render_graph = bevy_mod_debugdump::render_graph_dot(&mut app, &_render_graph_settings);
+    let _render_graph_g: graphviz_rust::dot_structures::Graph = parse(&_render_graph).unwrap();
+    let _render_graph_dot = exec(
+        _render_graph_g.clone(),
+        &mut PrinterContext::default(),
+        vec![Format::Dot.into(), CommandArg::Output("docs/render-graph.dot".to_string())]
+    ).unwrap();
+    let _render_graph_svg = exec(
+        _render_graph_g.clone(),
+        &mut PrinterContext::default(),
+        vec![Format::Svg.into(), CommandArg::Output("docs/render-graph.svg".to_string())]
+    ).unwrap();
+    let _render_graph_png = exec(
+        _render_graph_g.clone(),
+        &mut PrinterContext::default(),
+        vec![Format::Png.into(), CommandArg::Output("docs/render-graph.png".to_string())]
+    ).unwrap();
+
+    // First Schedule Graph
+    let _first_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
+        &mut app,
+        First,
+        &_schedule_graph_settings
+    );
+    let _first_schedule_g: graphviz_rust::dot_structures::Graph = parse(
+        &_first_schedule_graph
+    ).unwrap();
+    let _first_schedule_graph_dot = exec(
+        _first_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![Format::Dot.into(), CommandArg::Output("docs/first-schedule-graph.dot".to_string())]
+    ).unwrap();
+    let _first_schedule_graph_svg = exec(
+        _first_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![Format::Svg.into(), CommandArg::Output("docs/first-schedule-graph.svg".to_string())]
+    ).unwrap();
+    let _first_schedule_graph_png = exec(
+        _first_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![Format::Png.into(), CommandArg::Output("docs/first-schedule-graph.png".to_string())]
+    ).unwrap();
+
+    // Last Schedule Graph
+    let _last_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
+        &mut app,
+        Last,
+        &_schedule_graph_settings
+    );
+    let _last_schedule_g: graphviz_rust::dot_structures::Graph = parse(
+        &_last_schedule_graph
+    ).unwrap();
+    let _last_schedule_graph_dot = exec(
+        _last_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![Format::Dot.into(), CommandArg::Output("docs/last-schedule-graph.dot".to_string())]
+    ).unwrap();
+    let _last_schedule_graph_svg = exec(
+        _last_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![Format::Svg.into(), CommandArg::Output("docs/last-schedule-graph.svg".to_string())]
+    ).unwrap();
+    let _last_schedule_graph_png = exec(
+        _last_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![Format::Png.into(), CommandArg::Output("docs/last-schedule-graph.png".to_string())]
+    ).unwrap();
+
+    // StateTransition Schedule Graph
+    let _statetransition_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
+        &mut app,
+        StateTransition,
+        &_schedule_graph_settings
+    );
+    let _statetransition_schedule_g: graphviz_rust::dot_structures::Graph = parse(
+        &_statetransition_schedule_graph
+    ).unwrap();
+    let _statetransition_schedule_graph_dot = exec(
+        _statetransition_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Dot.into(),
+            CommandArg::Output("docs/statetransition-schedule-graph.dot".to_string())
+        ]
+    ).unwrap();
+    let _statetransition_schedule_graph_svg = exec(
+        _statetransition_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Svg.into(),
+            CommandArg::Output("docs/statetransition-schedule-graph.svg".to_string())
+        ]
+    ).unwrap();
+    let _statetransition_schedule_graph_png = exec(
+        _statetransition_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Png.into(),
+            CommandArg::Output("docs/statetransition-schedule-graph.png".to_string())
+        ]
+    ).unwrap();
+
+    // FixedMain
+    let _fixedmain_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
+        &mut app,
+        FixedMain,
+        &_schedule_graph_settings
+    );
+    let _fixedmain_schedule_g: graphviz_rust::dot_structures::Graph = parse(
+        &_fixedmain_schedule_graph
+    ).unwrap();
+    let _fixedmain_schedule_graph_dot = exec(
+        _fixedmain_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Dot.into(),
+            CommandArg::Output("docs/fixedmain-schedule-graph.dot".to_string())
+        ]
+    ).unwrap();
+    let _fixedmain_schedule_graph_svg = exec(
+        _fixedmain_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Svg.into(),
+            CommandArg::Output("docs/fixedmain-schedule-graph.svg".to_string())
+        ]
+    ).unwrap();
+    let _fixedmain_schedule_graph_png = exec(
+        _fixedmain_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Png.into(),
+            CommandArg::Output("docs/fixedmain-schedule-graph.png".to_string())
+        ]
+    ).unwrap();
+
+    // RunFixedMainLoop Schedule Graph
+    let _runfixedmainloop_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
+        &mut app,
+        RunFixedMainLoop,
+        &_schedule_graph_settings
+    );
+    let _runfixedmainloop_schedule_g: graphviz_rust::dot_structures::Graph = parse(
+        &_runfixedmainloop_schedule_graph
+    ).unwrap();
+    let _runfixedmainloop_schedule_graph_dot = exec(
+        _runfixedmainloop_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Dot.into(),
+            CommandArg::Output("docs/runfixedmainloop-schedule-graph.dot".to_string())
+        ]
+    ).unwrap();
+    let _runfixedmainloop_schedule_graph_svg = exec(
+        _runfixedmainloop_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Svg.into(),
+            CommandArg::Output("docs/runfixedmainloop-schedule-graph.svg".to_string())
+        ]
+    ).unwrap();
+    let _runfixedmainloop_schedule_graph_png = exec(
+        _runfixedmainloop_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Png.into(),
+            CommandArg::Output("docs/runfixedmainloop-schedule-graph.png".to_string())
+        ]
+    ).unwrap();
 
     // Startup Schedule Graph
-    let startup_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
+    let _startup_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
         &mut app,
         Startup,
-        &schedule_graph_settings
+        &_schedule_graph_settings
     );
-    let startup_schedule_g: graphviz_rust::dot_structures::Graph = parse(
-        &startup_schedule_graph
+    let _startup_schedule_g: graphviz_rust::dot_structures::Graph = parse(
+        &_startup_schedule_graph
     ).unwrap();
-    let startup_schedule_graph_dot = exec(
-        startup_schedule_g.clone(),
+    let _startup_schedule_graph_dot = exec(
+        _startup_schedule_g.clone(),
         &mut PrinterContext::default(),
         vec![Format::Dot.into(), CommandArg::Output("docs/startup-schedule-graph.dot".to_string())]
     ).unwrap();
-    let startup_schedule_graph_svg = exec(
-        startup_schedule_g.clone(),
+    let _startup_schedule_graph_svg = exec(
+        _startup_schedule_g.clone(),
         &mut PrinterContext::default(),
         vec![Format::Svg.into(), CommandArg::Output("docs/startup-schedule-graph.svg".to_string())]
     ).unwrap();
-    let startup_schedule_graph_png = exec(
-        startup_schedule_g.clone(),
+    let _startup_schedule_graph_png = exec(
+        _startup_schedule_g.clone(),
         &mut PrinterContext::default(),
         vec![Format::Png.into(), CommandArg::Output("docs/startup-schedule-graph.png".to_string())]
     ).unwrap();
 
+    // PreStartup Schedule Graph
+    let _prestartup_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
+        &mut app,
+        PreStartup,
+        &_schedule_graph_settings
+    );
+    let _prestartup_schedule_g: graphviz_rust::dot_structures::Graph = parse(
+        &_prestartup_schedule_graph
+    ).unwrap();
+    let _prestartup_schedule_graph_dot = exec(
+        _prestartup_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Dot.into(),
+            CommandArg::Output("docs/prestartup-schedule-graph.dot".to_string())
+        ]
+    ).unwrap();
+    let _prestartup_schedule_graph_svg = exec(
+        _prestartup_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Svg.into(),
+            CommandArg::Output("docs/prestartup-schedule-graph.svg".to_string())
+        ]
+    ).unwrap();
+    let _prestartup_schedule_graph_png = exec(
+        _prestartup_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Png.into(),
+            CommandArg::Output("docs/prestartup-schedule-graph.png".to_string())
+        ]
+    ).unwrap();
+
+    // PostStartup Schedule Graph
+    let _poststartup_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
+        &mut app,
+        PostStartup,
+        &_schedule_graph_settings
+    );
+    let _poststartup_schedule_g: graphviz_rust::dot_structures::Graph = parse(
+        &_poststartup_schedule_graph
+    ).unwrap();
+    let _poststartup_schedule_graph_dot = exec(
+        _poststartup_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Dot.into(),
+            CommandArg::Output("docs/poststartup-schedule-graph.dot".to_string())
+        ]
+    ).unwrap();
+    let _poststartup_schedule_graph_svg = exec(
+        _poststartup_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Svg.into(),
+            CommandArg::Output("docs/poststartup-schedule-graph.svg".to_string())
+        ]
+    ).unwrap();
+    let _poststartup_schedule_graph_png = exec(
+        _poststartup_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Png.into(),
+            CommandArg::Output("docs/poststartup-schedule-graph.png".to_string())
+        ]
+    ).unwrap();
+
     // PreUpdate Schedule Graph
-    let preupdate_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
+    let _preupdate_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
         &mut app,
         PreUpdate,
-        &schedule_graph_settings
+        &_schedule_graph_settings
     );
-    let preupdate_schedule_g: graphviz_rust::dot_structures::Graph = parse(
-        &preupdate_schedule_graph
+    let _preupdate_schedule_g: graphviz_rust::dot_structures::Graph = parse(
+        &_preupdate_schedule_graph
     ).unwrap();
-    let preupdate_schedule_graph_dot = exec(
-        preupdate_schedule_g.clone(),
+    let _preupdate_schedule_graph_dot = exec(
+        _preupdate_schedule_g.clone(),
         &mut PrinterContext::default(),
         vec![
             Format::Dot.into(),
             CommandArg::Output("docs/preupdate-schedule-graph.dot".to_string())
         ]
     ).unwrap();
-    let preupdate_schedule_graph_svg = exec(
-        preupdate_schedule_g.clone(),
+    let _preupdate_schedule_graph_svg = exec(
+        _preupdate_schedule_g.clone(),
         &mut PrinterContext::default(),
         vec![
             Format::Svg.into(),
             CommandArg::Output("docs/preupdate-schedule-graph.svg".to_string())
         ]
     ).unwrap();
-    let preupdate_schedule_graph_png = exec(
-        preupdate_schedule_g.clone(),
+    let _preupdate_schedule_graph_png = exec(
+        _preupdate_schedule_g.clone(),
         &mut PrinterContext::default(),
         vec![
             Format::Png.into(),
@@ -269,64 +518,64 @@ fn main() {
     ).unwrap();
 
     // Update Schedule Graph
-    let update_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
+    let _update_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
         &mut app,
         Update,
-        &schedule_graph_settings
+        &_schedule_graph_settings
     );
-    let update_schedule_g: graphviz_rust::dot_structures::Graph = parse(
-        &update_schedule_graph
+    let _update_schedule_g: graphviz_rust::dot_structures::Graph = parse(
+        &_update_schedule_graph
     ).unwrap();
-    let update_schedule_graph_dot = exec(
-        update_schedule_g.clone(),
+    let _update_schedule_graph_dot = exec(
+        _update_schedule_g.clone(),
         &mut PrinterContext::default(),
         vec![Format::Dot.into(), CommandArg::Output("docs/update-schedule-graph.dot".to_string())]
     ).unwrap();
-    let update_schedule_graph_svg = exec(
-        update_schedule_g.clone(),
+    let _update_schedule_graph_svg = exec(
+        _update_schedule_g.clone(),
         &mut PrinterContext::default(),
         vec![Format::Svg.into(), CommandArg::Output("docs/update-schedule-graph.svg".to_string())]
     ).unwrap();
-    let update_schedule_graph_png = exec(
-        update_schedule_g.clone(),
+    let _update_schedule_graph_png = exec(
+        _update_schedule_g.clone(),
         &mut PrinterContext::default(),
         vec![Format::Png.into(), CommandArg::Output("docs/update-schedule-graph.png".to_string())]
     ).unwrap();
 
     // PostUpdate Schedule Graph
-    let postupdate_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
+    let _postupdate_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
         &mut app,
         PostUpdate,
-        &schedule_graph_settings
+        &_schedule_graph_settings
     );
-    let postupdate_schedule_g: graphviz_rust::dot_structures::Graph = parse(
-        &postupdate_schedule_graph
+    let _postupdate_schedule_g: graphviz_rust::dot_structures::Graph = parse(
+        &_postupdate_schedule_graph
     ).unwrap();
-    let postupdate_schedule_graph_dot = exec(
-        postupdate_schedule_g.clone(),
+    let _postupdate_schedule_graph_dot = exec(
+        _postupdate_schedule_g.clone(),
         &mut PrinterContext::default(),
         vec![
             Format::Dot.into(),
             CommandArg::Output("docs/postupdate-schedule-graph.dot".to_string())
         ]
     ).unwrap();
-    let postupdate_schedule_graph_svg = exec(
-        postupdate_schedule_g.clone(),
+    let _postupdate_schedule_graph_svg = exec(
+        _postupdate_schedule_g.clone(),
         &mut PrinterContext::default(),
         vec![
             Format::Svg.into(),
             CommandArg::Output("docs/postupdate-schedule-graph.svg".to_string())
         ]
     ).unwrap();
-    let postupdate_schedule_graph_png = exec(
-        postupdate_schedule_g.clone(),
+    let _postupdate_schedule_graph_png = exec(
+        _postupdate_schedule_g.clone(),
         &mut PrinterContext::default(),
         vec![
             Format::Png.into(),
             CommandArg::Output("docs/postupdate-schedule-graph.png".to_string())
         ]
     ).unwrap();
-
+*/
     // Actually start the game now!
     app.run();
 }
