@@ -82,12 +82,15 @@ fn one_off_action_system(mut query: Query<(&mut ActionState, &ActionSpan), With<
     for (mut state, span) in &mut query {
         let _guard = span.span().enter();
         match *state {
+            ActionState::Init => {
+                debug!("One-Off ActionState init.");
+            }
             ActionState::Requested => {
-                debug!("One-off action!");
+                debug!("One-Off ActionState requested.");
                 *state = ActionState::Success;
             }
             ActionState::Cancelled => {
-                debug!("One-off action was cancelled. Considering this a failure.");
+                debug!("One-off ActionState was cancelled, resulting in failure.");
                 *state = ActionState::Failure;
             }
             _ => {}
@@ -100,7 +103,7 @@ pub fn init_entities(mut cmd: Commands) {
     // actions. It's not a general-purpose task scheduler.
     cmd.spawn((
         Thirst::new(75.0, 2.0),
-        Thinker::build().label("My Thinker").picker(FirstToScore { threshold: 0.8 }),
+        Thinker::build().label("AIBrain").picker(FirstToScore { threshold: 0.8 }),
     ));
 }
 
