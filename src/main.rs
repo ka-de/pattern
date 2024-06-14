@@ -205,13 +205,95 @@ fn main() {
     // dot .\docs\{}.dot -Tpng -o .\docs\{}.png
     // ```
     let mut render_graph_settings = bevy_mod_debugdump::render_graph::Settings::default();
+    let mut schedule_graph_settings = bevy_mod_debugdump::schedule_graph::Settings::default();
 
     //bevy_mod_debugdump::print_render_graph(&mut app);
-    //bevy_mod_debugdump::print_schedule_graph(&mut app, Startup);
-    //bevy_mod_debugdump::print_schedule_graph(&mut app, PreUpdate);
-    //bevy_mod_debugdump::print_schedule_graph(&mut app, Update);
-    //let postupdate_schedule_graph = bevy_mod_debugdump::print_schedule_graph(&mut app, PostUpdate);
-    let mut schedule_graph_settings = bevy_mod_debugdump::schedule_graph::Settings::default();
+
+    // Startup Schedule Graph
+    let startup_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
+        &mut app,
+        Startup,
+        &schedule_graph_settings
+    );
+    let startup_schedule_g: graphviz_rust::dot_structures::Graph = parse(
+        &startup_schedule_graph
+    ).unwrap();
+    let startup_schedule_graph_dot = exec(
+        startup_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![Format::Dot.into(), CommandArg::Output("docs/startup-schedule-graph.dot".to_string())]
+    ).unwrap();
+    let startup_schedule_graph_svg = exec(
+        startup_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![Format::Svg.into(), CommandArg::Output("docs/startup-schedule-graph.svg".to_string())]
+    ).unwrap();
+    let startup_schedule_graph_png = exec(
+        startup_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![Format::Png.into(), CommandArg::Output("docs/startup-schedule-graph.png".to_string())]
+    ).unwrap();
+
+    // PreUpdate Schedule Graph
+    let preupdate_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
+        &mut app,
+        PreUpdate,
+        &schedule_graph_settings
+    );
+    let preupdate_schedule_g: graphviz_rust::dot_structures::Graph = parse(
+        &preupdate_schedule_graph
+    ).unwrap();
+    let preupdate_schedule_graph_dot = exec(
+        preupdate_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Dot.into(),
+            CommandArg::Output("docs/preupdate-schedule-graph.dot".to_string())
+        ]
+    ).unwrap();
+    let preupdate_schedule_graph_svg = exec(
+        preupdate_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Svg.into(),
+            CommandArg::Output("docs/preupdate-schedule-graph.svg".to_string())
+        ]
+    ).unwrap();
+    let preupdate_schedule_graph_png = exec(
+        preupdate_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![
+            Format::Png.into(),
+            CommandArg::Output("docs/preupdate-schedule-graph.png".to_string())
+        ]
+    ).unwrap();
+
+    // Update Schedule Graph
+    let update_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
+        &mut app,
+        Update,
+        &schedule_graph_settings
+    );
+    let update_schedule_g: graphviz_rust::dot_structures::Graph = parse(
+        &update_schedule_graph
+    ).unwrap();
+    let update_schedule_graph_dot = exec(
+        update_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![Format::Dot.into(), CommandArg::Output("docs/update-schedule-graph.dot".to_string())]
+    ).unwrap();
+    let update_schedule_graph_svg = exec(
+        update_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![Format::Svg.into(), CommandArg::Output("docs/update-schedule-graph.svg".to_string())]
+    ).unwrap();
+    let update_schedule_graph_png = exec(
+        update_schedule_g.clone(),
+        &mut PrinterContext::default(),
+        vec![Format::Png.into(), CommandArg::Output("docs/update-schedule-graph.png".to_string())]
+    ).unwrap();
+
+    // PostUpdate Schedule Graph
     let postupdate_schedule_graph = bevy_mod_debugdump::schedule_graph_dot(
         &mut app,
         PostUpdate,
@@ -244,5 +326,7 @@ fn main() {
             CommandArg::Output("docs/postupdate-schedule-graph.png".to_string())
         ]
     ).unwrap();
+
+    // Actually start the game now!
     app.run();
 }
