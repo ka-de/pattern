@@ -53,6 +53,7 @@ bevy_prng = { git = "https://github.com/ka-de/bevy_rand", features = [
   "wyrand",
 ] }
 pathfinding = { git = "https://github.com/ka-de/pathfinding" }
+big-brain = { git = "https://github.com/ka-de/big-brain" }
 #bresenham = "0.1.0"
 #serde = "^1"
 #serde_json = "1"
