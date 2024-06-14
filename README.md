@@ -2,7 +2,18 @@
 
 ---
 
+## Render graphs
+
+---
+
+```pwsh
+$env:RENDER_GRAPHS = "true"
+cargo run
+```
+
 ## Trace
+
+---
 
 ```bash
 cargo run --release --features bevy/trace_tracy
@@ -10,11 +21,15 @@ cargo run --release --features bevy/trace_tracy
 
 ## Filter out DX12 spam with PowerShell
 
+---
+
 ```pwsh
 cargo run 2>&1 | Out-String -Stream | Where-Object { $_ -notmatch "ID3D12Device::CreateCommittedResource:" -and $_ -notmatch "Live Object at" }
 ```
 
 ## TODO
+
+---
 
 - Use WyRand instead of thread_rng()
 
@@ -40,6 +55,8 @@ fn setup_source(mut commands: Commands, mut global: ResMut<GlobalEntropy<WyRand>
 
 ```
 
+- AI Stuff ⚠️ Started work
+- A* Pathfinding
 - Use something to copy `dxil.dll` and `dxcompiler.dll` to Windows builds.
 - begin YarnSpinner integration ✅
 - YarnSpinner+LDTK integration ⚠️ Started work
