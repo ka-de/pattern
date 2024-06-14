@@ -1,6 +1,7 @@
 debug/
 target/
 rustc-ice-*.txt
+docs/
 
 Cargo.lock
 
