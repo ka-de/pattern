@@ -67,9 +67,6 @@ fn one_off_action_system(mut query: Query<(&mut ActionState, &ActionSpan), With<
     for (mut state, span) in &mut query {
         let _guard = span.span().enter();
         match *state {
-            ActionState::Init => {
-                debug!("One-Off ActionState init.");
-            }
             ActionState::Requested => {
                 debug!("One-Off ActionState requested.");
                 *state = ActionState::Success;
@@ -84,12 +81,39 @@ fn one_off_action_system(mut query: Query<(&mut ActionState, &ActionSpan), With<
 }
 
 pub fn init_entities(mut cmd: Commands) {
-    // You at least need to have a Thinker in order to schedule one-off
-    // actions. It's not a general-purpose task scheduler.
     cmd.spawn((
         Thirst::new(75.0, 2.0),
+        Weapon::new("Empty Hands".to_string(), 1.0, 1.0),
         Thinker::build().label("AIBrain").picker(FirstToScore { threshold: 0.8 }),
     ));
+}
+
+pub fn drop_weapon(
+    time: Res<Time>,
+    mut weapons: Query<(Entity, &mut Weapon)>,
+    has_thinkers: Query<&HasThinker>,
+    mut thinkers: Query<(&mut Thinker, &ActionSpan)>
+) {
+    for (actor, mut weapon) in &mut weapons {
+        let thinker_ent = has_thinkers.get(actor).unwrap().entity();
+        let (mut thinker, span) = thinkers.get_mut(thinker_ent).unwrap();
+        let _guard = span.span().enter();
+        log::debug!("Scheduling one-off weapon drop action.");
+        thinker.schedule_action(OneOff);
+    }
+}
+
+#[derive(Component, Debug)]
+pub struct Weapon {
+    pub name: String,
+    pub damage: f32,
+    pub durability: f32,
+}
+
+impl Weapon {
+    pub fn new(name: String, damage: f32, durability: f32) -> Self {
+        Self { name, damage, durability }
+    }
 }
 
 #[derive(Component, Debug)]
@@ -107,7 +131,6 @@ impl Thirst {
 pub fn thirst_system(
     time: Res<Time>,
     mut thirsts: Query<(Entity, &mut Thirst)>,
-    // We need to get to the Thinker. That takes a couple of steps.
     has_thinkers: Query<&HasThinker>,
     mut thinkers: Query<(&mut Thinker, &ActionSpan)>
 ) {
@@ -117,7 +140,7 @@ pub fn thirst_system(
             let thinker_ent = has_thinkers.get(actor).unwrap().entity();
             let (mut thinker, span) = thinkers.get_mut(thinker_ent).unwrap();
             let _guard = span.span().enter();
-            log::debug!("Scheduling one-off action");
+            log::debug!("Scheduling one-off action.");
             thinker.schedule_action(OneOff);
             thirst.thirst = 0.0;
         }

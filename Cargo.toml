@@ -85,7 +85,7 @@ features = [
   "x11",
   "wayland",
   "trace",
-  "trace_tracy",
+  #"trace_tracy",
 ]
 
 [dependencies.bevy_asset_loader]
