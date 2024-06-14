@@ -195,6 +195,7 @@ fn main() {
             plugins::input::InputPlugin,
             plugins::ui::plugin,
             plugins::audio::plugin,
+            plugins::pathfinding::plugin,
             //HanabiPlugin,
         ))
         .add_systems(Startup, set_window_icon)
