@@ -3,7 +3,7 @@
 
 // This changes the executable to a graphical application instead of a CLI one
 // only for Release builds.
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+//#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use rand::RngCore;
 
