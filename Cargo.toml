@@ -84,6 +84,8 @@ features = [
   "embedded_watcher",
   "x11",
   "wayland",
+  "trace",
+  "trace_tracy",
 ]
 
 [dependencies.bevy_asset_loader]
