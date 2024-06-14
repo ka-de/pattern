@@ -54,6 +54,8 @@ bevy_prng = { git = "https://github.com/ka-de/bevy_rand", features = [
 ] }
 pathfinding = { git = "https://github.com/ka-de/pathfinding" }
 big-brain = { git = "https://github.com/ka-de/big-brain" }
+bevy-scene-hook = { git = "https://github.com/ka-de/bevy-scene-hook" }
+bevy_mod_debugdump = { git = "https://github.com/ka-de/bevy_mod_debugdump" }
 #bresenham = "0.1.0"
 #serde = "^1"
 #serde_json = "1"
