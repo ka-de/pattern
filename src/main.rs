@@ -15,26 +15,14 @@ use bevy_hanabi::prelude::*;
 use bevy_prng::*;
 use bevy_rand::{ resource::GlobalEntropy, prelude::EntropyPlugin };
 use bevy::{
+    app::{ App, PreUpdate, Startup, Update },
     ecs::{
-        system::{ Commands, Query, ResMut, Res },
+        component::Component,
         entity::Entity,
         query::With,
-        component::Component,
+        system::{ Commands, Query, Res, ResMut },
     },
-    app::{
-        App,
-        StateTransition,
-        RunFixedMainLoop,
-        FixedMain,
-        First,
-        PreStartup,
-        Startup,
-        PostStartup,
-        PreUpdate,
-        Update,
-        PostUpdate,
-        Last,
-    },
+    log::{ self, debug },
     prelude::PluginGroup,
     render::{
         settings::{ WgpuFeatures, WgpuSettings },
@@ -42,10 +30,9 @@ use bevy::{
         view::Msaa,
         RenderPlugin,
     },
+    time::Time,
     utils::default,
     DefaultPlugins,
-    log::{ debug, trace, LogPlugin },
-    time::Time,
 };
 use plugins::gamestate::GameState;
 
@@ -55,8 +42,6 @@ mod entities;
 mod plugins;
 
 use bevy_tweening::*;
-// Steamworks
-use bevy_steamworks::*;
 
 // 🧠
 use big_brain::{
@@ -132,17 +117,17 @@ pub fn thirst_system(
             let thinker_ent = has_thinkers.get(actor).unwrap().entity();
             let (mut thinker, span) = thinkers.get_mut(thinker_ent).unwrap();
             let _guard = span.span().enter();
-            debug!("Scheduling one-off action");
+            log::debug!("Scheduling one-off action");
             thinker.schedule_action(OneOff);
             thirst.thirst = 0.0;
         }
-        trace!("Thirst: {}", thirst.thirst);
+        log::trace!("Thirst: {}", thirst.thirst);
     }
 }
 
 fn main() {
     #[cfg(not(debug_assertions))] // ⚠️ TODO: At some point we will need to dev with Steam.
-    match SteamworksPlugin::init_app(981370) {
+    match bevy_steamworks::SteamworksPlugin::init_app(981370) {
         Ok(_) => (),
         Err(err) => {
             eprintln!("{}", err);
@@ -170,15 +155,13 @@ fn main() {
         .add_systems(Update, thirst_system)
         .add_plugins((
             DefaultPlugins.build()
-                // ⚠️ TODO: Make this a feature flag or something!
-                //.disable::<LogPlugin>()
-                .set(plugins::debug::make_log_plugin())
                 .set(RenderPlugin {
                     render_creation: wgpu_settings.into(),
                     synchronous_pipeline_compilation: false,
                     ..default()
                 })
-                .set(ImagePlugin::default_nearest()),
+                .set(ImagePlugin::default_nearest())
+                .set(plugins::debug::make_log_plugin()),
             TweeningPlugin,
             plugins::gamestate::game_state_plugin,
             systems::setup_world_systems,
@@ -186,7 +169,6 @@ fn main() {
                 loading_state: GameState::SplashScreen,
                 playing_state: GameState::Playing,
             },
-            plugins::debug::plugin,
             plugins::input::InputPlugin,
             plugins::ui::plugin,
             plugins::audio::plugin,
@@ -195,7 +177,9 @@ fn main() {
         .add_systems(Startup, set_window_icon)
         .add_systems(Startup, print_random_value) // Set the Window icon.
         // GAME SETTINGS ⚠️
-        .insert_resource(GameSettings::default());
+        .insert_resource(GameSettings::default())
+        // Debug plugin comes last, allowing to inspect the final app state.
+        .add_plugins(plugins::debug::plugin);
 
     // Actually start the game now!
     app.run();
