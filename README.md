@@ -2,6 +2,12 @@
 
 ---
 
+## Trace
+
+```bash
+cargo run --release --features bevy/trace_tracy
+```
+
 ## Filter out DX12 spam with PowerShell
 
 ```pwsh
