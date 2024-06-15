@@ -56,7 +56,7 @@ pathfinding = { git = "https://github.com/ka-de/pathfinding" }
 big-brain = { git = "https://github.com/ka-de/big-brain" }
 bevy_mod_debugdump = { git = "https://github.com/ka-de/bevy_mod_debugdump" }
 graphviz-rust = "0.9.0"
-bevy_text_input = { git = "https://ka-de/bevy_text_input" }
+bevy_text_input = { git = "https://github.com/ka-de/bevy_text_input" }
 bevy_flurx = { git = "https://github.com/ka-de/bevy_flurx" }
 bevy-magic-light-2d = { git = "https://github.com/ka-de/bevy-magic-light-2d" }
 #bresenham = "0.1.0"
