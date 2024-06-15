@@ -25,8 +25,14 @@ cargo run --release --features bevy/trace_tracy
 ---
 
 ```pwsh
-cargo run 2>&1 | Out-String -Stream | Where-Object { $_ -notmatch "ID3D12Device::CreateCommittedResource:" -and $_ -notmatch "Live Object at" }
+cargo run 2>&1 | Out-String -Stream | Where-Object { $_ -notmatch "ID3D12Device" -and $_ -notmatch "Live Object at" }
 ```
+
+With tracing:
+
+```pwsh
+ cargo run --features bevy/trace_tracy 2>&1 | Out-String -Stream | Where-Object { $_ -notmatch "ID3D12Device" -and $_ -notmatch "Live Object at" }
+ ```
 
 ## TODO
 
@@ -54,25 +60,7 @@ fn setup_source(mut commands: Commands, mut global: ResMut<GlobalEntropy<WyRand>
 }
 ```
 
-- **Movement Improvements**
-  - Movement animations.
-  - Movement particle effects.
-  - Coyote (Grace) Time after falling off a ledge.
-    - Maybe needs a raycast in front of the player? Timer needs to start before falling off a ledge.
-  - **Jump Improvements**
-    - Jumping animations.
-    - Jumping particle effects.
-    - Wall Jumping
-    - Air Time
-    - Jump Height
-      - Increase the player's jump height the longer the jump button is being held down.
-    - Clamp maximum falling speed.
-    - Coyote Time while jumping and pressing the jump button.
-      - There is already some check for being in the air we just need the input part I think.
-    - Bonus Air Time
-    - Peak Control
-    - Fast Fall
-      - Increase Player's falling speed after the peak of their jump by adjusting gravity.
+---
 
 ```rust
 if ( jumping || falling ) {
@@ -93,7 +81,31 @@ if velocity.y < 0 {
     // we don't accelerate to insanely high speeds.
 }
 ```
-  
+
+- **Movement Improvements**
+  - Movement animations.
+  - Movement particle effects.
+  - Coyote (Grace) Time after falling off a ledge.
+    - Maybe needs a raycast in front of the player? Timer needs to start before falling off a ledge.
+  - **Jump Improvements**
+    - Jumping animations.
+    - Jumping particle effects.
+    - Wall Jumping
+      - ~~Prevent player movement for a short duration during the wall jump.~~ Reduce run force? Maybe a lerp between the wall jump speed and running speed?
+    - Air Time
+    - Jump Height
+      - Increase the player's jump height the longer the jump button is being held down.
+    - Clamp maximum falling speed.
+    - Coyote Time while jumping and pressing the jump button.
+      - There is already some check for being in the air we just need the input part I think.
+    - Bonus Air Time
+    - Peak Control
+    - Fast Fall
+      - Increase Player's falling speed after the peak of their jump by adjusting gravity.
+- **Game Feel Improvements**
+
+  This is kinda broad but always iterate over every small mechanic towards more fun.
+
 - AI Stuff ⚠️ Started work
   - Basic Timer with Action Scheduling
     - Thirst

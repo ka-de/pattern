@@ -19,10 +19,11 @@ use crate::components::ai::{ actions::drink::Drink, scorers::thirsty::Thirsty, t
 // to have AI behavior should have one *or more* Thinkers attached to it.
 pub(crate) fn setup(mut cmd: Commands) {
     // Create the entity and throw the Thirst component in there. Nothing special here.
+    // Neutral AI Brain
     cmd.spawn((
         Thirst::new(75.0, 1.6),
         Thinker::build()
-            .label("AIBrain")
+            .label("NeutralAIBrain")
             .picker(FirstToScore { threshold: 0.8 })
             // Technically these are supposed to be ActionBuilders and
             // ScorerBuilders, but our Clone impls simplify our code here.
@@ -30,5 +31,22 @@ pub(crate) fn setup(mut cmd: Commands) {
                 until: 1.0,
                 per_second: 5.0,
             }),
+        // ⚠️ TODO:
+        // When damaged by the player, become hostile.
+    ));
+
+    // AggressiveAIBrain
+    cmd.spawn((
+        Thirst::new(75.0, 1.6),
+        Thinker::build()
+            .label("AggressiveAIBrain")
+            .picker(FirstToScore { threshold: 0.8 })
+            .when(Thirsty, Drink {
+                until: 1.0,
+                per_second: 5.0,
+            }),
+        // ⚠️ TODO:
+        // When player is in line of sight and at the proper
+        // aggro radius, engage in combat.
     ));
 }
