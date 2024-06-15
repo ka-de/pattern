@@ -1,0 +1,28 @@
+// 🧠 - AI
+
+// Not to be confused by an actual LLM!
+
+pub(crate) mod actions;
+pub(crate) mod scorers;
+
+// Components
+pub(crate) mod thirst;
+
+// Now that we have all that defined, it's time to add a Thinker to an entity!
+// The Thinker is the actual "brain" behind all the AI. Every entity you want
+// to have AI behavior should have one *or more* Thinkers attached to it.
+pub(crate) fn setup(mut cmd: Commands) {
+    // Create the entity and throw the Thirst component in there. Nothing special here.
+    cmd.spawn((
+        Thirst::new(75.0, 1.6),
+        Thinker::build()
+            .label("AIBrain")
+            .picker(FirstToScore { threshold: 0.8 })
+            // Technically these are supposed to be ActionBuilders and
+            // ScorerBuilders, but our Clone impls simplify our code here.
+            .when(Thirsty, Drink {
+                until: 1.0,
+                per_second: 5.0,
+            }),
+    ));
+}

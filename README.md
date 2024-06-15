@@ -2,7 +2,7 @@
 
 ---
 
-## Render graphs
+## Render Engine Graphs
 
 ---
 
@@ -32,7 +32,7 @@ cargo run 2>&1 | Out-String -Stream | Where-Object { $_ -notmatch "ID3D12Device:
 
 ---
 
-- Use WyRand instead of thread_rng()
+- **Use WyRand instead of `thread_rng()`**
 
 ```rust
 fn print_random_value(mut rng: ResMut<GlobalEntropy<WyRand>>) {
@@ -56,7 +56,16 @@ fn setup_source(mut commands: Commands, mut global: ResMut<GlobalEntropy<WyRand>
 
 ```
 
+- **Movement Improvements**
+  - Coyote Time after falling off a ledge
+    - Needs a raycast
+  - Coyote Time while jumping and pressing the jump button.
+    - There is already some check for being in the air we just need the input part I think.
+  - Jump Improvements
 - AI Stuff ⚠️ Started work
+  - Basic Timer with Action Scheduling
+    - Thirst
+    - Fatigue
 - A* Pathfinding
 - Use something to copy `dxil.dll` and `dxcompiler.dll` to Windows builds.
 - begin YarnSpinner integration ✅

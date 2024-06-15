@@ -13,14 +13,14 @@ use crate::entities::player::Player;
 #[derive(Component, Clone)]
 pub(crate) struct LineOfSight {
     max_distance: f32,
-    last_sigthed: Option<Vec2>,
+    last_sighted: Option<Vec2>,
     in_sight: bool,
 }
 
 /// Component applied to entities that seek the player
 impl Default for LineOfSight {
     fn default() -> Self {
-        Self { max_distance: 250.0, last_sigthed: None, in_sight: false }
+        Self { max_distance: 250.0, last_sighted: None, in_sight: false }
     }
 }
 
@@ -29,14 +29,14 @@ pub(crate) fn line_of_sight(
     mut stalkers: Query<(&mut LineOfSight, &GlobalTransform, Entity, Option<&Name>)>,
     rapier_context: Res<RapierContext>
 ) {
-    let Ok((player_entity, player_transofrm)) = player.get_single() else {
+    let Ok((player_entity, player_transform)) = player.get_single() else {
         return;
     };
-    let player_pos = player_transofrm.translation().truncate();
+    let player_pos = player_transform.translation().truncate();
 
     // Iterate over entities having a LineOfSight component
-    for (mut line_of_sight, stalker_tranform, stalker_entity, stalker_name) in &mut stalkers {
-        let stalker_pos = stalker_tranform.translation().truncate();
+    for (mut line_of_sight, stalker_transform, stalker_entity, stalker_name) in &mut stalkers {
+        let stalker_pos = stalker_transform.translation().truncate();
         let vector = player_pos - stalker_pos;
         let max_distance = line_of_sight.max_distance;
         let distance = vector.length();
@@ -58,7 +58,12 @@ pub(crate) fn line_of_sight(
         {
             // TODO: remove debug
             if collided_entity == player_entity && !line_of_sight.in_sight {
-                log::debug!("{:?}({:?}) sees the player! toi={}", stalker_name, stalker_entity, toi);
+                log::debug!(
+                    "{:?}({:?}) sees the player! toi={}",
+                    stalker_name,
+                    stalker_entity,
+                    toi
+                );
             }
             collided_entity == player_entity
         } else {
@@ -68,9 +73,9 @@ pub(crate) fn line_of_sight(
         // Minimal updates
         if stalked {
             let last_sighted = Some(player_pos);
-            if !line_of_sight.in_sight || line_of_sight.last_sigthed != last_sighted {
+            if !line_of_sight.in_sight || line_of_sight.last_sighted != last_sighted {
                 let los_mut = line_of_sight.as_mut();
-                los_mut.last_sigthed = last_sighted;
+                los_mut.last_sighted = last_sighted;
                 los_mut.in_sight = true;
             }
         } else {
