@@ -82,6 +82,10 @@ if velocity.y < 0 {
 }
 ```
 
+- **Patrol**
+
+  - Flip sprite when turning around!
+
 - **Movement Improvements**
   - Movement animations.
   - Movement particle effects.
