@@ -19,15 +19,19 @@ use sickle_ui::{
     widgets::{ container::UiContainerExt, label::{ LabelConfig, UiLabelExt } },
 };
 use crate::plugins::ui::set::{ SetFont, SetPosition };
+
 #[derive(Component)]
 pub(crate) struct KeycapWidget;
+
 #[derive(Component)]
 struct KeycapLabel;
+
 pub struct KeycapWidgetConfig {
     pub label: String,
     pub font: String,
     pub font_size: f32,
 }
+
 impl KeycapWidgetConfig {
     pub fn from(
         label: impl Into<String>,
@@ -41,9 +45,11 @@ impl KeycapWidgetConfig {
         }
     }
 }
+
 pub trait UiKeycapWidgetExt<'w, 's> {
     fn keycap_widget<'a>(&'a mut self, config: KeycapWidgetConfig) -> UiBuilder<'w, 's, 'a, Entity>;
 }
+
 impl<'w, 's> UiKeycapWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
     fn keycap_widget<'a>(
         &'a mut self,
@@ -67,6 +73,7 @@ impl<'w, 's> UiKeycapWidgetExt<'w, 's> for UiBuilder<'w, 's, '_, UiRoot> {
         })
     }
 }
+
 pub trait KeycapWidgetCommands<'a> {
     fn font(
         &'a mut self,
@@ -76,6 +83,7 @@ pub trait KeycapWidgetCommands<'a> {
     ) -> &mut EntityCommands<'a>;
     fn set_position(&'a mut self, x: f32, y: f32) -> &mut EntityCommands<'a>;
 }
+
 impl<'a> KeycapWidgetCommands<'a> for EntityCommands<'a> {
     fn font(
         &'a mut self,
