@@ -1,3 +1,9 @@
+use bevy::{
+    time::Time,
+    log::{ trace, debug },
+    ecs::{ system::{ Commands, Query, Res }, component::Component },
+};
+
 // First, we define a "Thirst" component and associated system. This is NOT
 // THE AI. It's a plain old system that just makes an entity "thirstier" over
 // time. This is what the AI will later interact with.

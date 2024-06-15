@@ -1,3 +1,8 @@
+use bevy::{ log::debug, ecs::{ query::With, system::{ Res, Query }, component::Component } };
+use big_brain::prelude::{ Actor, ScorerBuilder, Score, ScorerSpan };
+
+use crate::components::ai::thirst::Thirst;
+
 #[derive(Clone, Component, Debug, ScorerBuilder)]
 pub(crate) struct Thirsty;
 

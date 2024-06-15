@@ -61,6 +61,12 @@ use big_brain::{
     BigBrainPlugin,
 };
 
+use crate::components::ai::{
+    thirst::thirst_system,
+    scorers::thirsty::thirsty_scorer_system,
+    actions::drink::drink_action_system,
+};
+
 // ⚠️ TODO: Move this with Game Settings
 use components::settings::GameSettings;
 

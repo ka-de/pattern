@@ -8,6 +8,12 @@ pub(crate) mod scorers;
 // Components
 pub(crate) mod thirst;
 
+use bevy::ecs::system::Commands;
+
+use big_brain::prelude::{ FirstToScore, Thinker };
+
+use crate::components::ai::{ actions::drink::Drink, scorers::thirsty::Thirsty, thirst::Thirst };
+
 // Now that we have all that defined, it's time to add a Thinker to an entity!
 // The Thinker is the actual "brain" behind all the AI. Every entity you want
 // to have AI behavior should have one *or more* Thinkers attached to it.

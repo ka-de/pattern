@@ -52,8 +52,6 @@ fn setup_source(mut commands: Commands, mut global: ResMut<GlobalEntropy<WyRand>
             global.fork_rng(),
         ));
 }
-
-
 ```
 
 - **Movement Improvements**

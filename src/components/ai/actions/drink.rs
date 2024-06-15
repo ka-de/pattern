@@ -1,10 +1,16 @@
-use bevy::{ log::{ trace, debug }, ecs::component::Component };
-use big_brain::prelude::ActionBuilder;
+use bevy::{
+    time::Time,
+    log::{ trace, debug },
+    ecs::{ system::{ Query, Res }, component::Component },
+};
+use big_brain::prelude::{ Actor, ActionBuilder, ActionState, ActionSpan };
+
+use crate::components::ai::thirst::Thirst;
 
 #[derive(Clone, Component, Debug, ActionBuilder)]
 pub(crate) struct Drink {
-    until: f32,
-    per_second: f32,
+    pub until: f32,
+    pub per_second: f32,
 }
 
 // Action systems execute according to a state machine, where the states are
