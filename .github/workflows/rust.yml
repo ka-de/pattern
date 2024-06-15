@@ -28,7 +28,7 @@ jobs:
           ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
           ${{ runner.os }}-cargo
     - name: Install dependencies
-      run: sudo apt-get install -y clang pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev libxkbcommon-dev mesa-vulkan-drivers
+      run: sudo apt-get install -y clang pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev libxkbcommon-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev mesa-vulkan-drivers
     - name: Build
       run: cargo build --verbose
     - name: Run tests
