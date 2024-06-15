@@ -55,11 +55,45 @@ fn setup_source(mut commands: Commands, mut global: ResMut<GlobalEntropy<WyRand>
 ```
 
 - **Movement Improvements**
-  - Coyote Time after falling off a ledge
-    - Needs a raycast
-  - Coyote Time while jumping and pressing the jump button.
-    - There is already some check for being in the air we just need the input part I think.
-  - Jump Improvements
+  - Movement animations.
+  - Movement particle effects.
+  - Coyote (Grace) Time after falling off a ledge.
+    - Maybe needs a raycast in front of the player? Timer needs to start before falling off a ledge.
+  - **Jump Improvements**
+    - Jumping animations.
+    - Jumping particle effects.
+    - Wall Jumping
+    - Air Time
+    - Jump Height
+      - Increase the player's jump height the longer the jump button is being held down.
+    - Clamp maximum falling speed.
+    - Coyote Time while jumping and pressing the jump button.
+      - There is already some check for being in the air we just need the input part I think.
+    - Bonus Air Time
+    - Peak Control
+    - Fast Fall
+      - Increase Player's falling speed after the peak of their jump by adjusting gravity.
+
+```rust
+if ( jumping || falling ) {
+
+    if velocity.y.abs() < jumpHangTimeThreshold {
+        // Increase acceleration for this duration also.
+
+        // Reduce gravity.
+    }
+}
+
+// If the player is moving downwards..
+if velocity.y < 0 {
+    // Increase gravity while falling.
+    gravityScale *= fallGravityMultiplier;
+
+    // Cap maximum fall speed, so when falling over large distances,
+    // we don't accelerate to insanely high speeds.
+}
+```
+  
 - AI Stuff ⚠️ Started work
   - Basic Timer with Action Scheduling
     - Thirst
