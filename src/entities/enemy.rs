@@ -16,5 +16,5 @@ pub struct EnemyBundle {
     pub enemy: Enemy,
     #[ldtk_entity]
     pub predefined_path: PredefinedPath,
-    pub line_of_sight: LineOfSight,
+    pub line_of_sight: LineOfSight<super::player::Player>,
 }

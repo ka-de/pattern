@@ -10,7 +10,7 @@ use bevy_asset_loader::loading_state::{
 use bevy_ecs_ldtk::LdtkPlugin;
 use bevy_rapier2d::plugin::{ NoUserData, RapierPhysicsPlugin };
 
-use crate::{ components, plugins::{ gamestate::GameState, ldtk } };
+use crate::{ components, entities, plugins::{ gamestate::GameState, ldtk } };
 
 /// Sets up the game world using the LDTK plugin.
 ///
@@ -57,7 +57,7 @@ pub fn setup_world_systems(app: &mut App) {
                 components::predefinedpath::move_on_path,
                 components::camera::fit_inside_current_level,
                 components::items::dbg_player_items,
-                components::line_of_sight::line_of_sight,
+                components::line_of_sight::line_of_sight::<entities::Player>,
             ).run_if(in_state(GameState::Playing))
         );
     // RapierPhysicsPlugin
