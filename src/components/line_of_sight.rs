@@ -26,7 +26,7 @@ impl Default for LineOfSight {
 
 pub(crate) fn line_of_sight(
     player: Query<(Entity, &GlobalTransform), With<Player>>,
-    mut stalkers: Query<(&mut LineOfSight, &GlobalTransform, Entity, Option<&Name>)>,
+    mut observers: Query<(&mut LineOfSight, &GlobalTransform, Entity, Option<&Name>)>,
     rapier_context: Res<RapierContext>
 ) {
     let Ok((player_entity, player_transform)) = player.get_single() else {
@@ -35,9 +35,9 @@ pub(crate) fn line_of_sight(
     let player_pos = player_transform.translation().truncate();
 
     // Iterate over entities having a LineOfSight component
-    for (mut line_of_sight, stalker_transform, stalker_entity, stalker_name) in &mut stalkers {
-        let stalker_pos = stalker_transform.translation().truncate();
-        let vector = player_pos - stalker_pos;
+    for (mut line_of_sight, observer_transform, observer_entity, observer_name) in &mut observers {
+        let observer_pos = observer_transform.translation().truncate();
+        let vector = player_pos - observer_pos;
         let max_distance = line_of_sight.max_distance;
         let distance = vector.length();
         if distance > max_distance {
@@ -45,23 +45,23 @@ pub(crate) fn line_of_sight(
         }
         let ray_dir = vector.normalize();
 
-        // Cast ray from the stalker toward the player
+        // Cast ray from the observer toward the player
         let stalked = if
             let Some((collided_entity, toi)) = rapier_context.cast_ray(
-                stalker_pos,
+                observer_pos,
                 ray_dir,
                 max_distance,
                 false,
                 // FIXME: make sight obstacles (wall etc) into a group and use .groups() to only hit player and obstacles
-                QueryFilter::new().exclude_sensors().exclude_collider(stalker_entity)
+                QueryFilter::new().exclude_sensors().exclude_collider(observer_entity)
             )
         {
             // TODO: remove debug
             if collided_entity == player_entity && !line_of_sight.in_sight {
                 log::debug!(
                     "{:?}({:?}) sees the player! toi={}",
-                    stalker_name,
-                    stalker_entity,
+                    observer_name,
+                    observer_entity,
                     toi
                 );
             }
@@ -82,7 +82,7 @@ pub(crate) fn line_of_sight(
             if line_of_sight.in_sight {
                 line_of_sight.in_sight = false;
                 // TODO: remove debug
-                log::debug!("{:?}({:?}) lost the player.", stalker_name, stalker_entity);
+                log::debug!("{:?}({:?}) lost the player.", observer_name, observer_entity);
             }
         }
     }
