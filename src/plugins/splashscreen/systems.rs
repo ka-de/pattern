@@ -9,7 +9,7 @@ use bevy::{
 use bevy_asset_loader::dynamic_asset::DynamicAssets;
 
 use super::{
-    components::{ SplashScreenTag, SplashScreenImage },
+    components::{ SplashScreenImage, SplashScreenTag },
     resources::{ SplashScreenConfiguration, SplashScreenImages },
     state::SplashScreenState,
 };

@@ -1,6 +1,6 @@
 use bevy::{
     app::{ App, Update },
-    ecs::{ entity::Entity, component::Component, query::With, system::{ Commands, Query, Res } },
+    ecs::{ component::Component, entity::Entity, query::With, system::{ Commands, Query, Res } },
     render::color::Color,
     text::TextStyle,
     ui::{ node_bundles::NodeBundle, JustifyContent, PositionType, Val },

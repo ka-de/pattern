@@ -58,8 +58,7 @@ pub(super) fn spawn_tooltip(
                     transform,
                     ..Default::default()
                 },
-                #[cfg(debug_assertions)]
-                Name::new("Tooltip")
+                #[cfg(debug_assertions)] Name::new("Tooltip"),
             ));
         });
     }

@@ -1,18 +1,18 @@
-use bevy::app::{ Startup, PreUpdate, Update };
-use tooltip::spawn_tooltip;
+use bevy::app::{ PreUpdate, Startup, Update };
 use release_label::release_label;
+use tooltip::spawn_tooltip;
 //use keycap_demo::keycap_demo;
 
 // release_label depends on it, this also shares a lot of code with keycap
 // but keycap needs to be dynamically replaced with a gamepad button later! ⚠️
 pub(crate) mod banner_widget;
 
-pub(crate) mod set_window_icon;
 pub(crate) mod fps_widget;
-pub(crate) mod release_label;
-pub(crate) mod set;
 pub(crate) mod keycap;
 pub(crate) mod keycap_demo;
+pub(crate) mod release_label;
+pub(crate) mod set;
+pub(crate) mod set_window_icon;
 mod tooltip;
 
 /*

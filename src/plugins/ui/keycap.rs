@@ -1,3 +1,4 @@
+use crate::plugins::ui::set::{ SetFont, SetPosition };
 use bevy::{
     ecs::system::EntityCommands,
     prelude::{ Component, Entity },
@@ -18,7 +19,6 @@ use sickle_ui::{
     },
     widgets::{ container::UiContainerExt, label::{ LabelConfig, UiLabelExt } },
 };
-use crate::plugins::ui::set::{ SetFont, SetPosition };
 
 #[derive(Component)]
 pub(crate) struct KeycapWidget;

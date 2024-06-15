@@ -10,7 +10,7 @@ use bevy_asset_loader::loading_state::{
 use bevy_ecs_ldtk::LdtkPlugin;
 use bevy_rapier2d::plugin::{ NoUserData, RapierPhysicsPlugin };
 
-use crate::{ components, plugins::{ ldtk, gamestate::GameState } };
+use crate::{ components, plugins::{ gamestate::GameState, ldtk } };
 
 /// Sets up the game world using the LDTK plugin.
 ///
