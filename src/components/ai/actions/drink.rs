@@ -7,7 +7,7 @@ use big_brain::prelude::{ Actor, ActionBuilder, ActionState, ActionSpan };
 
 use crate::components::ai::thirst::Thirst;
 
-#[derive(Clone, Component, Debug, ActionBuilder)]
+#[derive(Reflect, Clone, Component, Debug, ActionBuilder)]
 pub(crate) struct Drink {
     pub until: f32,
     pub per_second: f32,

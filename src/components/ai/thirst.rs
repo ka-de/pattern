@@ -9,7 +9,7 @@ use bevy::{
 // time. This is what the AI will later interact with.
 //
 // There's nothing special here. It's a plain old Bevy component.
-#[derive(Component, Debug)]
+#[derive(Reflect, Component, Debug)]
 pub(crate) struct Thirst {
     pub per_second: f32,
     pub thirst: f32,
