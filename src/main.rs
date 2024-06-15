@@ -7,10 +7,6 @@
 
 use rand::RngCore;
 
-// Particle effects
-// ⚠️ TODO: Move to plugin or something?
-use bevy_hanabi::prelude::*;
-
 // bevy_rand
 use bevy_prng::*;
 use bevy_rand::{ resource::GlobalEntropy, prelude::EntropyPlugin };
@@ -60,6 +56,19 @@ use big_brain::{
     BigBrainSet,
     BigBrainPlugin,
 };
+
+// ✨ - ?
+// ✨ - Ray Marching
+/*
+use bevy_incandescent::{
+    ecs::{ PointLight2d, PointLight2dBundle, ShadowCaster2dBundle, SpotLight2d, SpotLight2dBundle },
+    math::CircularSector,
+    IncandescentPlugin,
+};
+*/
+// ✨ - Particle effects
+// ⚠️ TODO: Move to plugin or something?
+//use bevy_hanabi::prelude::*;
 
 use crate::components::ai::{
     thirst::thirst_system,
@@ -136,6 +145,7 @@ fn main() {
             plugins::ui::plugin,
             plugins::audio::plugin,
             plugins::pathfinding::plugin,
+            //IncandescentPlugin,
             //HanabiPlugin,
         ))
         .add_systems(Startup, set_window_icon)
