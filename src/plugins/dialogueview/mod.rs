@@ -68,9 +68,9 @@ pub struct YarnSpinnerDialogueViewSystemSet;
 struct Assets {
     #[asset(path = "fonts/bahnschrift.ttf")]
     font: Handle<Font>,
-    #[asset(path = "dialogue_continue.png")]
+    #[asset(path = "ui/dialogue_continue.png")]
     continue_indicator: Handle<Image>,
-    #[asset(path = "dialogue_edge.png")]
+    #[asset(path = "ui/dialogue_edge.png")]
     edge: Handle<Image>,
 }
 
