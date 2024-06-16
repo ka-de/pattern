@@ -109,9 +109,9 @@ git = "https://github.com/ka-de/bevy-inspector-egui"
 #[dependencies.bevy_tweening]
 #git = "https://github.com/ka-de/bevy_tweening"
 
-#[dependencies.bevy_progress]
-#git = "https://github.com/ka-de/bevy_progress"
-#features = ["assets", "debug"]
+[dependencies.bevy_progress]
+git = "https://github.com/ka-de/bevy_progress"
+features = ["assets"]
 
 [dependencies.bevy-steamworks]
 git = "https://github.com/ka-de/bevy_steamworks"
