@@ -16,11 +16,7 @@ use bevy::{
     transform::components::GlobalTransform,
 };
 use bevy_ecs_ldtk::{ ldtk::ldtk_fields::LdtkFields, EntityInstance };
-use bevy_rapier2d::{
-    geometry::{ ActiveEvents, Collider, Sensor },
-    pipeline::CollisionEvent,
-    render::ColliderDebugColor,
-};
+use bevy_rapier2d::{ geometry::{ ActiveEvents, Collider, Sensor }, pipeline::CollisionEvent };
 
 use crate::entities::Player;
 use crate::plugins::rapier_utils::reciprocal_collisions;
@@ -49,10 +45,10 @@ pub(crate) fn spawn_interaction_sensor(
                 Sensor,
                 InteractionSensor::default(),
             ));
-            #[cfg(debug_assertions)]
+            #[cfg(feature = "dev_features")]
             sensor_cmds.insert((
                 Name::new("interaction_sensor"),
-                ColliderDebugColor(Color::rgb(0.0, 1.0, 0.0)),
+                bevy_rapier2d::render::ColliderDebugColor(Color::rgb(0.0, 1.0, 0.0)),
             ));
             let child = sensor_cmds.id();
             commands.add(PushChild { parent, child });

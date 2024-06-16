@@ -27,16 +27,38 @@ codegen-units = 1
 
 [profile.release]
 codegen-units = 1
+lto = "thin"
+
+[features]
+# Build release with `cargo build --release --no-default-features`
+default = ["dev_features"]
+dev_features = [
+  "bevy/trace",
+  "bevy/file_watcher",
+  "bevy/embedded_watcher",
+  "bevy/dynamic_linking",
+  "bevy_progress/debug",
+  "bevy_rapier2d/debug-render-2d",
+  "big-brain/trace",
+  "sickle_ui/dev",
+  # "bevy_incandescent/debug",
+  "dep:bevy-inspector-egui",
+  "dep:bevy_mod_debugdump",
+  "dep:graphviz-rust",
+]
 
 [build-dependencies]
 embed-resource = "2.4.2"
 
 [dependencies]
 winit = { version = "0.29.15", default-features = false, features = ["rwh_06"] }
-image = "0.25.1"
+image = { version = "0.25.1", default-features = false, features = ["png"] }
 rand = "0.8.5"
 unicode-segmentation = "1.11.0"
-bevy_rapier2d = { version = "0.26.0", features = ["simd-stable"] }
+bevy_rapier2d = { version = "0.26.0", default-features = false, features = [
+  "dim2",
+  "simd-stable",
+] }
 wgpu = { version = "0.19.3", default-features = false, features = [
   "dx12",
   "metal",
@@ -52,14 +74,14 @@ bevy_prng = { git = "https://github.com/ka-de/bevy_rand", features = [
   #"rand_chacha",
   "wyrand",
 ] }
-pathfinding = { git = "https://github.com/ka-de/pathfinding" }
+# pathfinding = { git = "https://github.com/ka-de/pathfinding" }
 big-brain = { git = "https://github.com/ka-de/big-brain" }
-bevy_mod_debugdump = { git = "https://github.com/ka-de/bevy_mod_debugdump" }
-graphviz-rust = "0.9.0"
-bevy_text_input = { git = "https://github.com/ka-de/bevy_text_input" }
-bevy_flurx = { git = "https://github.com/ka-de/bevy_flurx" }
-bevy_magic_light_2d = { git = "https://github.com/ka-de/bevy_magic_light_2d" }
-bevy_asepritesheet = { git = "https://github.com/ka-de/bevy_asepritesheet" }
+bevy_mod_debugdump = { git = "https://github.com/ka-de/bevy_mod_debugdump", optional = true }
+graphviz-rust = { version = "0.9.0", optional = true }
+# bevy_text_input = { git = "https://github.com/ka-de/bevy_text_input" }
+# bevy_flurx = { git = "https://github.com/ka-de/bevy_flurx" }
+# bevy_magic_light_2d = { git = "https://github.com/ka-de/bevy_magic_light_2d" }
+bevy_mod_aseprite = { git = "https://github.com/ka-de/bevy_mod_aseprite" }
 #bevy_incandescent = { git = "https://github.com/ka-de/bevy_incandescent", features = [
 #  "debug",
 #  "ray_marching",
@@ -84,15 +106,10 @@ features = [
   "bevy_text",
   "subpixel_glyph_atlas",
   "bevy_render",
-  "dynamic_linking",
   "multi-threaded",
-  "file_watcher",
   "bevy_winit",
-  "embedded_watcher",
   "x11",
   "wayland",
-  "trace",
-  #"trace_tracy",
 ]
 
 [dependencies.bevy_asset_loader]
@@ -105,6 +122,7 @@ git = "https://github.com/ka-de/bevy_ecs_ldtk"
 
 [dependencies.bevy-inspector-egui]
 git = "https://github.com/ka-de/bevy-inspector-egui"
+optional = true
 
 #[dependencies.bevy_tweening]
 #git = "https://github.com/ka-de/bevy_tweening"
@@ -112,6 +130,7 @@ git = "https://github.com/ka-de/bevy-inspector-egui"
 [dependencies.bevy_progress]
 git = "https://github.com/ka-de/bevy_progress"
 features = ["assets"]
+default-features = false
 
 [dependencies.bevy-steamworks]
 git = "https://github.com/ka-de/bevy_steamworks"
@@ -119,7 +138,6 @@ features = ["serde"]
 
 [dependencies.sickle_ui]
 git = "https://github.com/ka-de/sickle_ui"
-features = ["dev"]
 
 [dependencies.bevy_yarnspinner]
 git = "https://github.com/ka-de/YarnSpinner-Rust"

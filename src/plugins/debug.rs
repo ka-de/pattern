@@ -13,9 +13,7 @@ use bevy_rapier2d::render::{ DebugRenderContext, RapierDebugRenderPlugin };
 // ⚠️ GraphViz
 use graphviz_rust::{ cmd::{ CommandArg, Format }, exec_dot };
 
-use super::ui::fps_widget::{ spawn_fps_widget, FpsWidget };
-
-use crate::GameState;
+use super::{ gamestate::GameState, ui::fps_widget::{ spawn_fps_widget, FpsWidget } };
 
 // Adds L key as debug KeyCode for toggling physics wireframes.
 pub fn toggle_physics_wireframes(

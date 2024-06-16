@@ -10,11 +10,11 @@ pub(crate) mod rapier_utils;
 pub(crate) mod audio;
 pub(crate) mod pathfinding;
 
-#[cfg(debug_assertions)]
+#[cfg(feature="dev_features")]
 pub(crate) mod debug;
 
 /// this code is compiled only if debug assertions are disabled (release mode)
-#[cfg(not(debug_assertions))]
+#[cfg(not(feature="dev_features"))]
 pub(crate) mod debug {
     pub fn plugin(_app: &mut bevy::app::App) {}
 

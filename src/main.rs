@@ -57,9 +57,6 @@ use big_brain::{
     BigBrainPlugin,
 };
 
-// bevy_asepritesheet
-use bevy_asepritesheet::prelude::*;
-
 // ✨ - ?
 // ✨ - Ray Marching
 /*
@@ -92,12 +89,14 @@ fn print_random_value(mut rng: ResMut<GlobalEntropy<WyRand>>) {
 }
 
 fn main() {
-    #[cfg(not(debug_assertions))] // ⚠️ TODO: At some point we will need to dev with Steam.
-    match bevy_steamworks::SteamworksPlugin::init_app(981370) {
-        Ok(_) => (),
-        Err(err) => {
-            eprintln!("{}", err);
-            return;
+    #[cfg(not(feature = "dev_features"))] // ⚠️ TODO: At some point we will need to dev with Steam.
+    if std::env::var_os("NO_STEAM") == None {
+        match bevy_steamworks::SteamworksPlugin::init_app(981370) {
+            Ok(_) => (),
+            Err(err) => {
+                eprintln!("{}", err);
+                return;
+            }
         }
     }
 
@@ -150,7 +149,7 @@ fn main() {
             plugins::ui::plugin,
             plugins::audio::plugin,
             plugins::pathfinding::plugin,
-            AsepritesheetPlugin::new(&["sprite.json"]),
+            bevy_mod_aseprite::AsepritePlugin,
             //IncandescentPlugin,
             //HanabiPlugin,
         ))

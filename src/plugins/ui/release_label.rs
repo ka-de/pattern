@@ -18,9 +18,8 @@ pub fn release_label(mut commands: Commands) {
         .style()
         .left(Val::Px(100.0))
         .bottom(Val::Px(100.0));
-    // ⚠️ TODO: This will have to go away from the actual release build
-    // Print out "ALPHA RELEASE BUILD" when in release mode.
-    #[cfg(not(debug_assertions))]
+    // Print out "ALPHA RELEASE BUILD" when in release mode with dev_features.
+    #[cfg(all(not(debug_assertions), feature = "dev_features"))]
     commands
         .ui_builder(UiRoot)
         .banner_widget(
