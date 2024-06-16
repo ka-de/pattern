@@ -118,6 +118,7 @@ fn main() {
         // 🎲
         .add_plugins(EntropyPlugin::<WyRand>::with_seed(seed.to_ne_bytes()))
         // 🧠
+        /*
         .add_plugins(BigBrainPlugin::new(PreUpdate))
         .add_systems(Startup, components::ai::setup)
         //.add_systems(Update, search_for_weapon)
@@ -127,6 +128,7 @@ fn main() {
             thirsty_scorer_system.in_set(BigBrainSet::Scorers),
         ))
         .add_systems(Update, thirst_system)
+		*/
         // ~~~
         .add_plugins((
             DefaultPlugins.build()
