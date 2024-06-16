@@ -57,6 +57,9 @@ use big_brain::{
     BigBrainPlugin,
 };
 
+// bevy_asepritesheet
+use bevy_asepritesheet::prelude::*;
+
 // ✨ - ?
 // ✨ - Ray Marching
 /*
@@ -145,6 +148,7 @@ fn main() {
             plugins::ui::plugin,
             plugins::audio::plugin,
             plugins::pathfinding::plugin,
+            AsepritesheetPlugin::new(&["sprite.json"]),
             //IncandescentPlugin,
             //HanabiPlugin,
         ))

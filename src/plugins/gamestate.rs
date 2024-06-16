@@ -69,12 +69,4 @@ pub fn game_state_plugin(app: &mut App) {
         // Splash Screen
         .add_plugins(SplashScreenPlugin(config))
         .init_resource::<bevy_progress::ProgressCounter>();
-
-    // StateInspectorPlugin
-    #[cfg(debug_assertions)]
-    app.add_plugins(
-        bevy_inspector_egui::quick::StateInspectorPlugin::<GameState>
-            ::default()
-            .run_if(bevy::input::common_conditions::input_toggle_active(false, KeyCode::F10))
-    );
 }

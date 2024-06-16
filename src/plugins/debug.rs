@@ -38,6 +38,13 @@ pub(crate) fn plugin(app: &mut App) {
     // DebugRenderContext - Rapier
     app.add_systems(Update, toggle_physics_wireframes);
 
+    // StateInspectorPlugin
+    app.add_plugins(
+        bevy_inspector_egui::quick::StateInspectorPlugin::<GameState>
+            ::default()
+            .run_if(bevy::input::common_conditions::input_toggle_active(false, KeyCode::F10))
+    );
+
     if let Err(err) = render_graphs(app) {
         log::error!("Error rendering graph: {}", err);
     }

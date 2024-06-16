@@ -59,6 +59,7 @@ graphviz-rust = "0.9.0"
 bevy_text_input = { git = "https://github.com/ka-de/bevy_text_input" }
 bevy_flurx = { git = "https://github.com/ka-de/bevy_flurx" }
 bevy_magic_light_2d = { git = "https://github.com/ka-de/bevy_magic_light_2d" }
+bevy_asepritesheet = { git = "https://github.com/ka-de/bevy_asepritesheet" }
 #bevy_incandescent = { git = "https://github.com/ka-de/bevy_incandescent", features = [
 #  "debug",
 #  "ray_marching",
@@ -94,10 +95,10 @@ features = [
   #"trace_tracy",
 ]
 
-[dependencies.bevy_asset_loader]
-git = "https://github.com/ka-de/bevy_asset_loader"
-default-features = false
-features = ["2d", "standard_dynamic_assets", "progress_tracking"]
+#[dependencies.bevy_asset_loader]
+#git = "https://github.com/ka-de/bevy_asset_loader"
+#default-features = false
+#features = ["2d", "standard_dynamic_assets", "progress_tracking"]
 
 [dependencies.bevy_ecs_ldtk]
 git = "https://github.com/ka-de/bevy_ecs_ldtk"
@@ -105,12 +106,12 @@ git = "https://github.com/ka-de/bevy_ecs_ldtk"
 [dependencies.bevy-inspector-egui]
 git = "https://github.com/ka-de/bevy-inspector-egui"
 
-[dependencies.bevy_tweening]
-git = "https://github.com/ka-de/bevy_tweening"
+#[dependencies.bevy_tweening]
+#git = "https://github.com/ka-de/bevy_tweening"
 
-[dependencies.bevy_progress]
-git = "https://github.com/ka-de/bevy_progress"
-features = ["assets", "debug"]
+#[dependencies.bevy_progress]
+#git = "https://github.com/ka-de/bevy_progress"
+#features = ["assets", "debug"]
 
 [dependencies.bevy-steamworks]
 git = "https://github.com/ka-de/bevy_steamworks"

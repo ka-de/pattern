@@ -82,6 +82,8 @@ if velocity.y < 0 {
 }
 ```
 
+- **`bevy_asepritesheet` + `bevy_ecs_ldtk` integration.**
+
 - **Patrol**
 
   - Flip sprite when turning around!
