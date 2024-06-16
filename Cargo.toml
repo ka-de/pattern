@@ -95,10 +95,10 @@ features = [
   #"trace_tracy",
 ]
 
-#[dependencies.bevy_asset_loader]
-#git = "https://github.com/ka-de/bevy_asset_loader"
-#default-features = false
-#features = ["2d", "standard_dynamic_assets", "progress_tracking"]
+[dependencies.bevy_asset_loader]
+git = "https://github.com/ka-de/bevy_asset_loader"
+default-features = false
+features = ["2d", "standard_dynamic_assets", "progress_tracking"]
 
 [dependencies.bevy_ecs_ldtk]
 git = "https://github.com/ka-de/bevy_ecs_ldtk"

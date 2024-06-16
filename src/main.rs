@@ -37,7 +37,7 @@ mod systems;
 mod entities;
 mod plugins;
 
-use bevy_tweening::*;
+//use bevy_tweening::*;
 
 // 🧠
 use big_brain::{
@@ -137,7 +137,7 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest())
                 .set(plugins::debug::make_log_plugin()),
-            TweeningPlugin,
+            //TweeningPlugin,
             plugins::gamestate::game_state_plugin,
             systems::setup_world_systems,
             plugins::dialogueview::YarnSpinnerDialogueViewPlugin {
