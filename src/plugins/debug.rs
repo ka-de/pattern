@@ -15,6 +15,8 @@ use graphviz_rust::{ cmd::{ CommandArg, Format }, exec_dot };
 
 use super::ui::fps_widget::{ spawn_fps_widget, FpsWidget };
 
+use crate::GameState;
+
 // Adds L key as debug KeyCode for toggling physics wireframes.
 pub fn toggle_physics_wireframes(
     mut ctx: ResMut<DebugRenderContext>,
