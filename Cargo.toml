@@ -99,7 +99,6 @@ features = [
   "bevy_audio",
   "animation",
   "bevy_gilrs",
-  "bevy_gizmos",
   "bevy_sprite",
   "bevy_animation",
   "bevy_ui",
