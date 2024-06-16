@@ -1,6 +1,7 @@
 use bevy::{
     asset::{ Assets, Handle },
     core::Name,
+    ecs::system::EntityCommands,
     hierarchy::{ BuildChildren, Parent },
     log::debug,
     prelude::{ Added, Bundle, Commands, Entity, Query, Res, Without },
@@ -8,11 +9,11 @@ use bevy::{
     utils::{ default, HashMap, HashSet },
 };
 use bevy_ecs_ldtk::{
-    EntityInstance,
-    LdtkIntCell,
     assets::LdtkProject,
-    ldtk::LayerInstance,
+    ldtk::{ loaded_level::LoadedLevel, LayerInstance },
+    EntityInstance,
     GridCoords,
+    LdtkIntCell,
     LevelIid,
 };
 use bevy_rapier2d::{
@@ -22,22 +23,13 @@ use bevy_rapier2d::{
 
 use crate::entities::intcells::Wall;
 
-/// Spawns heron collisions for the walls of a level
+/// Spawns heron collisions for the walls that have just been spawned
 ///
-/// You could just insert a ColliderBundle in to the WallBundle,
-/// but this spawns a different collider for EVERY wall tile.
-/// This approach leads to bad performance.
+/// Lookup the levels corresponding to the walls that have been spawned, and
+/// associate to them the GridCoords of the walls.
 ///
-/// Instead, by flagging the wall tiles and spawning the collisions later,
-/// we can minimize the amount of colliding entities.
-///
-/// The algorithm used here is a nice compromise between simplicity, speed,
-/// and a small number of rectangle colliders.
-/// In basic terms, it will:
-/// 1. consider where the walls are
-/// 2. combine wall tiles into flat "plates" in each individual row
-/// 3. combine the plates into rectangles across multiple rows wherever possible
-/// 4. spawn colliders for each rectangle
+/// See [`spawn_wall_collision_for_level`] for the actual collider generation
+/// algorithm.
 pub fn spawn_wall_collision(
     mut commands: Commands,
     wall_query: Query<(&GridCoords, &Parent), Added<Wall>>,
@@ -46,21 +38,13 @@ pub fn spawn_wall_collision(
     ldtk_projects: Query<&Handle<LdtkProject>>,
     ldtk_project_assets: Res<Assets<LdtkProject>>
 ) {
-    /// Represents a wide wall that is 1 tile tall
-    /// Used to spawn wall collisions
-    #[derive(Clone, Eq, PartialEq, Debug, Default, Hash)]
-    struct Plate {
-        left: i32,
-        right: i32,
+    if wall_query.is_empty() {
+        return;
     }
 
-    /// A simple rectangle type representing a wall of any size
-    struct Rect {
-        left: i32,
-        right: i32,
-        top: i32,
-        bottom: i32,
-    }
+    let ldtk_project = ldtk_project_assets
+        .get(ldtk_projects.single())
+        .expect("Project should be loaded if level has spawned");
 
     // Consider where the walls are
     // storing them as GridCoords in a HashSet for quick, easy lookup
@@ -80,24 +64,66 @@ pub fn spawn_wall_collision(
         }
     });
 
-    if !wall_query.is_empty() {
-        level_query.iter().for_each(|(level_entity, level_iid)| {
-            if let Some(level_walls) = level_to_wall_locations.get(&level_entity) {
-                let ldtk_project = ldtk_project_assets
-                    .get(ldtk_projects.single())
-                    .expect("Project should be loaded if level has spawned");
+    level_query.iter().for_each(|(level_entity, level_iid)| {
+        if let Some(level_walls) = level_to_wall_locations.get(&level_entity) {
+            let level = ldtk_project
+                .as_standalone()
+                .get_loaded_level_by_iid(&level_iid.to_string())
+                .expect("Spawned level should exist in LDtk project");
 
-                let level = ldtk_project
-                    .as_standalone()
-                    .get_loaded_level_by_iid(&level_iid.to_string())
-                    .expect("Spawned level should exist in LDtk project");
+            spawn_wall_collision_for_level(level, level_walls, commands.entity(level_entity));
+        }
+    });
+}
+
+/// Spawns heron collisions for the walls of a level
+///
+/// You could just insert a ColliderBundle in to the WallBundle,
+/// but this spawns a different collider for EVERY wall tile.
+/// This approach leads to bad performance.
+///
+/// Instead, by flagging the wall tiles and spawning the collisions later,
+/// we can minimize the amount of colliding entities.
+///
+/// The algorithm used here is a nice compromise between simplicity, speed,
+/// and a small number of rectangle colliders.
+/// In basic terms, it will:
+/// 1. consider where the walls are
+/// 2. combine wall tiles into flat "plates" in each individual row
+/// 3. combine the plates into rectangles across multiple rows wherever possible
+/// 4. spawn colliders for each rectangle
+fn spawn_wall_collision_for_level(
+    level: LoadedLevel,
+    level_walls: &bevy::utils::hashbrown::HashSet<GridCoords>,
+    mut entity_commands: EntityCommands
+) {
+    /// Represents a wide wall that is 1 tile tall
+    /// Used to spawn wall collisions
+    #[derive(Clone, Eq, PartialEq, Debug, Default, Hash)]
+    struct Plate {
+        left: i32,
+        right: i32,
+    }
+
+    /// A simple rectangle type representing a wall of any size
+    struct Rect {
+        left: i32,
+        right: i32,
+        top: i32,
+        bottom: i32,
+    }
 
                 let LayerInstance {
                     c_wid: width,
                     c_hei: height,
                     grid_size,
                     ..
-                } = level.layer_instances()[0];
+    } = *level
+        .layer_instances()
+        .iter()
+        .filter(|level| level.identifier == "Collisions")
+        .next()
+        .expect("could not find the Collisions layer");
 
                 // combine wall tiles into flat "plates" in each individual row
                 let mut plate_stack: Vec<Vec<Plate>> = Vec::new();
@@ -159,7 +185,7 @@ pub fn spawn_wall_collision(
                     prev_row = current_row;
                 }
 
-                commands.entity(level_entity).with_children(|level| {
+    entity_commands.with_children(|level| {
                     // Spawn colliders for every rectangle..
                     // Making the collider a child of the level serves two purposes:
                     // 1. Adjusts the transforms to be relative to the level for free
@@ -182,11 +208,9 @@ pub fn spawn_wall_collision(
                             .insert(Friction::new(1.0))
                             .insert(
                                 Transform::from_xyz(
-                                    (((wall_rect.left + wall_rect.right + 1) as f32) *
-                                        (grid_size as f32)) /
+                        (((wall_rect.left + wall_rect.right + 1) as f32) * (grid_size as f32)) /
                                         2.0,
-                                    (((wall_rect.bottom + wall_rect.top + 1) as f32) *
-                                        (grid_size as f32)) /
+                        (((wall_rect.bottom + wall_rect.top + 1) as f32) * (grid_size as f32)) /
                                         2.0,
                                     0.0
                                 )
@@ -194,9 +218,6 @@ pub fn spawn_wall_collision(
                             .insert(GlobalTransform::default());
                     }
                 });
-            }
-        });
-    }
 }
 
 #[derive(Clone, Default, Bundle, LdtkIntCell)]
