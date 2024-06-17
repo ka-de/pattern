@@ -2,6 +2,34 @@
 
 ---
 
+## Introduction
+
+SEPARATED is a 2D platformer game.
+
+## Table of Contents
+
+- [SEPARATED](#separated)
+  - [Introduction](#introduction)
+  - [Table of Contents](#table-of-contents)
+  - [Debugging Keyboard Shortcuts](#debugging-keyboard-shortcuts)
+  - [Spawn and Respawn `flurx` Reactor](#spawn-and-respawn-flurx-reactor)
+  - [Render Engine Graphs](#render-engine-graphs)
+  - [Trace](#trace)
+  - [Filter out DX12 spam with PowerShell](#filter-out-dx12-spam-with-powershell)
+  - [TODO](#todo)
+  - [`filesystem_watcher` and `asset_processor`](#filesystem_watcher-and-asset_processor)
+  - [Default RapierConfiguration](#default-rapierconfiguration)
+  - [Rust Things 🦀](#rust-things-)
+  - [A Mouthful of Errors](#a-mouthful-of-errors)
+
+## Debugging Keyboard Shortcuts
+
+| Action                         | KeyCode |
+| :----------------------------- | :-----: |
+| Toggle Physics Wireframes      |   F9    |
+| StateInspector (**GameState**) |   F10   |
+| WorldInspector                 |   F11   |
+
 ## Spawn and Respawn `flurx` Reactor
 
 ```rust
@@ -221,13 +249,6 @@ if velocity.y < 0 {
 - sickle_ui
   - labels ✅
   - keycap/gamepad button switching ⚠️
-
-## Debugging Keyboard Shortcuts
-
-| Action                         | KeyCode |
-| :----------------------------- | :-----: |
-| StateInspector (**GameState**) |   F10   |
-| WorldInspector                 |   F11   |
 
 ## `filesystem_watcher` and `asset_processor`
 

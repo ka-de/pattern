@@ -1,5 +1,7 @@
 /// this code is compiled only if debug assertions are enabled (debug mode)
 
+use graphviz_rust::{ cmd::{ CommandArg, Format }, exec_dot };
+
 use bevy::{
     app::{ App, Plugin, Update },
     ecs::schedule::ScheduleLabel,
@@ -9,19 +11,21 @@ use bevy::{
     utils::intern::Interned,
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
-use bevy_rapier2d::render::{ DebugRenderContext, RapierDebugRenderPlugin };
-// ⚠️ GraphViz
-use graphviz_rust::{ cmd::{ CommandArg, Format }, exec_dot };
+use bevy_rapier2d::{ prelude::RapierDebugRenderPlugin, render::DebugRenderContext };
 
 use super::{ gamestate::GameState, ui::fps_widget::{ spawn_fps_widget, FpsWidget } };
 
-// Adds L key as debug KeyCode for toggling physics wireframes.
+// Adds F9 key as debug KeyCode for toggling physics wireframes.
 pub fn toggle_physics_wireframes(
     mut ctx: ResMut<DebugRenderContext>,
     input: Res<ButtonInput<KeyCode>>
 ) {
-    if input.just_pressed(KeyCode::KeyL) {
-        ctx.enabled = !ctx.enabled;
+    if ctx.enabled {
+        if input.just_pressed(KeyCode::F9) {
+            ctx.enabled = !ctx.enabled;
+        }
+    } else {
+        ctx.enabled = false;
     }
 }
 
@@ -31,6 +35,7 @@ pub(crate) fn plugin(app: &mut App) {
         super::ui::fps_widget::plugin,
         // WorldInspectorPlugin
         WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::F11)),
+        // RapierDebugRenderPlugin
         RapierDebugRenderPlugin::default(),
     ));
     // FpsWidget
