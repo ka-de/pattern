@@ -42,6 +42,8 @@ dev_features = [
   "sickle_ui/dev",
   # "bevy_incandescent/debug",
   "dep:bevy-inspector-egui",
+  # Allow egui to take priority over actions when processing inputs.
+  "input-manager/egui",
   "dep:bevy_mod_debugdump",
   "dep:graphviz-rust",
 ]
@@ -74,6 +76,7 @@ bevy_prng = { git = "https://github.com/ka-de/bevy_rand", features = [
   #"rand_chacha",
   "wyrand",
 ] }
+input-manager = { git = "https://github.com/ka-de/input-manager" }
 # pathfinding = { git = "https://github.com/ka-de/pathfinding" }
 big-brain = { git = "https://github.com/ka-de/big-brain" }
 bevy_mod_debugdump = { git = "https://github.com/ka-de/bevy_mod_debugdump", optional = true }
@@ -126,6 +129,8 @@ git = "https://github.com/ka-de/bevy_ecs_ldtk"
 [dependencies.bevy-inspector-egui]
 git = "https://github.com/ka-de/bevy-inspector-egui"
 optional = true
+default-features = false
+features = ["highlight_changes"]
 
 #[dependencies.bevy_tweening]
 #git = "https://github.com/ka-de/bevy_tweening"

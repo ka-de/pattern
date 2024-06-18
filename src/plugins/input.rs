@@ -1,11 +1,19 @@
 use bevy::{
     app::{ App, Plugin, Update },
-    ecs::{ query::With, system::{ Query, Res } },
-    input::{ keyboard::{ KeyCode, KeyboardInput }, ButtonInput, ButtonState },
-    prelude::{ in_state, Condition, EventReader, IntoSystemConfigs, ResMut, Resource },
+    ecs::{ component::Component, query::With, system::{ Query, Res } },
+    input::keyboard::KeyCode,
+    prelude::{ in_state, Condition, IntoSystemConfigs as _ },
+    reflect::Reflect,
     time::{ Real, Time },
 };
 use bevy_rapier2d::dynamics::Velocity;
+use input_manager::{
+    action_state::ActionData,
+    axislike::VirtualDPad,
+    input_processing::WithDualAxisProcessingPipelineExt,
+    plugin::InputManagerPlugin,
+    Actionlike,
+};
 use std::collections::HashMap;
 use std::time::Instant;
 
@@ -15,75 +23,108 @@ use crate::{
     plugins::{ dialogueview::not_in_dialogue, gamestate::GameState },
 };
 
-#[derive(Debug)]
-pub(crate) struct KeyPressState {
+#[derive(Actionlike, PartialEq, Eq, Hash, Clone, Copy, Debug, Reflect)]
+pub enum Action {
+    Move,
+    Jump,
+    Interact,
+}
+
+pub(crate) type InputMap = input_manager::prelude::InputMap<Action>;
+pub(crate) type ActionState = input_manager::prelude::ActionState<Action>;
+
+pub(crate) fn make_action_map() -> InputMap {
+    let dual_axis_pad = VirtualDPad::wasd()
+        // You can configure a processing pipeline to handle axis-like user inputs.
+        //
+        // This step adds a circular deadzone that normalizes input values
+        // by clamping their magnitude to a maximum of 1.0,
+        // excluding those with a magnitude less than 0.1,
+        // and scaling other values linearly in between.
+        .with_circle_deadzone(0.1)
+        // Followed by appending Y-axis inversion for the next processing step.
+        .inverted_y()
+        // Or reset the pipeline, leaving no any processing applied.
+        .reset_processing_pipeline();
+
+    InputMap::new([
+        (Action::Jump, KeyCode::Space),
+        (Action::Interact, KeyCode::KeyE),
+    ]).with(Action::Move, dual_axis_pad)
+}
+
+// Velocity in px/s for full gamepad range
+const AXIS_GAIN: f32 = 200.0;
+
+#[derive(Copy, Clone, Debug)]
+pub(crate) struct ActionTimer {
     pub count: u32,
     pub last_pressed: Instant,
 }
 
-#[derive(Resource, Default)]
-pub(crate) struct KeyPressStates(pub HashMap<KeyCode, KeyPressState>);
+#[derive(Component, Default, Clone)]
+pub(crate) struct ActionTimers(pub HashMap<Action, ActionTimer>);
 
 pub(crate) fn movement(
-    input: Res<ButtonInput<KeyCode>>,
-    mut query: Query<(&mut Velocity, &mut Climber, &mut Swimmer, &GroundDetection), With<Player>>
+    mut query: Query<
+        (
+            &ActionState,
+            &mut ActionTimers,
+            &mut Velocity,
+            &mut Climber,
+            &mut Swimmer,
+            &GroundDetection,
+        ),
+        With<Player>
+    >,
+    time: Res<Time<Real>>
 ) {
-    for (mut velocity, mut climber, mut swimmer, ground_detection) in &mut query {
-        let right = if input.pressed(KeyCode::KeyD) { 1.0 } else { 0.0 };
-        let left = if input.pressed(KeyCode::KeyA) { 1.0 } else { 0.0 };
+    for (
+        action_state,
+        mut timers,
+        mut velocity,
+        mut climber,
+        mut swimmer,
+        ground_detection,
+    ) in &mut query {
+        if
+            let Some(ActionData { axis_pair: Some(axis_pair), state, .. }) =
+                action_state.action_data(&Action::Move)
+        {
+            if climber.intersecting_climbables.is_empty() {
+                climber.climbing = false;
+            } else if state.just_pressed() && axis_pair.y().abs() > 0.0 {
+                climber.climbing = true;
+            }
 
-        velocity.linvel.x = (right - left) * 200.0;
+            swimmer.swimming = !swimmer.intersecting_swimmables.is_empty();
+            let axis_gain = if swimmer.swimming { AXIS_GAIN * 0.5 } else { AXIS_GAIN };
 
-        if climber.intersecting_climbables.is_empty() {
-            climber.climbing = false;
-        } else if input.just_pressed(KeyCode::KeyW) || input.just_pressed(KeyCode::KeyS) {
-            climber.climbing = true;
-        }
-
-        if climber.climbing {
-            let up = if input.pressed(KeyCode::KeyW) { 1.0 } else { 0.0 };
-            let down = if input.pressed(KeyCode::KeyS) { 1.0 } else { 0.0 };
-
-            velocity.linvel.y = (up - down) * 200.0;
-        }
-
-        if swimmer.intersecting_swimmables.is_empty() {
-            swimmer.swimming = false;
-        } else {
-            swimmer.swimming = true;
-            velocity.linvel.x /= 2.0;
+            velocity.linvel.x = axis_pair.x() * axis_gain;
+            if climber.climbing {
+                velocity.linvel.y = axis_pair.y() * axis_gain;
+            } else if swimmer.swimming {
+                velocity.linvel.y = (axis_pair.y() + 0.5) * axis_gain;
+            }
         }
 
         if
-            input.just_pressed(KeyCode::Space) &&
-            (ground_detection.on_ground || climber.climbing || swimmer.swimming)
+            action_state.just_pressed(&Action::Jump) &&
+            (ground_detection.on_ground || climber.climbing)
         {
             velocity.linvel.y = 500.0;
             climber.climbing = false;
         }
-    }
-}
 
-pub(crate) fn handle_keypress(
-    time: Res<Time<Real>>,
-    mut keyboard_input: EventReader<KeyboardInput>,
-    mut key_press_states: ResMut<KeyPressStates>
-) {
-    if keyboard_input.is_empty() {
-        return;
-    }
-    let now = time.last_update().unwrap_or(Instant::now());
-    for event in keyboard_input.read() {
-        let is_pressed = event.state == ButtonState::Pressed;
-        let key_code = event.key_code;
-        if is_pressed {
-            key_press_states.0
-                .entry(key_code)
+        for action in action_state.get_pressed() {
+            let now = time.last_update().unwrap_or(Instant::now());
+            timers.0
+                .entry(action)
                 .and_modify(|state| {
                     state.count += 1;
                     state.last_pressed = now;
                 })
-                .or_insert_with(|| KeyPressState {
+                .or_insert_with(|| ActionTimer {
                     count: 0,
                     last_pressed: now,
                 });
@@ -92,20 +133,17 @@ pub(crate) fn handle_keypress(
 }
 
 pub struct InputPlugin;
-use crate::components;
 
 impl Plugin for InputPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<KeyPressStates>().add_systems(
+        use crate::components;
+        app.add_plugins(InputManagerPlugin::<Action>::default()).add_systems(
             Update,
-            (
-                handle_keypress,
-                movement
-                    .after(components::ground::update_on_ground)
-                    .after(components::climbing::detect_climb_range)
-                    .after(components::swimming::detect_swim_range)
-                    .run_if(not_in_dialogue.and_then(in_state(GameState::Playing))),
-            ).chain()
+            movement
+                .run_if(not_in_dialogue.and_then(in_state(GameState::Playing)))
+                .after(components::ground::update_on_ground)
+                .after(components::climbing::detect_climb_range)
+                .after(components::swimming::detect_swim_range)
         );
     }
 }
