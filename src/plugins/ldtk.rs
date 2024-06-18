@@ -34,7 +34,8 @@ pub(crate) fn level_selection_systems() -> SystemConfigs {
 
 #[derive(AssetCollection, Resource)]
 pub(crate) struct LdtkAssets {
-    #[asset(path = "levels/first_level.ldtk")]
+    #[asset(path = "levels/biomes.ldtk")]
+    //#[asset(path = "levels/first_level.ldtk")]
     first_level: Handle<LdtkProject>,
 }
 
