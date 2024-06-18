@@ -59,7 +59,6 @@ bevy_rapier2d = { version = "0.26.0", default-features = false, features = [
   "dim2",
   "simd-stable",
   "parallel",
-  "debug-render-2d",
 ] }
 wgpu = { version = "0.19.3", default-features = false, features = [
   "dx12",
