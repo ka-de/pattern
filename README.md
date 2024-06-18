@@ -4,7 +4,7 @@
 
 ## Introduction
 
-SEPARATED is a 2D platformer game.
+SEPARATED is a 2D platformer game where you can talk to NPCs.
 
 ## Table of Contents
 
@@ -21,7 +21,14 @@ SEPARATED is a 2D platformer game.
   - [`filesystem_watcher` and `asset_processor`](#filesystem_watcher-and-asset_processor)
   - [Default RapierConfiguration](#default-rapierconfiguration)
   - [Rust Things 🦀](#rust-things-)
-  - [A Mouthful of Errors](#a-mouthful-of-errors)
+    - [Pedantic linting](#pedantic-linting)
+    - [Linting on all packages, treating warnings as errors](#linting-on-all-packages-treating-warnings-as-errors)
+    - [Format code](#format-code)
+    - [Test without default features](#test-without-default-features)
+    - [Test with only the `bevy_ui` features](#test-with-only-the-bevy_ui-features)
+    - [Test with all features enabled](#test-with-all-features-enabled)
+    - [Test with all features enabled on nightly](#test-with-all-features-enabled-on-nightly)
+    - [Generate documentation with all features enabled](#generate-documentation-with-all-features-enabled)
 
 ## Player Inputs ∆
 
@@ -249,17 +256,21 @@ if velocity.y < 0 {
 
   This is kinda broad but always iterate over every small mechanic towards more fun.
 
-- AI Stuff ⚠️ Started work
+- **AI Stuff** ⚠️ Started work
+
   - Basic Timer with Action Scheduling
     - Thirst
     - Fatigue
-- A* Pathfinding
+
+- **Pathfinding** ⚠️ Started work
 - Use something to copy `dxil.dll` and `dxcompiler.dll` to Windows builds.
-- begin YarnSpinner integration ✅
-- YarnSpinner+LDTK integration ⚠️ Started work
-- sickle_ui
-  - labels ✅
-  - keycap/gamepad button switching ⚠️
+- **YarnSpinner**
+  - Begin YarnSpinner integration ✅
+  - YarnSpinner+LDTK integration ⚠️ Started work
+- **UI**
+  - sickle_ui
+    - labels ✅
+    - keycap/gamepad button switching ⚠️
 
 ## `filesystem_watcher` and `asset_processor`
 
@@ -294,11 +305,23 @@ impl RapierConfiguration {
 
 ## Rust Things 🦀
 
+---
+
+### Pedantic linting
+
+```bash
+cargo clippy -- -W clippy::pedantic
+```
+
+### Linting on all packages, treating warnings as errors
+
 ```bash
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 ```
 
 This command runs the `clippy` linter on all packages in the workspace, for all targets and features. The `-D warnings` option treats any warnings as errors.
+
+### Format code
 
 ```bash
 cargo fmt --all
@@ -306,11 +329,15 @@ cargo fmt --all
 
 This command formats the code in every package using the default formatting rules provided by `rustfmt`.
 
+### Test without default features
+
 ```bash
 cargo test --no-default-features
 ```
 
 This command runs tests in the package, but disables the default features.
+
+### Test with only the `bevy_ui` features
 
 ```bash
 cargo test --no-default-features --features="bevy_ui"
@@ -318,11 +345,15 @@ cargo test --no-default-features --features="bevy_ui"
 
 This command runs tests with only the `bevy_ui` feature enabled.
 
+### Test with all features enabled
+
 ```bash
 cargo test --all-features
 ```
 
 This command runs tests with all features enabled.
+
+### Test with all features enabled on nightly
 
 ```bash
 cargo +nightly build --all-features
@@ -330,10 +361,10 @@ cargo +nightly build --all-features
 
 This command builds the package with all features enabled using the nightly version of the Rust compiler. This is typically used for generating documentation on docs.rs.
 
+### Generate documentation with all features enabled
+
 ```bash
 cargo +nightly doc --all-features --no-deps
 ```
 
 This command generates documentation for the package with all features enabled, without including dependencies, using the nightly version of the Rust compiler.
-
-## A Mouthful of Errors
