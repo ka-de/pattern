@@ -16,9 +16,6 @@
 //! This dialogue view expects only a single instance of [`DialogueRunner`](bevy_yarnspinner::prelude::DialogueRunner) to be running.
 //! Its behavior is otherwise undefined.
 
-#![allow(clippy::too_many_arguments, clippy::type_complexity)]
-#![warn(missing_docs, missing_debug_implementations)]
-
 mod option_selection;
 mod setup;
 mod typewriter;
@@ -97,7 +94,7 @@ impl<T: States> Plugin for YarnSpinnerDialogueViewPlugin<T> {
 }
 
 fn spawn_dialogue_runner(mut commands: Commands, project: Res<YarnProject>) {
-    info!("Starting dialogue");
+    info!("Starting dialogue runner.");
     // Create a dialogue runner from the project.
     let mut dialogue_runner = project.create_dialogue_runner();
     // ⚠️ TODO: Only run dialogues on interaction!
