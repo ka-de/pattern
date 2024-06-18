@@ -36,7 +36,6 @@ dev_features = [
   "bevy/trace",
   "bevy/file_watcher",
   "bevy/embedded_watcher",
-  "bevy/dynamic_linking",
   "bevy_progress/debug",
   "bevy_rapier2d/debug-render-2d",
   "big-brain/trace",
@@ -103,7 +102,7 @@ features = [
   "bevy_sprite",
   "bevy_animation",
   "bevy_ui",
-  "bevy_core_pipeline",   # This sounds important!
+  "bevy_core_pipeline",   # This sounds important, but I've only seen camera stuff in it for 2D?
   "bevy_text",
   "subpixel_glyph_atlas",
   "bevy_render",
@@ -111,7 +110,7 @@ features = [
   "bevy_winit",
   "x11",
   "wayland",
-  # ⚠️ Futures
+  # Future Stuff
   #"bevy_state",           # Needs research
   #"sysinfo_plugin",       # OwO whats this?
 ]
