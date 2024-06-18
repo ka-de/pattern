@@ -1,5 +1,5 @@
 use bevy::{
-    app::{ App, PreUpdate, Update },
+    app::{ App, PreUpdate, Update, PostUpdate },
     ecs::schedule::{ common_conditions::in_state, OnEnter },
     prelude::IntoSystemConfigs,
 };
@@ -55,10 +55,16 @@ pub fn setup_world_systems(app: &mut App) {
                 ).chain(),
                 components::swimming::detect_swim_range,
                 components::predefinedpath::move_on_path,
-                components::camera::fit_inside_current_level,
                 components::items::dbg_player_items,
                 components::line_of_sight::line_of_sight::<entities::Player>,
             ).run_if(in_state(GameState::Playing))
         );
-    // RapierPhysicsPlugin
+
+    // ⚠️ NOTE:
+    // 🎥 updates always go to PostUpdate.
+    // If you update the camera on the same frame you update the player position it can cause physics jitters.
+    app.add_systems(
+        PostUpdate,
+        components::camera::fit_inside_current_level.run_if(in_state(GameState::Playing))
+    );
 }

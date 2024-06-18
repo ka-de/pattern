@@ -14,12 +14,23 @@ pub fn release_label(mut commands: Commands) {
     #[cfg(debug_assertions)]
     commands
         .ui_builder(UiRoot)
-        .banner_widget(BannerWidgetConfig::from("DEVELOPMENT BUILD", "fonts/bahnschrift.ttf", 8.0))
+        .banner_widget(
+            BannerWidgetConfig::from("DEVELOPMENT DEBUG BUILD", "fonts/bahnschrift.ttf", 8.0)
+        )
         .style()
         .left(Val::Px(100.0))
         .bottom(Val::Px(100.0));
     // Print out "ALPHA RELEASE BUILD" when in release mode with dev_features.
     #[cfg(all(not(debug_assertions), feature = "dev_features"))]
+    commands
+        .ui_builder(UiRoot)
+        .banner_widget(
+            BannerWidgetConfig::from("DEVELOPMENT RELEASE BUILD", "fonts/bahnschrift.ttf", 8.0)
+        )
+        .style()
+        .left(Val::Px(100.0))
+        .bottom(Val::Px(100.0));
+    #[cfg(all(not(debug_assertions), not(feature = "dev_features")))]
     commands
         .ui_builder(UiRoot)
         .banner_widget(

@@ -99,10 +99,11 @@ features = [
   "vorbis",
   "bevy_audio",
   "animation",
-  "bevy_gilrs",
+  "bevy_gilrs",           # Gamepad support
   "bevy_sprite",
   "bevy_animation",
   "bevy_ui",
+  "bevy_core_pipeline",   # This sounds important!
   "bevy_text",
   "subpixel_glyph_atlas",
   "bevy_render",
@@ -110,6 +111,9 @@ features = [
   "bevy_winit",
   "x11",
   "wayland",
+  # ⚠️ Futures
+  #"bevy_state",           # Needs research
+  #"sysinfo_plugin",       # OwO whats this?
 ]
 
 [dependencies.bevy_asset_loader]

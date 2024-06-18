@@ -11,6 +11,7 @@ SEPARATED is a 2D platformer game.
 - [SEPARATED](#separated)
   - [Introduction](#introduction)
   - [Table of Contents](#table-of-contents)
+  - [Player Inputs ∆](#player-inputs-)
   - [Debugging Keyboard Shortcuts](#debugging-keyboard-shortcuts)
   - [Spawn and Respawn `flurx` Reactor](#spawn-and-respawn-flurx-reactor)
   - [Render Engine Graphs](#render-engine-graphs)
@@ -21,6 +22,16 @@ SEPARATED is a 2D platformer game.
   - [Default RapierConfiguration](#default-rapierconfiguration)
   - [Rust Things 🦀](#rust-things-)
   - [A Mouthful of Errors](#a-mouthful-of-errors)
+
+## Player Inputs ∆
+
+| Input        |          KeyCode          |     Gamepad Button/Axis     |
+| :----------- | :-----------------------: | :-------------------------: |
+| **Run**      |         **Shift**         | Xbox: **X** PS5: **Square** |
+| **Interact** |           **E**           |   Xbox: **B** PS5: **◯**    |
+| **Attack1**  |           **Q**           |      Xbox/PS5: **L1**       |
+| **Jump**     |         **Space**         |   Xbox: **A** PS5: **╳**    |
+| **Move**     | **WASD** + **Arrow Keys** |    **Any Axis + D-Pad**     |
 
 ## Debugging Keyboard Shortcuts
 

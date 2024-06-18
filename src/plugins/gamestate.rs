@@ -18,6 +18,7 @@ pub enum GameState {
     #[default]
     SplashScreen,
     Playing,
+    // ⚠️ TODO: Setting this to default causes a panic!
     Loading,
     MainMenu,
 }
