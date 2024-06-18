@@ -3,7 +3,7 @@
 use graphviz_rust::{ cmd::{ CommandArg, Format }, exec_dot };
 
 use bevy::{
-    app::{ App, Plugin, Update },
+    app::{ App, Plugin, Startup, Update },
     ecs::schedule::ScheduleLabel,
     input::{ common_conditions::input_toggle_active, ButtonInput },
     log,
@@ -15,18 +15,18 @@ use bevy_rapier2d::{ prelude::RapierDebugRenderPlugin, render::DebugRenderContex
 
 use super::{ gamestate::GameState, ui::fps_widget::{ spawn_fps_widget, FpsWidget } };
 
-// Adds F9 key as debug KeyCode for toggling physics wireframes.
+// Adds L key as debug KeyCode for toggling physics wireframes.
 pub fn toggle_physics_wireframes(
     mut ctx: ResMut<DebugRenderContext>,
     input: Res<ButtonInput<KeyCode>>
 ) {
-    if ctx.enabled {
-        if input.just_pressed(KeyCode::F9) {
-            ctx.enabled = !ctx.enabled;
-        }
-    } else {
-        ctx.enabled = false;
+    if input.just_pressed(KeyCode::F9) {
+        ctx.enabled = !ctx.enabled;
     }
+}
+
+pub fn disable_physics_wireframes(mut ctx: ResMut<DebugRenderContext>) {
+    ctx.enabled = false;
 }
 
 pub(crate) fn plugin(app: &mut App) {
@@ -38,6 +38,10 @@ pub(crate) fn plugin(app: &mut App) {
         // RapierDebugRenderPlugin
         RapierDebugRenderPlugin::default(),
     ));
+
+    // Disable wireframes by default. I've seen enough collision boxes for now.
+    app.add_systems(Startup, disable_physics_wireframes);
+
     // FpsWidget
     app.add_systems(Update, spawn_fps_widget.run_if(not(any_with_component::<FpsWidget>)));
     // DebugRenderContext - Rapier
