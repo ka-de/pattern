@@ -2,7 +2,7 @@ use bevy::{
     app::App,
     log::info,
     math::Vec2,
-    prelude::{ KeyCode, OnEnter, States },
+    prelude::{ OnEnter, States },
     reflect::Reflect,
     render::{ camera::ScalingMode, color::Color },
 };
@@ -10,6 +10,7 @@ use bevy_asset_loader::{
     loading_state::{ LoadingState, LoadingStateAppExt },
     standard_dynamic_asset::StandardDynamicAsset,
 };
+use bevy_progress::ProgressPlugin;
 
 use crate::plugins::splashscreen::{ SplashScreenConfiguration, SplashScreenPlugin };
 
@@ -69,5 +70,5 @@ pub fn game_state_plugin(app: &mut App) {
         .add_systems(OnEnter(GameState::Playing), set_state_playing)
         // Splash Screen
         .add_plugins(SplashScreenPlugin(config))
-        .init_resource::<bevy_progress::ProgressCounter>();
+        .add_plugins(ProgressPlugin::new(GameState::SplashScreen).continue_to(GameState::Playing));
 }
