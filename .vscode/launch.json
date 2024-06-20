@@ -23,3 +23,53 @@
         }
     ]
 }
+
+/*
+ * The `#![allow(clippy::match_same_arms)]` is a Rust attribute that allows a specific lint warning to be ignored.
+ * 
+ * `#!` is a Rust attribute, which is a way to annotate a module or crate with additional information.
+ * `allow` is a specific attribute that allows a lint warning to be ignored.
+ * `clippy::match_same_arms` is the name of the lint warning being allowed.
+ *
+ * The `match_same_arms` lint warns when a match expression has multiple arms with the same pattern. For example:
+ *
+ * ```rust
+match foo {
+    1 => println!("one"),
+    1 => println!("also one"), // warning: same arm
+}
+ * ```
+ * 
+ * In this case, `clippy` would normally warn about the duplicate arm, suggesting that it might be an error.
+ * By adding the `#![allow(clippy::match_same_arms)]` attribute, you're telling `clippy` to ignore this specific
+ * warning for the entire crate or module. This can be useful if you intentionally have a match expression with
+ * duplicate arms, or if you're working on a legacy codebase that hasn't been updated to avoid this pattern.
+ * 
+ * Note that this attribute only affects the `clippy` linter, and not the standard Rust compiler warnings.
+ */
+
+/*
+ * RUSTFLAGS="-Funsafe-code --cap-lints=warn" cargo check
+ *
+ * This command will cause the compilation to fail if unsafe code is detected.
+ * However, it’s important to note that this method might not be foolproof for all cases,
+ * as some dependencies might require unsafe code to function correctly, and this could
+ * lead to false positives or prevent your project from compiling.
+ *
+ * Remember, while unsafe code is often necessary for low-level system programming tasks,
+ * its usage should be minimized and carefully reviewed to maintain the safety guarantees
+ * that Rust provides.
+ */
+
+/*
+ * The `--cap-lints=warn` flag in Rust is used to set the maximum lint level for the entire project to warn.
+ *
+ * This means that even if a lint is defined with a more severe levelsuch as deny or forbid,
+ * it will only issue a warning rather than causing the compilation to fail. Essentially, this flag ensures that
+ * no matter what lint levels are specified within the code or by dependencies, they will not exceed a warning level.
+ *
+ * This can be particularly useful when compiling a large number of crates, some of which you may not have control over,
+ * and you want to ensure that lint issues do not prevent the project from building. However, it’s important to note that
+ * while this flag can help with getting a project to compile, it does not address the underlying issues that the lints are warning about.
+ * It’s generally a good idea to review and address lint warnings to maintain code quality.
+ */

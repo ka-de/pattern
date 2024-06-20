@@ -39,7 +39,7 @@ dev_features = [
   "bevy_progress/debug",
   "bevy_rapier2d/debug-render-2d",
   "big-brain/trace",
-  "sickle_ui/dev",
+  #"sickle_ui/dev",
   # "bevy_incandescent/debug",
   "dep:bevy-inspector-egui",
   # Allow egui to take priority over actions when processing inputs.
