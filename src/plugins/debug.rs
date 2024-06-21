@@ -6,6 +6,7 @@ use bevy::{
     app::{ App, Plugin, Startup, Update },
     ecs::schedule::ScheduleLabel,
     input::{ common_conditions::input_toggle_active, ButtonInput },
+    log::debug,
     log,
     prelude::{ any_with_component, not, IntoSystemConfigs, KeyCode, Res, ResMut, Schedules },
     utils::intern::Interned,

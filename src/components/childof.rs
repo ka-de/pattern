@@ -1,4 +1,6 @@
+use bevy::log::debug;
 use aery::prelude::*;
+
 use super::name::Name;
 
 #[derive(Relation)]
