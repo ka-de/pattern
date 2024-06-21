@@ -2,7 +2,7 @@ use bevy::{
     app::{ App, Plugin, Update, PreUpdate },
     ecs::{ component::Component, query::With, system::{ Query, Res } },
     input::keyboard::KeyCode,
-    prelude::{ in_state, Condition, IntoSystemConfigs as _ },
+    prelude::{ DerefMut, Deref, in_state, Condition, IntoSystemConfigs as _ },
     reflect::Reflect,
     time::{ Real, Time },
     utils::HashMap,
@@ -16,7 +16,6 @@ use input_manager::{
     plugin::InputManagerSystem,
     Actionlike,
 };
-use std::collections::HashMap;
 use std::time::Instant;
 
 use crate::{
@@ -67,7 +66,7 @@ pub enum Ability {
 }
 
 /// This struct stores which ability corresponds to which slot for a particular player
-#[derive(Component, Debug, Default, Deref, DerefMut, Reflect)]
+#[derive(Component, Debug, Default, Deref, DerefMut, Reflect, Clone)]
 pub struct AbilitySlotMap {
     pub map: HashMap<Slot, Ability>,
 }
