@@ -258,9 +258,10 @@ if velocity.y < 0 {
 
 - **AI Stuff** ⚠️ Started work
 
+  - Pass player input(s) to ai-brain so it can use it for prediction.
   - Basic Timer with Action Scheduling
-    - Thirst
-    - Fatigue
+    - Thirst ✅
+    - Fatigue ⚠️
 
 - **Pathfinding** ⚠️ Started work
 - Use something to copy `dxil.dll` and `dxcompiler.dll` to Windows builds.

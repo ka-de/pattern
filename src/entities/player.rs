@@ -7,6 +7,7 @@ use bevy::{
     render::color::Color,
 };
 use bevy_ecs_ldtk::{ EntityInstance, LdtkEntity, Worldly };
+use input_manager::prelude::InputMap;
 
 use crate::{
     components::{
@@ -19,6 +20,7 @@ use crate::{
         swimming::Swimmer,
     },
     plugins::input,
+    plugins::input::{ ActionState, Slot, Ability, AbilitySlotMap },
 };
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
@@ -52,10 +54,15 @@ pub struct PlayerBundle {
     input_map: input::InputMap,
     action_state: input::ActionState,
     action_timers: input::ActionTimers,
+    slot_input_map: InputMap<Slot>,
+    slot_action_state: ActionState<Slot>,
+    // We do not need an InputMap<Ability> component,
+    // as abilities are never triggered directly from inputs.
+    ability_action_state: ActionState<Ability>,
+    ability_slot_map: AbilitySlotMap,
 }
 
-// ⚠️ TODO: Let's make it public so AI can use it for prediction.
-pub fn make_action_map(_: &EntityInstance) -> input::InputMap {
+fn make_action_map(_: &EntityInstance) -> input::InputMap {
     input::make_action_map()
 }
 
