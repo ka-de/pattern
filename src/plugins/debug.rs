@@ -14,6 +14,7 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier2d::{ prelude::RapierDebugRenderPlugin, render::DebugRenderContext };
 
 use super::{ gamestate::GameState, ui::fps_widget::{ spawn_fps_widget, FpsWidget } };
+use crate::components::childof::debug_children;
 
 // Adds L key as debug KeyCode for toggling physics wireframes.
 pub fn toggle_physics_wireframes(
@@ -30,29 +31,31 @@ pub fn disable_physics_wireframes(mut ctx: ResMut<DebugRenderContext>) {
 }
 
 pub(crate) fn plugin(app: &mut App) {
+    // Plugins
     app.add_plugins((
+        // Debug all parent and child elements with the Name component.
+        crate::components::childof::debug_children,
         // FpsWidget
         super::ui::fps_widget::plugin,
         // WorldInspectorPlugin
         WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::F11)),
         // RapierDebugRenderPlugin
         RapierDebugRenderPlugin::default(),
+        // StateInspectorPlugin
+        bevy_inspector_egui::quick::StateInspectorPlugin::<GameState>
+            ::default()
+            .run_if(bevy::input::common_conditions::input_toggle_active(false, KeyCode::F10)),
     ));
 
+    // Startup
     // Disable wireframes by default. I've seen enough collision boxes for now.
     app.add_systems(Startup, disable_physics_wireframes);
 
+    // Update
     // FpsWidget
     app.add_systems(Update, spawn_fps_widget.run_if(not(any_with_component::<FpsWidget>)));
     // DebugRenderContext - Rapier
     app.add_systems(Update, toggle_physics_wireframes);
-
-    // StateInspectorPlugin
-    app.add_plugins(
-        bevy_inspector_egui::quick::StateInspectorPlugin::<GameState>
-            ::default()
-            .run_if(bevy::input::common_conditions::input_toggle_active(false, KeyCode::F10))
-    );
 
     if let Err(err) = render_graphs(app) {
         log::error!("Error rendering graph: {}", err);

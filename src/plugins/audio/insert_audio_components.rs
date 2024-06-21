@@ -5,7 +5,7 @@ use bevy::{
     audio::{ PlaybackSettings, SpatialListener, Volume, SpatialScale },
     core::Name,
     ecs::{ entity::Entity, query::Added, system::{ Commands, Query, Res } },
-    log::info,
+    log::debug,
 };
 use bevy_ecs_ldtk::{ prelude::LdtkFields, EntityInstance };
 use rand::{ Rng, thread_rng };
@@ -20,7 +20,7 @@ pub fn insert_spatial_listener(
     added_player: Query<(Entity, &Name), Added<Player>>
 ) {
     for (player_entity, name) in &added_player {
-        info!("Inserted spatial listener for {}", name);
+        debug!("Inserted spatial listener for {}", name);
         commands.entity(player_entity).insert(SpatialListener::default());
     }
 }
