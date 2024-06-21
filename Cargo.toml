@@ -77,6 +77,8 @@ bevy_prng = { git = "https://github.com/ka-de/bevy_rand", features = [
   "wyrand",
 ] }
 input-manager = { git = "https://github.com/ka-de/input-manager" }
+aery = { git = "https://github.com/ka-de/aery" }
+bevy_vector_shapes = { git = "https://github.com/ka-de/bevy_vector_shapes" }
 # pathfinding = { git = "https://github.com/ka-de/pathfinding" }
 big-brain = { git = "https://github.com/ka-de/big-brain" }
 bevy_mod_debugdump = { git = "https://github.com/ka-de/bevy_mod_debugdump", optional = true }
@@ -84,14 +86,12 @@ graphviz-rust = { version = "0.9.0", optional = true }
 # bevy_text_input = { git = "https://github.com/ka-de/bevy_text_input" }
 # bevy_flurx = { git = "https://github.com/ka-de/bevy_flurx" }
 # bevy_magic_light_2d = { git = "https://github.com/ka-de/bevy_magic_light_2d" }
-bevy_mod_aseprite = { git = "https://github.com/ka-de/bevy_mod_aseprite" }
 #bevy_incandescent = { git = "https://github.com/ka-de/bevy_incandescent", features = [
 #  "debug",
 #  "ray_marching",
 #] }
-#bresenham = "0.1.0"
-#serde = "^1"
-#serde_json = "1"
+# ⚠️ Would be really nice if we could use it, but its not the end of the world.
+#bevy_mod_aseprite = { git = "https://github.com/ka-de/bevy_mod_aseprite" }
 
 [dependencies.bevy]
 version = "0.13.2"
