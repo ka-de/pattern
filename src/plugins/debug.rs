@@ -34,8 +34,6 @@ pub fn disable_physics_wireframes(mut ctx: ResMut<DebugRenderContext>) {
 pub(crate) fn plugin(app: &mut App) {
     // Plugins
     app.add_plugins((
-        // Debug all parent and child elements with the Name component.
-        crate::components::childof::debug_children,
         // FpsWidget
         super::ui::fps_widget::plugin,
         // WorldInspectorPlugin
@@ -50,7 +48,11 @@ pub(crate) fn plugin(app: &mut App) {
 
     // Startup
     // Disable wireframes by default. I've seen enough collision boxes for now.
-    app.add_systems(Startup, disable_physics_wireframes);
+    app.add_systems(Startup, (
+        // Debug all parent and child elements with the Name component.
+        debug_children,
+        disable_physics_wireframes,
+    ));
 
     // Update
     // FpsWidget

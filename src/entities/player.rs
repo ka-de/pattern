@@ -1,4 +1,11 @@
-use bevy::{ ecs::{ bundle::Bundle, component::Component }, sprite::SpriteBundle };
+use bevy::{
+    transform::components::Transform,
+    math::Vec3, // Bleh, math in player! ☠️
+    ecs::{ bundle::Bundle, component::Component, system::{ Query, Res } },
+    sprite::SpriteBundle,
+    gizmos::{ gizmos::Gizmos, config::GizmoConfig },
+    render::color::Color,
+};
 use bevy_ecs_ldtk::{ EntityInstance, LdtkEntity, Worldly };
 
 use crate::{
@@ -47,6 +54,29 @@ pub struct PlayerBundle {
     action_timers: input::ActionTimers,
 }
 
-fn make_action_map(_: &EntityInstance) -> input::InputMap {
+// ⚠️ TODO: Let's make it public so AI can use it for prediction.
+pub fn make_action_map(_: &EntityInstance) -> input::InputMap {
     input::make_action_map()
+}
+
+pub fn draw_health_bar(mut gizmos: Gizmos, query: Query<(&Transform, &Player, &Health)>) {
+    for (transform, _, health) in query.iter() {
+        let health_ratio = (health.current as f32) / (health.max as f32);
+        let bar_width = 1.0f32; // Adjust as needed
+        let bar_height = 0.1f32; // Adjust as needed
+        let offset = Vec3::new(0.0, 0.5, 0.0); // Offset above the player
+
+        let start = transform.translation + offset;
+        let end = start + Vec3::new(bar_width, 0.0, 0.0);
+
+        // Draw the background (red) bar
+        gizmos.line_2d(start.truncate(), end.truncate(), Color::RED);
+
+        // Draw the foreground (green) bar based on health
+        gizmos.line_2d(
+            start.truncate(),
+            (start + Vec3::new(bar_width * health_ratio, 0.0, 0.0)).truncate(),
+            Color::GREEN
+        );
+    }
 }

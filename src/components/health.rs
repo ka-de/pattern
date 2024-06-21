@@ -1,9 +1,9 @@
-use bevy::ecs::component::Component;
+use bevy::{ ecs::component::Component, reflect::Reflect };
 
 use super::armor::Armor;
 
 // 🩸
-#[derive(Component, Clone)]
+#[derive(Component, Clone, Reflect)]
 pub struct Health {
     pub current: u32,
     pub max: u32,

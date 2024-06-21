@@ -1,5 +1,4 @@
-use bevy::log::debug;
-use aery::prelude::*;
+use bevy::{ ecs::{ entity::Entity, system::Query }, log::debug };
 
 use super::name::Name;
 

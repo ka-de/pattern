@@ -8,8 +8,8 @@
 use rand::RngCore;
 
 // bevy_rand
-use bevy_prng::*;
-use bevy_rand::{ resource::GlobalEntropy, prelude::EntropyPlugin };
+use bevy_rand::prelude::{ WyRand, EntropyPlugin, GlobalEntropy };
+
 use bevy::{
     app::{ App, PreUpdate, Startup, Update },
     ecs::{

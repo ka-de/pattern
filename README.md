@@ -189,7 +189,7 @@ fn print_random_value(mut rng: ResMut<GlobalEntropy<WyRand>>) {
     println!("Random value: {}", rng.next_u32());
 }
 
-use bevy_prng::WyRand;
+use bevy_rand::WyRand;
 use bevy_rand::prelude::{GlobalEntropy, ForkableRng};
 
 #[derive(Component)]

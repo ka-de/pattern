@@ -1,4 +1,5 @@
-use bevy::app::{ PreUpdate, Startup, Update };
+use bevy::{ app::{ PreUpdate, Startup, Update }, render::{ camera::ClearColor, color::Color } };
+
 use release_label::release_label;
 use tooltip::spawn_tooltip;
 use bevy_vector_shapes::prelude::*;

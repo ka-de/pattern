@@ -24,7 +24,7 @@ pub trait Animal: Component {
         let name = self.name();
 
         // Iterate over the ANIMAL_NAMES array
-        for &(animal_name, gender, _) in names::ANIMAL_NAMES {
+        for &(animal_name, gender, _) in ANIMAL_NAMES {
             // If the name of the animal matches the name in the array
             if animal_name == name {
                 // Return the gender of the animal
@@ -44,7 +44,7 @@ fn generate_animal_name(animal_type: AnimalType) -> String {
 
     // Choose a random animal name from the ANIMAL_NAMES array
     // The chosen element is a tuple containing the name, gender, and type of the animal
-    match names::ANIMAL_NAMES.choose(&mut rng) {
+    match ANIMAL_NAMES.choose(&mut rng) {
         Some((name, _gender, name_type)) => {
             // If the type of the chosen animal matches the given animal type
             if *name_type == animal_type {
