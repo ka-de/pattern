@@ -1,4 +1,4 @@
-//pub(crate) mod animals;
+pub(crate) mod animals;
 pub(crate) mod health;
 pub(crate) mod collision;
 pub(crate) mod ground;
@@ -6,7 +6,6 @@ pub(crate) mod items;
 pub(crate) mod sensorbundle;
 pub(crate) mod camera;
 pub(crate) mod hunger;
-//pub(crate) mod names;
 pub(crate) mod armor;
 pub(crate) mod predefinedpath;
 pub(crate) mod animation;
