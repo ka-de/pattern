@@ -118,8 +118,6 @@ pub(crate) fn make_action_map<Ability: Actionlike>(
         .with(Action::Ability(6), GamepadButtonType::C)
         .with(Action::Ability(7), GamepadButtonType::Z);
 
-    info!("input map: {:?}", input_map);
-
     InputBundle {
         input_map,
         ability_slot_map: AbilitySlotMap { map: abilities },
