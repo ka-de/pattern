@@ -55,7 +55,7 @@ pub(crate) fn spawn_ldtk_world(mut commands: Commands, ldtk_assets: Res<LdtkAsse
         ldtk_handle: ldtk_assets.first_level.clone(),
         ..Default::default()
     });
-    log::info!("Spawned ldtk world");
+    info!("Spawned ldtk world");
 }
 
 // Updates the current level selection based on the player’s position.
@@ -92,7 +92,7 @@ pub(crate) fn update_level_selection(
                 player_transform.translation.y > level_bounds.min.y &&
                 !level_selection.is_match(&LevelIndices::default(), level)
             {
-                log::debug!("Updating level selection {:?} -> {:?}", level_selection, level.iid);
+                debug!("Updating level selection {:?} -> {:?}", level_selection, level.iid);
                 *level_selection = LevelSelection::iid(level.iid.clone());
             }
         }
