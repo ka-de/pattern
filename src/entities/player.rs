@@ -1,6 +1,7 @@
+use std::collections::HashMap;
+
 use bevy::prelude::*;
 use bevy_ecs_ldtk::{ EntityInstance, LdtkEntity, Worldly };
-use input_manager::prelude::*;
 
 use crate::{
     components::{
@@ -13,7 +14,7 @@ use crate::{
         swimming::Swimmer,
     },
     plugins::input,
-    plugins::input::{ ActionState, Slot, Ability, AbilitySlotMap },
+    //plugins::input::{ ActionState, Slot, Ability, AbilitySlotMap },
 };
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
@@ -44,13 +45,32 @@ pub struct PlayerBundle {
 
     // Input manager components
     #[with(make_action_map)]
-    input_map: input::InputMap,
-    action_state: input::ActionState,
-    action_timers: input::ActionTimers,
+    input_bundle: input::InputBundle<Ability>
 }
 
-fn make_action_map(_: &EntityInstance) -> input::InputMap {
-    input::make_action_map()
+// The list of possible abilities is typically longer than the list of slots
+#[derive(input::Actionlike, PartialEq, Eq, Hash, Clone, Debug, Copy, Reflect)]
+pub enum Ability {
+    Slash,
+    Shoot,
+    LightningBolt,
+    Fireball,
+    Dash,
+    Heal,
+    FrozenOrb,
+    PolymorphSheep,
+}
+
+
+fn make_action_map(_: &EntityInstance) -> input::InputBundle<Ability> {
+    input::make_action_map(HashMap::from([
+        (0, Ability::Slash),
+        (1, Ability::Shoot),
+        (2, Ability::FrozenOrb),
+        // Some slots may be empty!
+        (4, Ability::Dash),
+        (5, Ability::PolymorphSheep),
+    ]))
 }
 
 pub fn draw_health_bar(mut gizmos: Gizmos, query: Query<(&Transform, &Player, &Health)>) {
