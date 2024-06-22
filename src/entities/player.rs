@@ -45,7 +45,7 @@ pub struct PlayerBundle {
 
     // Input manager components
     #[with(make_action_map)]
-    input_bundle: input::InputBundle<Ability>
+    input_bundle: input::InputBundle<Ability>,
 }
 
 // The list of possible abilities is typically longer than the list of slots
@@ -61,26 +61,27 @@ pub enum Ability {
     PolymorphSheep,
 }
 
-
 fn make_action_map(_: &EntityInstance) -> input::InputBundle<Ability> {
-    input::make_action_map(HashMap::from([
-        (0, Ability::Slash),
-        (1, Ability::Shoot),
-        (2, Ability::FrozenOrb),
-        // Some slots may be empty!
-        (4, Ability::Dash),
-        (5, Ability::PolymorphSheep),
-    ]))
+    input::make_action_map(
+        HashMap::from([
+            (0, Ability::Slash),
+            (1, Ability::Shoot),
+            (2, Ability::FrozenOrb),
+            // Some slots may be empty!
+            (4, Ability::Dash),
+            (5, Ability::PolymorphSheep),
+        ])
+    )
 }
 
-pub fn draw_health_bar(mut gizmos: Gizmos, query: Query<(&Transform, &Player, &Health)>) {
+pub fn draw_health_bar(mut gizmos: Gizmos, query: Query<(&GlobalTransform, &Player, &Health)>) {
     for (transform, _, health) in query.iter() {
         let health_ratio = (health.current as f32) / (health.max as f32);
-        let bar_width = 1.0f32; // Adjust as needed
+        let bar_width = 20.0f32; // Adjust as needed
         let bar_height = 0.1f32; // Adjust as needed
-        let offset = Vec3::new(0.0, 0.5, 0.0); // Offset above the player
+        let offset = Vec3::new(-10.0, 20.0, 0.0); // Offset above the player
 
-        let start = transform.translation + offset;
+        let start = transform.translation() + offset;
         let end = start + Vec3::new(bar_width, 0.0, 0.0);
 
         // Draw the background (red) bar

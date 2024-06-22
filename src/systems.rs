@@ -65,6 +65,7 @@ pub fn setup_world_systems(app: &mut App) {
                 components::predefinedpath::move_on_path,
                 components::items::dbg_player_items,
                 components::line_of_sight::line_of_sight::<entities::Player>,
+                entities::player::draw_health_bar,
             ).run_if(in_state(GameState::Playing))
         )
 
