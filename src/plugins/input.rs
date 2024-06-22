@@ -136,19 +136,24 @@ impl Plugin for InputPlugin {
         ))
 
             // PreUpdate
-            .add_systems(PreUpdate, (
+            .add_systems(
+                PreUpdate,
                 // This system coordinates the state of our two actions
-                copy_action_state.after(InputManagerSystem::ManualControl),
+                copy_action_state.after(InputManagerSystem::ManualControl)
                 // ⚠️ NOTE: These systems run during PreUpdate.
                 //
                 // If you have systems that care about inputs and actions that also run during this stage,
                 // you must define an ordering between your systems or behavior will be very erratic.
                 // The stable system sets for these systems are available under InputManagerSystem enum.
+            )
+
+            .add_systems(
+                Update,
                 movement
                     .run_if(not_in_dialogue.and_then(in_state(GameState::Playing)))
                     .after(components::ground::update_on_ground)
                     .after(components::climbing::detect_climb_range)
-                    .after(components::swimming::detect_swim_range),
-            ));
+                    .after(components::swimming::detect_swim_range)
+            );
     }
 }
