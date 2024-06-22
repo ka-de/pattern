@@ -1,9 +1,4 @@
-use bevy::{
-    ecs::component::Component,
-    prelude::{ Deref, DerefMut, Query, Res, With },
-    sprite::TextureAtlas,
-    time::{ Time, Timer },
-};
+use bevy::prelude::*;
 
 use super::health::Health;
 

@@ -1,4 +1,6 @@
 use bevy::prelude::*;
+
+// ⚠️ NOTE: Port to bevy_rand somehow.
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 

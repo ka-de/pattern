@@ -3,12 +3,10 @@
 use graphviz_rust::{ cmd::{ CommandArg, Format }, exec_dot };
 
 use bevy::{
-    app::{ App, Plugin, Startup, Update },
-    ecs::schedule::ScheduleLabel,
-    input::{ common_conditions::input_toggle_active, ButtonInput },
-    log,
-    prelude::{ any_with_component, not, IntoSystemConfigs, KeyCode, Res, ResMut, Schedules },
+    prelude::*,
     utils::intern::Interned,
+    ecs::schedule::ScheduleLabel,
+    input::common_conditions::input_toggle_active,
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier2d::{ prelude::RapierDebugRenderPlugin, render::DebugRenderContext };
@@ -46,10 +44,10 @@ pub(crate) fn plugin(app: &mut App) {
     ));
 
     // Startup
-    // Disable wireframes by default. I've seen enough collision boxes for now.
     app.add_systems(Startup, (
         // Debug all parent and child elements with the Name component.
         debug_children,
+        // Disable wireframes by default. I've seen enough collision boxes for now.
         disable_physics_wireframes,
     ));
 
@@ -60,7 +58,7 @@ pub(crate) fn plugin(app: &mut App) {
     app.add_systems(Update, toggle_physics_wireframes);
 
     if let Err(err) = render_graphs(app) {
-        log::error!("Error rendering graph: {}", err);
+        error!("Error rendering graph: {}", err);
     }
 }
 

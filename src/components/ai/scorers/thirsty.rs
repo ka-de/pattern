@@ -1,5 +1,5 @@
-use bevy::{ log::debug, ecs::{ query::With, system::{ Res, Query }, component::Component } };
-use big_brain::prelude::{ Actor, ScorerBuilder, Score, ScorerSpan };
+use bevy::prelude::*;
+use big_brain::prelude::*;
 
 use crate::components::ai::thirst::Thirst;
 

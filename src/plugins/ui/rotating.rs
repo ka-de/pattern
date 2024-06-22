@@ -1,7 +1,4 @@
-use bevy::{
-    ecs::{ component::Component, entity::Entity, query::With, system::{ Commands, Query, Res } },
-    time::Time,
-};
+use bevy::prelude::*;
 
 use super::banner_widget::BannerWidgetCommands;
 

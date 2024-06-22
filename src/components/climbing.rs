@@ -1,13 +1,6 @@
 use std::collections::HashSet;
-use bevy::ecs::{
-    component::Component,
-    entity::Entity,
-    event::EventReader,
-    query::{With, Changed},
-    system::Query,
-};
-use bevy_rapier2d::{dynamics::GravityScale, pipeline::CollisionEvent};
-
+use bevy::prelude::*;
+use bevy_rapier2d::{ dynamics::GravityScale, pipeline::CollisionEvent };
 
 use crate::plugins::rapier_utils::reciprocal_collisions;
 
@@ -49,7 +42,6 @@ pub fn detect_climb_range(
         }
     });
 }
-
 
 // Checks if a climber entity is climbing.
 // If it is, the gravity scale is set to 0.0, effectively ignoring gravity.

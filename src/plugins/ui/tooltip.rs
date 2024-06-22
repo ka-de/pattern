@@ -1,21 +1,4 @@
-use bevy::{
-    asset::AssetServer,
-    core::Name,
-    ecs::{
-        component::Component,
-        entity::Entity,
-        query::{ Changed, With },
-        system::{ Commands, Query },
-    },
-    hierarchy::{ BuildChildren as _, DespawnRecursiveExt },
-    math::Vec3,
-    prelude::Res,
-    render::primitives::Aabb,
-    sprite::Anchor,
-    text::{ Text, Text2dBundle, TextStyle },
-    transform::components::Transform,
-    utils::default,
-};
+use bevy::{ prelude::*, render::primitives::Aabb, sprite::Anchor };
 
 /// Marker component for removing tooltips
 #[derive(Component)]

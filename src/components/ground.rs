@@ -1,18 +1,4 @@
-use std::collections::HashSet;
-
-use bevy::{
-    core::Name,
-    ecs::{
-        component::Component,
-        entity::Entity,
-        event::EventReader,
-        query::{ Added, Changed, With, Without },
-        system::{ Commands, Query },
-    },
-    hierarchy::BuildChildren,
-    math::{ Vec2, Vec3 },
-    transform::components::{ GlobalTransform, Transform },
-};
+use bevy::{ prelude::*, utils::HashSet };
 use bevy_rapier2d::{ geometry::{ ActiveEvents, Collider, Sensor }, pipeline::CollisionEvent };
 
 use crate::plugins::rapier_utils::reciprocal_collisions;

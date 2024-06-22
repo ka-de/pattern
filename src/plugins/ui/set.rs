@@ -1,12 +1,5 @@
 // SetFont
-use bevy::{
-    asset::AssetServer,
-    ecs::system::EntityCommand,
-    prelude::{ Entity, World },
-    render::color::Color,
-    text::Text,
-    ui::{ PositionType, Style, Val },
-};
+use bevy::{ prelude::*, ecs::system::EntityCommand };
 
 pub struct SetFont(pub String, pub f32, pub Color);
 

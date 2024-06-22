@@ -1,10 +1,5 @@
-use bevy::{
-    reflect::Reflect,
-    time::Time,
-    log::{ trace, debug },
-    ecs::{ system::{ Query, Res }, component::Component },
-};
-use big_brain::prelude::{ Actor, ActionBuilder, ActionState, ActionSpan };
+use bevy::prelude::*;
+use big_brain::prelude::*;
 
 use crate::components::ai::thirst::Thirst;
 

@@ -8,7 +8,7 @@ pub(crate) mod scorers;
 // Components
 pub(crate) mod thirst;
 
-use bevy::ecs::system::Commands;
+use bevy::prelude::*;
 
 use big_brain::prelude::{ FirstToScore, Thinker };
 

@@ -1,5 +1,5 @@
 // Import necessary Bevy and Winit types.
-use bevy::{ prelude::NonSend, winit::WinitWindows };
+use bevy::{ prelude::*, winit::WinitWindows };
 use winit::window::Icon;
 
 // Define a function to set the window icon for all windows managed by Bevy.

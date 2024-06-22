@@ -1,13 +1,4 @@
-use bevy::{
-    asset::{ Assets, Handle },
-    core::Name,
-    ecs::system::EntityCommands,
-    hierarchy::{ BuildChildren, Parent },
-    log::debug,
-    prelude::{ Added, Bundle, Commands, Entity, Query, Res, Without },
-    transform::components::{ GlobalTransform, Transform },
-    utils::{ default, HashMap, HashSet },
-};
+use bevy::{ prelude::*, utils::HashMap, utils::HashSet, ecs::system::EntityCommands };
 use bevy_ecs_ldtk::{
     assets::LdtkProject,
     ldtk::{ loaded_level::LoadedLevel, LayerInstance },
@@ -113,11 +104,11 @@ fn spawn_wall_collision_for_level(
         bottom: i32,
     }
 
-                let LayerInstance {
-                    c_wid: width,
-                    c_hei: height,
-                    grid_size,
-                    ..
+    let LayerInstance {
+        c_wid: width,
+        c_hei: height,
+        grid_size,
+        ..
     } = *level
         .layer_instances()
         .iter()
@@ -125,99 +116,99 @@ fn spawn_wall_collision_for_level(
         .next()
         .expect("could not find the Collisions layer");
 
-                // combine wall tiles into flat "plates" in each individual row
-                let mut plate_stack: Vec<Vec<Plate>> = Vec::new();
+    // combine wall tiles into flat "plates" in each individual row
+    let mut plate_stack: Vec<Vec<Plate>> = Vec::new();
 
-                for y in 0..height {
-                    let mut row_plates: Vec<Plate> = Vec::new();
-                    let mut plate_start = None;
+    for y in 0..height {
+        let mut row_plates: Vec<Plate> = Vec::new();
+        let mut plate_start = None;
 
-                    // + 1 to the width so the algorithm "terminates" plates that touch the right edge
-                    for x in 0..width + 1 {
-                        match (plate_start, level_walls.contains(&(GridCoords { x, y }))) {
-                            (Some(s), false) => {
-                                row_plates.push(Plate {
-                                    left: s,
-                                    right: x - 1,
-                                });
-                                plate_start = None;
-                            }
-                            (None, true) => {
-                                plate_start = Some(x);
-                            }
-                            _ => (),
-                        }
-                    }
-
-                    plate_stack.push(row_plates);
+        // + 1 to the width so the algorithm "terminates" plates that touch the right edge
+        for x in 0..width + 1 {
+            match (plate_start, level_walls.contains(&(GridCoords { x, y }))) {
+                (Some(s), false) => {
+                    row_plates.push(Plate {
+                        left: s,
+                        right: x - 1,
+                    });
+                    plate_start = None;
                 }
-
-                // combine "plates" into rectangles across multiple rows
-                let mut rect_builder: HashMap<Plate, Rect> = HashMap::new();
-                let mut prev_row: Vec<Plate> = Vec::new();
-                let mut wall_rects: Vec<Rect> = Vec::new();
-
-                // an extra empty row so the algorithm "finishes" the rects that touch the top edge
-                plate_stack.push(Vec::new());
-
-                for (y, current_row) in plate_stack.into_iter().enumerate() {
-                    for prev_plate in &prev_row {
-                        if !current_row.contains(prev_plate) {
-                            // remove the finished rect so that the same plate in the future starts a new rect
-                            if let Some(rect) = rect_builder.remove(prev_plate) {
-                                wall_rects.push(rect);
-                            }
-                        }
-                    }
-                    for plate in &current_row {
-                        rect_builder
-                            .entry(plate.clone())
-                            .and_modify(|e| {
-                                e.top += 1;
-                            })
-                            .or_insert(Rect {
-                                bottom: y as i32,
-                                top: y as i32,
-                                left: plate.left,
-                                right: plate.right,
-                            });
-                    }
-                    prev_row = current_row;
+                (None, true) => {
+                    plate_start = Some(x);
                 }
+                _ => (),
+            }
+        }
+
+        plate_stack.push(row_plates);
+    }
+
+    // combine "plates" into rectangles across multiple rows
+    let mut rect_builder: HashMap<Plate, Rect> = HashMap::new();
+    let mut prev_row: Vec<Plate> = Vec::new();
+    let mut wall_rects: Vec<Rect> = Vec::new();
+
+    // an extra empty row so the algorithm "finishes" the rects that touch the top edge
+    plate_stack.push(Vec::new());
+
+    for (y, current_row) in plate_stack.into_iter().enumerate() {
+        for prev_plate in &prev_row {
+            if !current_row.contains(prev_plate) {
+                // remove the finished rect so that the same plate in the future starts a new rect
+                if let Some(rect) = rect_builder.remove(prev_plate) {
+                    wall_rects.push(rect);
+                }
+            }
+        }
+        for plate in &current_row {
+            rect_builder
+                .entry(plate.clone())
+                .and_modify(|e| {
+                    e.top += 1;
+                })
+                .or_insert(Rect {
+                    bottom: y as i32,
+                    top: y as i32,
+                    left: plate.left,
+                    right: plate.right,
+                });
+        }
+        prev_row = current_row;
+    }
 
     entity_commands.with_children(|level| {
-                    // Spawn colliders for every rectangle..
-                    // Making the collider a child of the level serves two purposes:
-                    // 1. Adjusts the transforms to be relative to the level for free
-                    // 2. the colliders will be despawned automatically when levels unload
-                    for wall_rect in wall_rects {
-                        level
-                            .spawn_empty()
-                            .insert(Name::new("wall_collision"))
-                            .insert(
-                                Collider::cuboid(
-                                    (((wall_rect.right as f32) - (wall_rect.left as f32) + 1.0) *
-                                        (grid_size as f32)) /
-                                        2.0,
-                                    (((wall_rect.top as f32) - (wall_rect.bottom as f32) + 1.0) *
-                                        (grid_size as f32)) /
-                                        2.0
-                                )
-                            )
-                            .insert(RigidBody::Fixed)
-                            .insert(Friction::new(1.0))
-                            .insert(
-                                Transform::from_xyz(
+        // Spawn colliders for every rectangle..
+        // Making the collider a child of the level serves two purposes:
+        // 1. Adjusts the transforms to be relative to the level for free
+        // 2. the colliders will be despawned automatically when levels unload
+        for wall_rect in wall_rects {
+            level
+                .spawn_empty()
+                .insert(Name::new("wall_collision"))
+                .insert(
+                    Collider::cuboid(
+                        (((wall_rect.right as f32) - (wall_rect.left as f32) + 1.0) *
+                            (grid_size as f32)) /
+                            2.0,
+                        (((wall_rect.top as f32) - (wall_rect.bottom as f32) + 1.0) *
+                            (grid_size as f32)) /
+                            2.0
+                    )
+                )
+                .insert(RigidBody::Fixed)
+                .insert(Friction::new(1.0))
+                .insert(
+                    Transform::from_xyz(
                         (((wall_rect.left + wall_rect.right + 1) as f32) * (grid_size as f32)) /
-                                        2.0,
+                            2.0,
                         (((wall_rect.bottom + wall_rect.top + 1) as f32) * (grid_size as f32)) /
-                                        2.0,
-                                    0.0
-                                )
-                            )
-                            .insert(GlobalTransform::default());
-                    }
-                });
+                            2.0,
+                        0.0
+                    )
+                )
+                .insert(GlobalTransform::default());
+        }
+    });
 }
 
 #[derive(Clone, Default, Bundle, LdtkIntCell)]

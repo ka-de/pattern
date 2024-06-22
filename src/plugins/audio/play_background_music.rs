@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 #[derive(Component)]
-struct BackgroundMusic;
+pub struct BackgroundMusic;
 
 // ⚠️ TODO: Currently very dumb, just plays one music on repeat!
 pub fn play_background_music(asset_server: Res<AssetServer>, mut commands: Commands) {
@@ -21,7 +21,7 @@ pub fn reset_speed(music_controller: Query<&AudioSink, With<BackgroundMusic>>) {
     }
 }
 
-fn pause(
+pub fn pause(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     music_controller: Query<&AudioSink, With<BackgroundMusic>>
 ) {

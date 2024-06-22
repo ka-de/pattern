@@ -1,4 +1,4 @@
-use bevy::{ app::{ PreUpdate, Startup, Update }, render::{ camera::ClearColor, color::Color } };
+use bevy::prelude::*;
 
 use release_label::release_label;
 use tooltip::spawn_tooltip;
