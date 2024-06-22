@@ -1,26 +1,84 @@
-use bevy::{ prelude::*, utils::HashMap };
+use bevy::{
+    app::{ App, Plugin, PreUpdate },
+    core::Name,
+    ecs::{
+        bundle::Bundle,
+        component::Component,
+        schedule::{ common_conditions::in_state, Condition, IntoSystemConfigs as _ },
+        system::{ Query, Res },
+    },
+    input::{ gamepad::GamepadButtonType, keyboard::KeyCode, mouse::MouseButton },
+    log::info,
+    reflect::Reflect,
+    time::{ Real, Time },
+    utils::default,
+};
 use bevy_rapier2d::dynamics::Velocity;
+use input_manager::{
+    input_map::InputMap,
+    action_state::{ ActionData, ActionState },
+    axislike::VirtualDPad,
+    input_processing::WithDualAxisProcessingPipelineExt,
+    plugin::{ InputManagerPlugin, InputManagerSystem },
+};
+pub use input_manager::Actionlike;
 
-use input_manager::{ plugin::InputManagerSystem, action_state::ActionData, prelude::* };
+use std::collections::HashMap;
 use std::time::Instant;
 
-use crate::{
-    components::{ climbing::Climber, swimming::Swimmer, ground::GroundDetection },
-    entities::player::Player,
-    plugins::{ dialogueview::not_in_dialogue, gamestate::GameState },
-};
+use crate::{ components::{ climbing::Climber, ground::GroundDetection, swimming::Swimmer } };
 
 #[derive(Actionlike, PartialEq, Eq, Hash, Clone, Copy, Debug, Reflect)]
 pub enum Action {
     Move,
     Jump,
     Interact,
+    Ability(u8),
 }
 
-pub(crate) type InputMap = input_manager::prelude::InputMap<Action>;
-pub(crate) type ActionState = input_manager::prelude::ActionState<Action>;
+impl Action {
+    const PRIMARY_ACTION: Self = Self::Ability(0);
+    const SECONDARY_ACTION: Self = Self::Ability(1);
+}
 
-pub(crate) fn make_action_map() -> InputMap {
+#[derive(Bundle, Clone)]
+pub struct InputBundle<Ability: Actionlike> {
+    input_map: InputMap<Action>,
+    action_state: ActionState<Action>,
+    // We do not need an InputMap<Ability> component,
+    // as abilities are never triggered directly from inputs.
+    ability_action_state: ActionState<Ability>,
+    ability_slot_map: AbilitySlotMap<Ability>,
+    action_timers: ActionTimers,
+}
+
+/// This struct stores which ability corresponds to which slot for a particular player
+#[derive(Component, Debug, Clone)]
+pub struct AbilitySlotMap<Ability> {
+    map: HashMap<u8, Ability>,
+}
+
+// Fix wrong trait bounds on default
+impl<A> Default for AbilitySlotMap<A> {
+    fn default() -> Self {
+        Self { map: Default::default() }
+    }
+}
+impl<A: Actionlike> Default for InputBundle<A> {
+    fn default() -> Self {
+        Self {
+            input_map: default(),
+            action_state: default(),
+            ability_action_state: default(),
+            ability_slot_map: default(),
+            action_timers: default(),
+        }
+    }
+}
+
+pub(crate) fn make_action_map<Ability: Actionlike>(
+    abilities: HashMap<u8, Ability>
+) -> InputBundle<Ability> {
     let dual_axis_pad = VirtualDPad::wasd()
         // You can configure a processing pipeline to handle axis-like user inputs.
         //
@@ -34,10 +92,39 @@ pub(crate) fn make_action_map() -> InputMap {
         // Or reset the pipeline, leaving no any processing applied.
         .reset_processing_pipeline();
 
-    InputMap::new([
+    let input_map = InputMap::new([
         (Action::Jump, KeyCode::Space),
         (Action::Interact, KeyCode::KeyE),
-    ]).with(Action::Move, dual_axis_pad)
+        // (Action::PRIMARY_ACTION, KeyCode::KeyQ),
+        // (Action::SECONDARY_ACTION, KeyCode::KeyW),
+        // (Action::Ability(2), KeyCode::KeyR),
+        // (Action::Ability(3), KeyCode::KeyT),
+        // (Action::Ability(4), KeyCode::KeyZ),
+        // (Action::Ability(5), KeyCode::KeyX),
+        // (Action::Ability(6), KeyCode::KeyC),
+        // (Action::Ability(7), KeyCode::KeyV),
+    ])
+        .with(Action::Move, dual_axis_pad)
+        .with(Action::Interact, GamepadButtonType::RightTrigger2);
+    // .with(Action::Jump, MouseButton::Left)
+    // .with(Action::Jump, GamepadButtonType::LeftTrigger)
+    // .with(Action::PRIMARY_ACTION, MouseButton::Right)
+    // .with(Action::PRIMARY_ACTION, GamepadButtonType::RightTrigger)
+    // .with(Action::SECONDARY_ACTION, GamepadButtonType::LeftTrigger2)
+    // .with(Action::Ability(2), GamepadButtonType::East) // PS: Circle, Xbox: B
+    // .with(Action::Ability(3), GamepadButtonType::North) // PS: Triangle, Xbox: Y
+    // .with(Action::Ability(4), GamepadButtonType::West) // PS: Square, Xbox: X
+    // .with(Action::Ability(5), GamepadButtonType::South) // PS: Cross, Xbox: A
+    // .with(Action::Ability(6), GamepadButtonType::C)
+    // .with(Action::Ability(7), GamepadButtonType::Z)
+
+    info!("input map: {:?}", input_map);
+
+    InputBundle {
+        input_map,
+        ability_slot_map: AbilitySlotMap { map: abilities },
+        ..default()
+    }
 }
 
 // Velocity in px/s for full gamepad range
@@ -52,17 +139,17 @@ pub(crate) struct ActionTimer {
 #[derive(Component, Default, Clone)]
 pub(crate) struct ActionTimers(pub HashMap<Action, ActionTimer>);
 
+/// System that handle input and movement
 pub(crate) fn movement(
     mut query: Query<
         (
-            &ActionState,
+            &ActionState<Action>,
             &mut ActionTimers,
             &mut Velocity,
             &mut Climber,
             &mut Swimmer,
             &GroundDetection,
-        ),
-        With<Player>
+        )
     >,
     time: Res<Time<Real>>
 ) {
@@ -95,6 +182,10 @@ pub(crate) fn movement(
             }
         }
 
+        if action_state.just_pressed(&Action::Jump) {
+            info!("Jump commanded !");
+        }
+
         if
             action_state.just_pressed(&Action::Jump) &&
             (ground_detection.on_ground || climber.climbing)
@@ -119,37 +210,62 @@ pub(crate) fn movement(
     }
 }
 
+fn copy_ability_action_state<Ability: Actionlike + Copy + Clone + std::fmt::Debug>(
+    mut query: Query<
+        (&mut ActionState<Action>, &mut ActionState<Ability>, &AbilitySlotMap<Ability>)
+    >
+) {
+    for (mut action_state, mut ability_state, ability_slot_map) in query.iter_mut() {
+        for (&slot, &ability) in ability_slot_map.map.iter() {
+            ability_state.set_action_data(
+                ability,
+                action_state.action_data_mut_or_default(&Action::Ability(slot)).clone()
+            );
+        }
+    }
+}
+
+fn report_abilities_used<Ability: Actionlike + std::fmt::Debug>(
+    query: Query<(&Name, &ActionState<Ability>)>
+) {
+    for (name, ability_state) in query.iter() {
+        for ability in ability_state.get_just_pressed() {
+            info!("{} used {:?}", name, ability);
+        }
+    }
+}
+
 pub struct InputPlugin;
 
 impl Plugin for InputPlugin {
     fn build(&self, app: &mut App) {
-        use crate::components;
+        use crate::{
+            components,
+            entities::player, // FIXME: we should remove this dependency
+            plugins::{ dialogueview::not_in_dialogue, gamestate::GameState },
+        };
 
         // Plugins
         app.add_plugins((
             // Action
             InputManagerPlugin::<Action>::default(),
-            // Slot
-            InputManagerPlugin::<Slot>::default(),
-            // Ability
-            InputManagerPlugin::<Ability>::default(),
+            //InputManagerPlugin::<player::Ability>::default(),
         ))
 
             // PreUpdate
-            .add_systems(
-                PreUpdate,
+            .add_systems(PreUpdate, (
+                //copy_ability_action_state::<player::Ability>.after(InputManagerSystem::ManualControl),
                 // This system coordinates the state of our two actions
-                copy_action_state.after(InputManagerSystem::ManualControl)
+                // copy_action_state.after(InputManagerSystem::ManualControl),
                 // ⚠️ NOTE: These systems run during PreUpdate.
                 //
                 // If you have systems that care about inputs and actions that also run during this stage,
                 // you must define an ordering between your systems or behavior will be very erratic.
                 // The stable system sets for these systems are available under InputManagerSystem enum.
-            )
-
-            .add_systems(
-                Update,
-                movement
+                (
+                    movement,
+                    //report_abilities_used::<player::Ability>,
+                )
                     .run_if(not_in_dialogue.and_then(in_state(GameState::Playing)))
                     .after(components::ground::update_on_ground)
                     .after(components::climbing::detect_climb_range)

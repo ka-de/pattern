@@ -1,7 +1,6 @@
 // Import necessary Bevy and Winit types.
 use bevy::{ prelude::NonSend, winit::WinitWindows };
 use winit::window::Icon;
-use std::io;
 
 // Define a function to set the window icon for all windows managed by Bevy.
 pub fn set_window_icon(windows: NonSend<WinitWindows>) {
