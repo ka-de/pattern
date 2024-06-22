@@ -1,5 +1,5 @@
 use bevy::{
-    app::{ App, Plugin, PreUpdate },
+    app::{ App, Plugin, PreUpdate, Update },
     core::Name,
     ecs::{
         bundle::Bundle,
@@ -26,7 +26,7 @@ pub use input_manager::Actionlike;
 use std::collections::HashMap;
 use std::time::Instant;
 
-use crate::{ components::{ climbing::Climber, ground::GroundDetection, swimming::Swimmer } };
+use crate::components::{ climbing::Climber, ground::GroundDetection, swimming::Swimmer };
 
 #[derive(Actionlike, PartialEq, Eq, Hash, Clone, Copy, Debug, Reflect)]
 pub enum Action {
@@ -95,28 +95,28 @@ pub(crate) fn make_action_map<Ability: Actionlike>(
     let input_map = InputMap::new([
         (Action::Jump, KeyCode::Space),
         (Action::Interact, KeyCode::KeyE),
-        // (Action::PRIMARY_ACTION, KeyCode::KeyQ),
-        // (Action::SECONDARY_ACTION, KeyCode::KeyW),
-        // (Action::Ability(2), KeyCode::KeyR),
-        // (Action::Ability(3), KeyCode::KeyT),
-        // (Action::Ability(4), KeyCode::KeyZ),
-        // (Action::Ability(5), KeyCode::KeyX),
-        // (Action::Ability(6), KeyCode::KeyC),
-        // (Action::Ability(7), KeyCode::KeyV),
+        (Action::PRIMARY_ACTION, KeyCode::KeyQ),
+        (Action::SECONDARY_ACTION, KeyCode::KeyW),
+        (Action::Ability(2), KeyCode::KeyR),
+        (Action::Ability(3), KeyCode::KeyT),
+        (Action::Ability(4), KeyCode::KeyZ),
+        (Action::Ability(5), KeyCode::KeyX),
+        (Action::Ability(6), KeyCode::KeyC),
+        (Action::Ability(7), KeyCode::KeyV),
     ])
         .with(Action::Move, dual_axis_pad)
-        .with(Action::Interact, GamepadButtonType::RightTrigger2);
-    // .with(Action::Jump, MouseButton::Left)
-    // .with(Action::Jump, GamepadButtonType::LeftTrigger)
-    // .with(Action::PRIMARY_ACTION, MouseButton::Right)
-    // .with(Action::PRIMARY_ACTION, GamepadButtonType::RightTrigger)
-    // .with(Action::SECONDARY_ACTION, GamepadButtonType::LeftTrigger2)
-    // .with(Action::Ability(2), GamepadButtonType::East) // PS: Circle, Xbox: B
-    // .with(Action::Ability(3), GamepadButtonType::North) // PS: Triangle, Xbox: Y
-    // .with(Action::Ability(4), GamepadButtonType::West) // PS: Square, Xbox: X
-    // .with(Action::Ability(5), GamepadButtonType::South) // PS: Cross, Xbox: A
-    // .with(Action::Ability(6), GamepadButtonType::C)
-    // .with(Action::Ability(7), GamepadButtonType::Z)
+        .with(Action::Interact, GamepadButtonType::RightTrigger2)
+        .with(Action::Jump, MouseButton::Left)
+        .with(Action::Jump, GamepadButtonType::LeftTrigger)
+        .with(Action::PRIMARY_ACTION, MouseButton::Right)
+        .with(Action::PRIMARY_ACTION, GamepadButtonType::RightTrigger)
+        .with(Action::SECONDARY_ACTION, GamepadButtonType::LeftTrigger2)
+        .with(Action::Ability(2), GamepadButtonType::East) // PS: Circle, Xbox: B
+        .with(Action::Ability(3), GamepadButtonType::North) // PS: Triangle, Xbox: Y
+        .with(Action::Ability(4), GamepadButtonType::West) // PS: Square, Xbox: X
+        .with(Action::Ability(5), GamepadButtonType::South) // PS: Cross, Xbox: A
+        .with(Action::Ability(6), GamepadButtonType::C)
+        .with(Action::Ability(7), GamepadButtonType::Z);
 
     info!("input map: {:?}", input_map);
 
@@ -181,11 +181,6 @@ pub(crate) fn movement(
                 velocity.linvel.y = (axis_pair.y() + 0.5) * axis_gain;
             }
         }
-
-        if action_state.just_pressed(&Action::Jump) {
-            info!("Jump commanded !");
-        }
-
         if
             action_state.just_pressed(&Action::Jump) &&
             (ground_detection.on_ground || climber.climbing)
@@ -249,23 +244,20 @@ impl Plugin for InputPlugin {
         app.add_plugins((
             // Action
             InputManagerPlugin::<Action>::default(),
-            //InputManagerPlugin::<player::Ability>::default(),
+            //InputManagerPlugin::<player::Ability>::default(), // I don't think we need this
         ))
 
-            // PreUpdate
-            .add_systems(PreUpdate, (
-                //copy_ability_action_state::<player::Ability>.after(InputManagerSystem::ManualControl),
-                // This system coordinates the state of our two actions
-                // copy_action_state.after(InputManagerSystem::ManualControl),
-                // ⚠️ NOTE: These systems run during PreUpdate.
-                //
-                // If you have systems that care about inputs and actions that also run during this stage,
-                // you must define an ordering between your systems or behavior will be very erratic.
-                // The stable system sets for these systems are available under InputManagerSystem enum.
-                (
-                    movement,
-                    //report_abilities_used::<player::Ability>,
+            // PreUpdate: copy action state from the main action state to the ability one/
+            .add_systems(
+                PreUpdate,
+                copy_ability_action_state::<player::Ability>.after(
+                    InputManagerSystem::ManualControl
                 )
+            )
+            // Update: runs systems consuming the inputs
+            .add_systems(
+                Update,
+                (movement, report_abilities_used::<player::Ability>)
                     .run_if(not_in_dialogue.and_then(in_state(GameState::Playing)))
                     .after(components::ground::update_on_ground)
                     .after(components::climbing::detect_climb_range)
