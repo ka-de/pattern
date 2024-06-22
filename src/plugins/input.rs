@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{ prelude::*, utils::HashMap };
 use bevy_rapier2d::dynamics::Velocity;
 
 use input_manager::plugin::InputManagerSystem;

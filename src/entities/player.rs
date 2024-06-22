@@ -1,13 +1,6 @@
-use bevy::{
-    transform::components::Transform,
-    math::Vec3, // Bleh, math in player! ☠️
-    ecs::{ bundle::Bundle, component::Component, system::{ Query, Res } },
-    sprite::SpriteBundle,
-    gizmos::{ gizmos::Gizmos, config::GizmoConfig },
-    render::color::Color,
-};
+use bevy::prelude::*;
 use bevy_ecs_ldtk::{ EntityInstance, LdtkEntity, Worldly };
-use input_manager::prelude::InputMap;
+use input_manager::prelude::*;
 
 use crate::{
     components::{

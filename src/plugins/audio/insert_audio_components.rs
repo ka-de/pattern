@@ -1,6 +1,12 @@
 use std::time::Duration;
 
-use bevy::prelude::*;
+use bevy::{
+    prelude::*,
+    audio::SpatialScale,
+    audio::Volume,
+    transform::TransformSystem,
+    audio::PlaybackMode,
+};
 use bevy_ecs_ldtk::{ prelude::LdtkFields, EntityInstance };
 use rand::{ Rng, thread_rng };
 

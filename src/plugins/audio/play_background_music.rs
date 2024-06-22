@@ -15,7 +15,7 @@ pub fn play_background_music(asset_server: Res<AssetServer>, mut commands: Comma
     ));
 }
 
-pub fn reset_speed(music_controller: Query<&AudioSink, With<MyMusic>>, time: Res<Time>) {
+pub fn reset_speed(music_controller: Query<&AudioSink, With<BackgroundMusic>>, time: Res<Time>) {
     if let Ok(sink) = music_controller.get_single() {
         sink.set_speed(1.0);
     }
@@ -23,7 +23,7 @@ pub fn reset_speed(music_controller: Query<&AudioSink, With<MyMusic>>, time: Res
 
 fn pause(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    music_controller: Query<&AudioSink, With<MyMusic>>
+    music_controller: Query<&AudioSink, With<BackgroundMusic>>
 ) {
     if keyboard_input.just_pressed(KeyCode::KeyM) {
         if let Ok(sink) = music_controller.get_single() {

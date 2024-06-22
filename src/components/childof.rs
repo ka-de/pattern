@@ -1,4 +1,4 @@
-use bevy::{ ecs::{ entity::Entity, system::Query }, log::debug };
+use bevy::prelude::*;
 use aery::prelude::*;
 
 use super::name::Name;

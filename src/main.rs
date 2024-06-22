@@ -10,7 +10,8 @@ use rand::RngCore;
 // bevy_rand
 use bevy_rand::prelude::{ WyRand, EntropyPlugin, GlobalEntropy };
 
-use bevy::prelude::*;
+use bevy::{ prelude::*, render::RenderPlugin, render::settings::WgpuFeatures };
+
 use plugins::gamestate::GameState;
 
 mod components;
