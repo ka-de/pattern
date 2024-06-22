@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{ audio::{ DefaultSpatialScale, SpatialScale }, prelude::* };
 
 mod delayed_audio_source;
 mod insert_audio_components;

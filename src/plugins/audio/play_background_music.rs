@@ -15,7 +15,7 @@ pub fn play_background_music(asset_server: Res<AssetServer>, mut commands: Comma
     ));
 }
 
-pub fn reset_speed(music_controller: Query<&AudioSink, With<BackgroundMusic>>, time: Res<Time>) {
+pub fn reset_speed(music_controller: Query<&AudioSink, With<BackgroundMusic>>) {
     if let Ok(sink) = music_controller.get_single() {
         sink.set_speed(1.0);
     }
