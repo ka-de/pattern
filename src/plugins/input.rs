@@ -1,8 +1,7 @@
 use bevy::{ prelude::*, utils::HashMap };
 use bevy_rapier2d::dynamics::Velocity;
 
-use input_manager::plugin::InputManagerSystem;
-use input_manager::prelude::*;
+use input_manager::{ plugin::InputManagerSystem, action_state::ActionData, prelude::* };
 use std::time::Instant;
 
 use crate::{
