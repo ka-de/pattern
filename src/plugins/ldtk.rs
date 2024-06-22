@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{ prelude::*, ecs::schedule::SystemConfigs };
 use bevy_asset_loader::asset_collection::AssetCollection;
 use bevy_ecs_ldtk::{
     assets::{ LdtkProject, LevelIndices, LevelMetadataAccessor },
