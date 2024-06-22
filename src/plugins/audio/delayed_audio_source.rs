@@ -1,15 +1,6 @@
 use std::time::Duration;
 
-use bevy::{
-    app::{ App, PostUpdate },
-    asset::{ Asset, Assets, Handle },
-    audio::{ AddAudioSource as _, AudioSource, Decodable, PlaybackMode, PlaybackSettings },
-    ecs::{ component::Component, entity::Entity, system::{ Commands, Query, Res, ResMut } },
-    prelude::IntoSystemConfigs,
-    reflect::TypePath,
-    transform::TransformSystem,
-    log::warn,
-};
+use bevy::prelude::*;
 use rodio::source::{ Delay, Repeat, Source };
 
 /// An asset type that warps an audio source for adding a delay and infinite

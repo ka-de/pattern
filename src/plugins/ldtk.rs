@@ -1,18 +1,4 @@
-use bevy::{
-    asset::{ Assets, Handle },
-    core_pipeline::core_2d::Camera2dBundle,
-    ecs::{
-        entity::Entity,
-        query::{ With, Without },
-        schedule::SystemConfigs,
-        system::{ Commands, Query, Res, ResMut, Resource },
-    },
-    input::{ keyboard::KeyCode, ButtonInput },
-    log,
-    math::{ Rect, Vec2 },
-    prelude::IntoSystemConfigs,
-    transform::components::Transform,
-};
+use bevy::prelude::*;
 use bevy_asset_loader::asset_collection::AssetCollection;
 use bevy_ecs_ldtk::{
     assets::{ LdtkProject, LevelIndices, LevelMetadataAccessor },

@@ -1,8 +1,4 @@
-use bevy::{
-    app::{ App, PreUpdate, Update, PostUpdate },
-    ecs::schedule::{ common_conditions::in_state, OnEnter },
-    prelude::IntoSystemConfigs,
-};
+use bevy::prelude::*;
 use bevy_asset_loader::loading_state::{
     config::{ ConfigureLoadingState, LoadingStateConfig },
     LoadingStateAppExt,
@@ -23,14 +19,21 @@ pub fn setup_world_systems(app: &mut App) {
         LdtkPlugin,
         RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0),
     ))
+
+        // ⚠️ NOTE: Why is the LoadingStateConfig in the SplashScreen GameState?
         .configure_loading_state(
             LoadingStateConfig::new(GameState::SplashScreen).load_collection::<ldtk::LdtkAssets>()
         )
+
+        // PreUpdate
         .add_systems(
             PreUpdate,
             ldtk::level_selection_systems().run_if(in_state(GameState::Playing))
         )
+        // OnEnter(GameState::Playing)
         .add_systems(OnEnter(GameState::Playing), crate::plugins::ldtk::spawn_ldtk_world)
+
+        // Update
         .add_systems(
             Update,
             (
@@ -60,9 +63,8 @@ pub fn setup_world_systems(app: &mut App) {
             ).run_if(in_state(GameState::Playing))
         );
 
-    // ⚠️ NOTE:
-    // 🎥 updates always go to PostUpdate.
-    // If you update the camera on the same frame you update the player position it can cause physics jitters.
+    // PostUpdate
+    // ⚠️ NOTE: 🎥 updates always go to PostUpdate.
     app.add_systems(
         PostUpdate,
         components::camera::fit_inside_current_level.run_if(in_state(GameState::Playing))

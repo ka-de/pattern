@@ -10,26 +10,7 @@ use rand::RngCore;
 // bevy_rand
 use bevy_rand::prelude::{ WyRand, EntropyPlugin, GlobalEntropy };
 
-use bevy::{
-    app::{ App, PreUpdate, Startup, Update },
-    ecs::{
-        component::Component,
-        entity::Entity,
-        query::With,
-        system::{ Commands, Query, Res, ResMut },
-    },
-    log::{ self, debug, trace },
-    prelude::{ IntoSystemConfigs, PluginGroup },
-    render::{
-        settings::{ WgpuFeatures, WgpuSettings },
-        texture::ImagePlugin,
-        view::Msaa,
-        RenderPlugin,
-    },
-    time::Time,
-    utils::default,
-    DefaultPlugins,
-};
+use bevy::prelude::*;
 use plugins::gamestate::GameState;
 
 mod components;
@@ -39,6 +20,7 @@ mod plugins;
 
 //use bevy_tweening::*;
 
+/*
 // 🧠
 use big_brain::{
     prelude::{
@@ -56,6 +38,7 @@ use big_brain::{
     BigBrainSet,
     BigBrainPlugin,
 };
+*/
 
 // ✨ - ?
 // ✨ - Ray Marching
@@ -69,12 +52,6 @@ use bevy_incandescent::{
 // ✨ - Particle effects
 // ⚠️ TODO: Move to plugin or something?
 //use bevy_hanabi::prelude::*;
-
-use crate::components::ai::{
-    thirst::thirst_system,
-    scorers::thirsty::thirsty_scorer_system,
-    actions::drink::drink_action_system,
-};
 
 // ⚠️ TODO: Move this with Game Settings
 use components::settings::GameSettings;

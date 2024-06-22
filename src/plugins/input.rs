@@ -1,21 +1,8 @@
-use bevy::{
-    app::{ App, Plugin, Update, PreUpdate },
-    ecs::{ component::Component, query::With, system::{ Query, Res } },
-    input::keyboard::KeyCode,
-    prelude::{ DerefMut, Deref, in_state, Condition, IntoSystemConfigs as _ },
-    reflect::Reflect,
-    time::{ Real, Time },
-    utils::HashMap,
-};
+use bevy::prelude::*;
 use bevy_rapier2d::dynamics::Velocity;
-use input_manager::{
-    action_state::ActionData,
-    axislike::VirtualDPad,
-    input_processing::WithDualAxisProcessingPipelineExt,
-    plugin::InputManagerPlugin,
-    plugin::InputManagerSystem,
-    Actionlike,
-};
+
+use input_manager::plugin::InputManagerSystem;
+use input_manager::prelude::*;
 use std::time::Instant;
 
 use crate::{
@@ -33,68 +20,6 @@ pub enum Action {
 
 pub(crate) type InputMap = input_manager::prelude::InputMap<Action>;
 pub(crate) type ActionState = input_manager::prelude::ActionState<Action>;
-
-#[derive(Actionlike, PartialEq, Eq, Clone, Debug, Hash, Copy, Reflect)]
-pub enum Slot {
-    Primary,
-    Secondary,
-    Ability1,
-    Ability2,
-    Ability3,
-    Ability4,
-}
-
-impl Slot {
-    /// You could use the `strum` crate to derive this automatically!
-    fn variants() -> impl Iterator<Item = Slot> {
-        use Slot::*;
-        [Primary, Secondary, Ability1, Ability2, Ability3, Ability4].iter().copied()
-    }
-}
-
-// The list of possible abilities is typically longer than the list of slots
-#[derive(Actionlike, PartialEq, Eq, Hash, Clone, Debug, Copy, Reflect)]
-pub enum Ability {
-    Slash,
-    Shoot,
-    Something,
-    Another,
-    Dash,
-    Heal,
-    Placeholder,
-    Run,
-}
-
-/// This struct stores which ability corresponds to which slot for a particular player
-#[derive(Component, Debug, Default, Deref, DerefMut, Reflect, Clone)]
-pub struct AbilitySlotMap {
-    pub map: HashMap<Slot, Ability>,
-}
-
-fn copy_action_state(
-    mut query: Query<(&mut ActionState<Slot>, &mut ActionState<Ability>, &AbilitySlotMap)>
-) {
-    for (mut slot_state, mut ability_state, ability_slot_map) in query.iter_mut() {
-        for slot in Slot::variants() {
-            if let Some(matching_ability) = ability_slot_map.get(&slot) {
-                // This copies the `ActionData` between the ActionStates,
-                // including information about how long the buttons have been pressed or released
-                ability_state.set_action_data(
-                    *matching_ability,
-                    slot_state.action_data_mut_or_default(&slot).clone()
-                );
-            }
-        }
-    }
-}
-
-fn debug_abilities_used(query: Query<&ActionState<Ability>>) {
-    for ability_state in query.iter() {
-        for ability in ability_state.get_just_pressed() {
-            dbg!(ability);
-        }
-    }
-}
 
 pub(crate) fn make_action_map() -> InputMap {
     let dual_axis_pad = VirtualDPad::wasd()
@@ -119,13 +44,13 @@ pub(crate) fn make_action_map() -> InputMap {
 // Velocity in px/s for full gamepad range
 const AXIS_GAIN: f32 = 200.0;
 
-#[derive(Copy, Clone, Debug, Reflect)]
+#[derive(Copy, Clone, Debug)]
 pub(crate) struct ActionTimer {
     pub count: u32,
     pub last_pressed: Instant,
 }
 
-#[derive(Component, Default, Clone, Reflect)]
+#[derive(Component, Default, Clone)]
 pub(crate) struct ActionTimers(pub HashMap<Action, ActionTimer>);
 
 pub(crate) fn movement(
@@ -205,30 +130,26 @@ impl Plugin for InputPlugin {
         app.add_plugins((
             // Action
             InputManagerPlugin::<Action>::default(),
-            // Add `Slot` why not!
+            // Slot
             InputManagerPlugin::<Slot>::default(),
             // Ability
             InputManagerPlugin::<Ability>::default(),
         ))
 
             // PreUpdate
-            // This system coordinates the state of our two actions
-            .add_systems(PreUpdate, copy_action_state.after(InputManagerSystem::ManualControl))
-
-            // Update
-            .add_systems(Update, (
+            .add_systems(PreUpdate, (
+                // This system coordinates the state of our two actions
+                copy_action_state.after(InputManagerSystem::ManualControl),
+                // ⚠️ NOTE: These systems run during PreUpdate.
+                //
+                // If you have systems that care about inputs and actions that also run during this stage,
+                // you must define an ordering between your systems or behavior will be very erratic.
+                // The stable system sets for these systems are available under InputManagerSystem enum.
                 movement
                     .run_if(not_in_dialogue.and_then(in_state(GameState::Playing)))
                     .after(components::ground::update_on_ground)
                     .after(components::climbing::detect_climb_range)
                     .after(components::swimming::detect_swim_range),
-                // Q -
-                // W -
-                // E -
-                // R -
-                // F -
-                // Shift - Run
-                debug_abilities_used,
             ));
     }
 }
