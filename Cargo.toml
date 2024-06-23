@@ -76,8 +76,6 @@ bevy_rand = { git = "https://github.com/ka-de/bevy_rand", features = [
 input-manager = { git = "https://github.com/ka-de/input-manager", features = [
   "timing",
   "ui",
-  "egui",
-  "asset",
 ] }
 aery = { git = "https://github.com/ka-de/aery" }
 bevy_vector_shapes = { git = "https://github.com/ka-de/bevy_vector_shapes" }
