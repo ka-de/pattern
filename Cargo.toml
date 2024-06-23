@@ -73,7 +73,12 @@ bevy_rand = { git = "https://github.com/ka-de/bevy_rand", features = [
   "wyrand",
   "serialize",
 ] }
-input-manager = { git = "https://github.com/ka-de/input-manager", rev = "bac1c135" }
+input-manager = { git = "https://github.com/ka-de/input-manager", features = [
+  "timing",
+  "ui",
+  "egui",
+  "asset",
+] }
 aery = { git = "https://github.com/ka-de/aery" }
 bevy_vector_shapes = { git = "https://github.com/ka-de/bevy_vector_shapes" }
 # pathfinding = { git = "https://github.com/ka-de/pathfinding" }
