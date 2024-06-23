@@ -67,89 +67,6 @@ fn print_random_value(mut rng: ResMut<GlobalEntropy<WyRand>>) {
     println!("Random value: {}", rng.next_u32());
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
-/// STATE
-use crate::entities::Player;
-
-// Entities in the `Idle` state do nothing
-#[derive(Clone, Component)]
-#[component(storage = "SparseSet")]
-struct Idle;
-
-// Entities in the `Follow` state move toward the given entity at the given speed
-#[derive(Clone, Component)]
-#[component(storage = "SparseSet")]
-struct Follow {
-    target: Entity,
-    speed: f32,
-}
-
-// Let's define some behavior for entities in the follow state
-fn follow(
-    mut transforms: Query<&mut Transform>,
-    follows: Query<(Entity, &Follow)>,
-    time: Res<Time>
-) {
-    for (entity, follow) in &follows {
-        // Get the positions of the follower and target
-        let target_translation = transforms.get(follow.target).unwrap().translation;
-        let follow_transform = &mut transforms.get_mut(entity).unwrap();
-        let follow_translation = follow_transform.translation;
-
-        // Find the direction from the follower to the target and go that way
-        follow_transform.translation +=
-            (target_translation - follow_translation).normalize_or_zero() *
-            follow.speed *
-            time.delta_seconds();
-    }
-}
-
-// For the sake of example, this is a function that returns the `near_player` trigger from before.
-// This may be useful so that triggers that accept case-by-case values may be used across the
-// codebase. Triggers that don't need to accept any values from local code may be defined as normal
-// Bevy systems (see the `done` example). Also consider implementing the `Trigger` trait directly.
-#[allow(dead_code)]
-fn near(target: Entity) -> impl Trigger<Out = Result<f32, f32>> {
-    (move |In(entity): In<Entity>, transforms: Query<&Transform>| {
-        let distance = transforms
-            .get(target)
-            .unwrap()
-            .translation.truncate()
-            .distance(transforms.get(entity).unwrap().translation.truncate());
-
-        // Check whether the target is within range. If it is, return `Ok` to trigger!
-        match distance <= 300.0 {
-            true => Ok(distance),
-            false => Err(distance),
-        }
-    }).into_trigger()
-}
-
-fn state(player_query: Query<&Transform, With<Player>>) {
-    // This is our trigger, which is a Bevy system that returns a `bool`, `Option`, or `Result`. We
-    // define the trigger as a closure within this function so it can use variables in the scope
-    // (namely, `player`). For the sake of example, we also define this trigger as an external
-    // function later.
-    //
-    // Triggers are reinitialized after each transition, so they won't read events that occurred in a
-    // previous state, `Local`s are reset between transitions, etc.
-    let near_player = move |In(entity): In<Entity>, transforms: Query<&Transform>| {
-        let distance = transforms
-            .get(player)
-            .unwrap()
-            .translation.truncate()
-            .distance(transforms.get(entity).unwrap().translation.truncate());
-
-        // Check whether the target is within range. If it is, return `Ok` to trigger!
-        match distance <= 300.0 {
-            true => Ok(distance),
-            false => Err(distance),
-        }
-    };
-}
-
-///////////////////////////////////////////////////////////////////////////////////////
-
 fn main() {
     #[cfg(not(feature = "dev_features"))] // ⚠️ TODO: At some point we will need to dev with Steam.
     if std::env::var_os("NO_STEAM") == None {
@@ -225,8 +142,6 @@ fn main() {
 
         //.add_systems(Startup, print_random_value)
 
-        // Update
-        .add_systems(Update, follow)
         // Debug plugin comes last, allowing to inspect the final app state.
         .add_plugins(plugins::debug::plugin);
 
