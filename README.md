@@ -30,6 +30,7 @@ SEPARATED is a 2D platformer game where you can talk to NPCs.
     - [Test with all features enabled](#test-with-all-features-enabled)
     - [Test with all features enabled on nightly](#test-with-all-features-enabled-on-nightly)
     - [Generate documentation with all features enabled](#generate-documentation-with-all-features-enabled)
+  - [`seldom_state` + `input_manager` Example](#seldom_state--input_manager-example)
 
 ## Player Inputs ∆
 
