@@ -156,7 +156,7 @@ fn toggle(
 
 ---
 
-You can render graphs of the engine if you set the `RENDER_GRAPHS` environment variable `true`. By default it will output `.dot`, `.svg` and `.png` formats for each possible graphs.
+You can render graphs of the engine if you set the `RENDER_GRAPHS` environment variable `true`. By default it will output `.dot`, `.svg` and `.png` formats for each possible graphs in the `./docs` folder, but it takes a long time so only do this if you like looking at game engines naked!
 
 Bash:
 
