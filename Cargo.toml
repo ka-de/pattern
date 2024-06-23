@@ -80,9 +80,7 @@ bevy_vector_shapes = { git = "https://github.com/ka-de/bevy_vector_shapes" }
 big-brain = { git = "https://github.com/ka-de/big-brain" }
 bevy_mod_debugdump = { git = "https://github.com/ka-de/bevy_mod_debugdump", optional = true }
 graphviz-rust = { version = "0.9.0", optional = true }
-seldom_state = { git = "https://github.com/ka-de/seldom_state", features = [
-  "leafwing_input",
-] }
+seldom_state = { git = "https://github.com/ka-de/seldom_state" }
 # bevy_text_input = { git = "https://github.com/ka-de/bevy_text_input" }
 # bevy_flurx = { git = "https://github.com/ka-de/bevy_flurx" }
 # bevy_magic_light_2d = { git = "https://github.com/ka-de/bevy_magic_light_2d" }

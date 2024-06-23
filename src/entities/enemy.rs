@@ -17,4 +17,5 @@ pub struct EnemyBundle {
     #[ldtk_entity]
     pub predefined_path: PredefinedPath,
     pub line_of_sight: LineOfSight<super::player::Player>,
+    pub follow: Follow,
 }
