@@ -1,4 +1,4 @@
-# LDtk
+# `bevy_ecs_ldtk`
 
 ---
 
