@@ -1,4 +1,3 @@
-# Ignore everything in this directory
-*
-# Except this file
-!.gitignore
+# Ignore everything that is not a `.dot` in the graphs directory.
+/graphs/*.png
+/graphs/*.svg

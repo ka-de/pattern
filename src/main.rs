@@ -67,6 +67,11 @@ fn print_random_value(mut rng: ResMut<GlobalEntropy<WyRand>>) {
     println!("Random value: {}", rng.next_u32());
 }
 
+// 🌍 - Localization
+fn get_device_language() {
+    info!("Device language is {}", bevy_device_lang::get_lang());
+}
+
 fn main() {
     #[cfg(not(feature = "dev_features"))] // ⚠️ TODO: At some point we will need to dev with Steam.
     if std::env::var_os("NO_STEAM") == None {
@@ -139,6 +144,9 @@ fn main() {
 
         // Startup
         .add_systems(Startup, set_window_icon) // Set the Window icon.
+        // ⚠️ TODO: A proper system that saves this value and allows the player to change it.
+        //          Requires start of working on localization and saving and loading settings.
+        .add_systems(Startup, get_device_language) // Get the device language.
 
         //.add_systems(Startup, print_random_value)
 

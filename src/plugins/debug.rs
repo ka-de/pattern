@@ -93,7 +93,7 @@ fn render_render_graph(app: &mut App) -> IoResult {
     let settings = bevy_mod_debugdump::render_graph::Settings::default();
 
     let graph_str = bevy_mod_debugdump::render_graph_dot(app, &settings);
-    render_graph(graph_str, "docs/render")?;
+    render_graph(graph_str, "docs/graph/render")?;
     Ok(())
 }
 
@@ -105,7 +105,7 @@ fn render_schedules_graphs(
     let settings = bevy_mod_debugdump::schedule_graph::Settings::default();
 
     for &label in schedules.as_ref() {
-        let stem = format!("docs/{:?}-schedule", label);
+        let stem = format!("docs/graph/{:?}-schedule", label);
         let graph_str = bevy_mod_debugdump::schedule_graph_dot(app, label, &settings);
         render_graph(graph_str, stem)?;
     }
