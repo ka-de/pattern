@@ -18,16 +18,23 @@ unsafe_code = "warn"
 [workspace]
 resolver = "2"
 
+# Enable all compiler optimizations in debug builds.
 [profile.dev]
-opt-level = 1
+opt-level = 3
 
+# Enable all compiler optimizations for dependencies in debug builds.
+# With some link time optimizations, it might produce better optimized
+# code, using whole-program analysis, at the cost of longer linking time.
 [profile.dev.package."*"]
 opt-level = 3
 codegen-units = 1
 
+# Enable every possible compiler optimizations and stripping for release builds.
 [profile.release]
+opt-level = 3
+lto = true
 codegen-units = 1
-lto = "thin"
+strip = true
 
 [features]
 # Build release with `cargo build --release --no-default-features`
