@@ -69,7 +69,7 @@ fn print_random_value(mut rng: ResMut<GlobalEntropy<WyRand>>) {
 
 // 🌍 - Localization
 fn get_device_language() {
-    info!("Device language is {}", bevy_device_lang::get_lang());
+    info!("Device language is {:?}", bevy_device_lang::get_lang());
 }
 
 fn main() {

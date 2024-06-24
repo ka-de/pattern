@@ -13,7 +13,7 @@ fn bevy_system() {
 }
 
 fn get_device_language() {
-    info!("Device language is {}", bevy_device_lang::get_lang());
+    info!("Device language is {:?}", bevy_device_lang::get_lang());
 }
 
     add_systems(Startup, get_device_language)
