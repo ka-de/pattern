@@ -4,7 +4,7 @@
 
 ## Introduction
 
-SEPARATED is a 2D platformer game where you can talk to NPCs.
+SEPARATED is a 2D platformer game where you can talk to NPCs. Most of the game is not yet implemented.
 
 ## Table of Contents
 

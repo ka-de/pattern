@@ -84,19 +84,19 @@ fn make_state_machine(_: &EntityInstance) -> StateMachine {
 // Entities in the `Idle` state do nothing
 #[derive(Clone, Component, Default)]
 #[component(storage = "SparseSet")]
-struct Idle;
+pub struct Idle;
 
 // Entities in the `Follow` state move toward the given entity at the given speed
 #[derive(Clone, Component)]
 #[component(storage = "SparseSet")]
-struct Follow {
-    target: Entity,
-    speed: f32,
+pub struct Follow {
+    pub target: Entity,
+    pub speed: f32,
 }
 
 // Let's define some behavior for entities in the follow state
 // FIXME: should be adapted to switch between patrol mode Idle state, and pathfinding follow during ()
-fn follow(
+pub fn follow(
     mut transforms: Query<&mut Transform>,
     follows: Query<(Entity, &Follow)>,
     time: Res<Time>
