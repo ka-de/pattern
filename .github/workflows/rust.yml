@@ -34,3 +34,15 @@ jobs:
               run: cargo build --features "bevy/dynamic_linking" --verbose
             - name: Run tests
               run: cargo test --features "bevy/dynamic_linking" --verbose
+            - name: Pedantic Linting
+              run: cargo clippy -- -W clippy::pedantic
+            - name: Package Debug Build
+              run: |
+                  DATE=$(date +%Y-%m-%d)
+                  COMMIT_HASH=$(git rev-parse --short "$GITHUB_SHA")
+                  zip -r "separated-debug-build-${DATE}-${COMMIT_HASH}.zip" target/debug/
+            - name: Upload Debug Build
+              uses: actions/upload-artifact@v2
+              with:
+                  name: Debug Build
+                  path: "*.zip"
