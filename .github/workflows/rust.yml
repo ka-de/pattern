@@ -28,7 +28,9 @@ jobs:
                       ${{ runner.os }}-cargo
             - name: Install dependencies
               run: sudo apt-get install -y clang pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev libxkbcommon-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev mesa-vulkan-drivers
-            - name: Build
+            - name: Cargo Update
+              run: cargo update --verbose
+            - name: Build Debug
               run: cargo build --features "bevy/dynamic_linking" --verbose
             - name: Run tests
               run: cargo test --features "bevy/dynamic_linking" --verbose
