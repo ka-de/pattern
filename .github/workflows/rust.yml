@@ -33,7 +33,7 @@ jobs:
             - name: Build Debug
               run: cargo build --features "bevy/dynamic_linking" --verbose
             - name: Run tests
-              run: cargo test --features "bevy/dynamic_linking" --verbose
+              run: cargo test --features "bevy/dynamic_linking" --all-targets --verbose
             - name: Pedantic Linting
               run: cargo clippy -- -W clippy::pedantic
 #            - name: Package Debug Build
