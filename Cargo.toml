@@ -1,3 +1,5 @@
+cargo-features = ["profile-rustflags"]
+
 [package]
 name = "separated"
 version = "1.0.0"
@@ -19,6 +21,7 @@ unsafe_code = "warn"
 resolver = "2"
 
 [profile.miri]
+inherits = "dev"
 opt-level = 0
 debug = true
 debug-assertions = true
@@ -27,7 +30,6 @@ lto = false
 panic = 'unwind'
 incremental = true
 codegen-units = 16
-rustflags = ["-Zmiri-disable-isolation"]
 
 # Enable all compiler optimizations in debug builds.
 [profile.dev]
