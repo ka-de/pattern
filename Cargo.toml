@@ -18,6 +18,17 @@ unsafe_code = "warn"
 [workspace]
 resolver = "2"
 
+[profile.miri]
+opt-level = 0
+debug = true
+debug-assertions = true
+overflow-checks = true
+lto = false
+panic = 'unwind'
+incremental = true
+codegen-units = 16
+rustflags = ["-Zmiri-disable-isolation"]
+
 # Enable all compiler optimizations in debug builds.
 [profile.dev]
 opt-level = 3
