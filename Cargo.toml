@@ -20,7 +20,7 @@ unsafe_code = "warn"
 [workspace]
 resolver = "2"
 
-[profile.debug]
+[profile.awoo]
 inherits = "dev"
 opt-level = 0
 debug = true
