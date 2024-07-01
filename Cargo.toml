@@ -20,7 +20,7 @@ unsafe_code = "warn"
 [workspace]
 resolver = "2"
 
-[profile.miri]
+[profile.debug]
 inherits = "dev"
 opt-level = 0
 debug = true
